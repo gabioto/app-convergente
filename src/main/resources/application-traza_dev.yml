@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: trazabilidad-autogestion
+  jpa:
+    hibernate:
+      use-new-id-generator-mappings: true
+    show-sql: false
+    properties:
+      hibernate:
+        temp:
+          use_jdbc_metadata_defaults : false
+        jdbc:
+          batch_size: 5
+        default_schema: esqfcrautogestion
+    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
+  datasource:
+    hikari:
+      connectionTimeout: 20000
+      maximumPoolSize: 5
+    url: jdbc:postgresql://sl-us-south-1-portal.54.dblayer.com:23239/compose
+    username: admin
+    password: GNTVLIQEAIPDVGTT
+  kafka:
+    bootstrap-servers: cap-sg-prd-1.securegateway.appdomain.cloud:18007 
+app:
+  topic:
+    foo: queue-notification-tickets
+  oauth:
+    url: https://api.us-east.apiconnect.ibmcloud.com/telefonica-del-peru-development/ter/public/oauth2/token
+    client: afc1075e-69a4-40dc-809a-11e498cea9af
+  ticket:
+    create: https://api.us-east.apiconnect.ibmcloud.com/telefonica-del-peru-development/ter/triagefcr/createticket/tickets
+    retrieve: https://api.us-east.apiconnect.ibmcloud.com/telefonica-del-peru-development/ter/triagefcr/retrieveticket/tickets/
+    client: afc1075e-69a4-40dc-809a-11e498cea9af
+logging:
+  level:
+    com.tdp.ms.autogestion: DEBUG
