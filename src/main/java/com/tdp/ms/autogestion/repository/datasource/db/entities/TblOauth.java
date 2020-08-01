@@ -13,7 +13,7 @@ import javax.persistence.Table;
 import com.tdp.ms.autogestion.model.OAuth;
 
 @Entity
-@Table(name="tbl_oauth")
+@Table(name="tbl_oauth", schema="public")
 @NamedQuery(name="TblOauth.findAll", query="SELECT t FROM TblOauth t")
 public class TblOauth implements Serializable {
 

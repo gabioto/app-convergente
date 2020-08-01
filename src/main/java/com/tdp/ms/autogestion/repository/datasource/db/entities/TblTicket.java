@@ -32,7 +32,7 @@ import com.tdp.ms.autogestion.util.DateUtil;
  * , schema = "esqfcrautogestion"
  */
 @Entity
-@Table(name = "tbl_ticket")
+@Table(name = "tbl_ticket", schema="public")
 @NamedQuery(name = "TblTicket.findAll", query = "SELECT t FROM TblTicket t")
 public class TblTicket implements Serializable {
 	private static final long serialVersionUID = 1L;

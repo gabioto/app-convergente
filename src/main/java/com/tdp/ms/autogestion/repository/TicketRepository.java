@@ -10,4 +10,6 @@ public interface TicketRepository {
 	void saveGeneratedTicket(Ticket pTicket);
 	
 	Ticket getTicketStatus(String idTicket);
+	
+	
 }
