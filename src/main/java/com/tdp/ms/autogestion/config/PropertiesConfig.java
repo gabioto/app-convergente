@@ -30,8 +30,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Component
-//@Configuration
-//@ConfigurationProperties(prefix = "")
 public class PropertiesConfig {
 	
 	@Value("${app.oauth.url}")

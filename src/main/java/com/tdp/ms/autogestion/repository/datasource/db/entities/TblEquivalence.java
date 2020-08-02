@@ -9,7 +9,7 @@ import javax.persistence.*;
  * 
  */
 @Entity
-@Table(name="tbl_equivalence", schema="public")
+@Table(name="tbl_equivalence")
 @NamedQuery(name="TblEquivalence.findAll", query="SELECT t FROM TblEquivalence t")
 public class TblEquivalence implements Serializable {
 	private static final long serialVersionUID = 1L;

@@ -9,7 +9,7 @@ import javax.persistence.*;
  * 
  */
 @Entity
-@Table(name="tbl_equivalence_notification", schema="public")
+@Table(name="tbl_equivalence_notification")
 @NamedQuery(name="TblEquivalenceNotification.findAll", query="SELECT t FROM TblEquivalenceNotification t")
 public class TblEquivalenceNotification implements Serializable {
 	private static final long serialVersionUID = 1L;

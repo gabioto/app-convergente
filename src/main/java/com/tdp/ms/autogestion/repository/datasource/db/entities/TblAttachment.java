@@ -25,7 +25,7 @@ import org.hibernate.annotations.LazyCollectionOption;
  * 
  */
 @Entity
-@Table(name = "tbl_attachment", schema="public")
+@Table(name = "tbl_attachment")
 @NamedQuery(name = "TblAttachment.findAll", query = "SELECT t FROM TblAttachment t")
 public class TblAttachment implements Serializable {
 	private static final long serialVersionUID = 1L;

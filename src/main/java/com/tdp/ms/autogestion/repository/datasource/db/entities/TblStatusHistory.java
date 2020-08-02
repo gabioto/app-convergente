@@ -20,7 +20,7 @@ import javax.persistence.Table;
  * 
  */
 @Entity
-@Table(name = "tbl_status_history", schema="public")
+@Table(name = "tbl_status_history")
 @NamedQuery(name = "TblStatusHistory.findAll", query = "SELECT t FROM TblStatusHistory t")
 public class TblStatusHistory implements Serializable {
 	private static final long serialVersionUID = 1L;
