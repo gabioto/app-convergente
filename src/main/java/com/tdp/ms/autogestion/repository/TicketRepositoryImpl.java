@@ -85,13 +85,15 @@ public class TicketRepositoryImpl implements TicketRepository {
 	@Override
 	public List<TblEquivalence> getEquivalence(int idTicket) {
 		
-		return jpaEquivalenceRepository.getEquivalence(idTicket);
+		Optional<List<TblEquivalence>> list = jpaEquivalenceRepository.getEquivalence(idTicket);;
+		return list.get();
 	}
 
 	@Override
 	public TblEquivalenceNotification getEquivalenceNotification(String code) {
-	
-		return jpaEquivalenceNotificationRepository.getEquivalence(code);
+		Optional<TblEquivalenceNotification> tblEquivalenceNotification = jpaEquivalenceNotificationRepository.getEquivalence(code);
+		
+		return tblEquivalenceNotification.get();
 	}
 
 }
