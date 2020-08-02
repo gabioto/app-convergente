@@ -81,8 +81,6 @@ public class CreateTicketUsecaseImpl implements CreateTicketUseCase  {
 			ticketRepository.saveGeneratedTicket(ticket);
 
 			return new ResponseEntity<>(TicketCreateResponse.from(ticket), HttpStatus.OK);
-//		} catch (GenesisException e) {
-//			throw e;
 		} catch (Exception e) {
 			throw e;
 		}
