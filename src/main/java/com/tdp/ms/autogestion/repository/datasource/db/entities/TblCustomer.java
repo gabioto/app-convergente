@@ -17,7 +17,7 @@ import com.tdp.ms.autogestion.model.Customer;
  * 
  */
 @Entity
-@Table(name="tbl_customer")
+@Table(name="tbl_customer", schema="public")
 @NamedQuery(name="TblCustomer.findAll", query="SELECT t FROM TblCustomer t")
 public class TblCustomer implements Serializable {
 	private static final long serialVersionUID = 1L;

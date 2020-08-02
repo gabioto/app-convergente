@@ -13,7 +13,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="tbl_log_data")
+@Table(name="tbl_log_data", schema="public")
 @NamedQuery(name="TblLogData.findAll", query="SELECT t FROM TblLogData t")
 public class TblLogData implements Serializable {
 	private static final long serialVersionUID = 1L;
