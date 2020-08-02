@@ -1,5 +1,7 @@
 package com.tdp.ms.autogestion.repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.logging.Log;
@@ -12,8 +14,12 @@ import com.tdp.ms.autogestion.model.Ticket;
 import com.tdp.ms.autogestion.repository.datasource.api.TicketApi;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaCustomerRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaTicketRepository;
+import com.tdp.ms.autogestion.repository.datasource.db.JpaEquivalenceRepository;
+import com.tdp.ms.autogestion.repository.datasource.db.JpaEquivalenceNotificationRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblCustomer;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblCustomerPK;
+import com.tdp.ms.autogestion.repository.datasource.db.entities.TblEquivalence;
+import com.tdp.ms.autogestion.repository.datasource.db.entities.TblEquivalenceNotification;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblTicket;
 
 @Repository
@@ -30,6 +36,12 @@ public class TicketRepositoryImpl implements TicketRepository {
 	
 	@Autowired
 	private JpaTicketRepository jpaTicketRepository;
+	
+	@Autowired
+	private JpaEquivalenceRepository jpaEquivalenceRepository;
+	
+	@Autowired
+	private JpaEquivalenceNotificationRepository jpaEquivalenceNotificationRepository;
 
 	@Override
 	public Ticket generateTicket(OAuth pOAuth, Ticket pTicket) {
@@ -61,6 +73,27 @@ public class TicketRepositoryImpl implements TicketRepository {
 	public Ticket getTicketStatus(String idTicket) {
 //		jpaTicketRepository.getTicketStatus(Integer.parseInt(idTicket));
 		return null;
+	}
+
+	@Override
+	public List<TblTicket> findByCustomerAndUseCase(String docType, String docNumber, String reference,
+			String involvement, LocalDateTime creationDate, LocalDateTime endDate) {
+		return jpaTicketRepository.findByCustomerAndUseCase(docType, docNumber, reference, involvement, creationDate, endDate);
+		
+	}
+
+	@Override
+	public List<TblEquivalence> getEquivalence(int idTicket) {
+		
+		Optional<List<TblEquivalence>> list = jpaEquivalenceRepository.getEquivalence(idTicket);;
+		return list.get();
+	}
+
+	@Override
+	public TblEquivalenceNotification getEquivalenceNotification(String code) {
+		Optional<TblEquivalenceNotification> tblEquivalenceNotification = jpaEquivalenceNotificationRepository.getEquivalence(code);
+		
+		return tblEquivalenceNotification.get();
 	}
 
 }
