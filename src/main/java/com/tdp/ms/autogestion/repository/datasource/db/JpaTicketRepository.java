@@ -38,7 +38,7 @@ public interface JpaTicketRepository extends JpaRepository<TblTicket, Integer> {
 			+ "AND t.involvement = ?4 "
 			+ "AND t.creationDate >= ?5 AND t.creationDate < ?6 "
 			+ "ORDER BY t.creationDate ASC")
-	Optional<List<TblTicket>> findByCustomerAndUseCase(String docType, String docNumber,
+	List<TblTicket> findByCustomerAndUseCase(String docType, String docNumber,
 			String reference, String involvement, LocalDateTime creationDate, LocalDateTime endDate);
 
 	@Query					

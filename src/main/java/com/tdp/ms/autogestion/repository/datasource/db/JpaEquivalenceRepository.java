@@ -31,5 +31,5 @@ public interface JpaEquivalenceRepository extends JpaRepository<TblEquivalence, 
 	(value = "SELECT te FROM TblEquivalence te "
 			+ "JOIN TblAttachment ta ON ta.nameAttachment = te.attachmentName "
 			+ "WHERE ta.tblTicket.idTicket = ?1 ORDER BY ta.idAttachmentKafka ASC")
-	Optional<List<TblEquivalence>> getEquivalence(int idTicket);	
+	List<TblEquivalence> getEquivalence(int idTicket);	
 }

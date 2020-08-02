@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.tdp.ms.autogestion.business.CreateTicketUseCase;
 import com.tdp.ms.autogestion.model.TicketCreateRequest;
 import com.tdp.ms.autogestion.model.TicketCreateResponse;
+import com.tdp.ms.autogestion.model.TicketRetrieveRequest;
+import com.tdp.ms.autogestion.model.TicketStatusResponse;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -21,11 +23,22 @@ public class TicketController {
 
 	@Autowired
 	private CreateTicketUseCase createTicketUseCase;
-	
+
 	// Creación de ticket
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<TicketCreateResponse> createTicket(@RequestBody TicketCreateRequest request) {
 		return createTicketUseCase.createTicket(request);
+	}
+
+	// Consulta de bandeja
+	@ResponseStatus(HttpStatus.OK)
+	@PostMapping("/retrieveTickets")
+	public ResponseEntity<TicketStatusResponse> retrieveTickets(@RequestBody TicketRetrieveRequest request) {
+		return createTicketUseCase.pendingTicket(request);
+		// return Mono.justOrEmpty(ticketService.pendingTicket(request));
+
+		// return
+		// ResponseEntity.status(status).body(ticketService.pendingTicket(request));
 	}
 }

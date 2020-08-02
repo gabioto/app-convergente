@@ -29,5 +29,5 @@ public interface JpaEquivalenceNotificationRepository extends JpaRepository<TblE
 	@Query					
 	(value = "SELECT ten FROM TblEquivalenceNotification ten "			
 			+ "WHERE ten.code = ?1")
-	Optional<TblEquivalenceNotification> getEquivalence(String code);	
+	TblEquivalenceNotification getEquivalence(String code);	
 }	
