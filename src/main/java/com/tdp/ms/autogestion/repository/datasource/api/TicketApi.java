@@ -20,6 +20,7 @@ import com.tdp.ms.autogestion.model.OAuth;
 import com.tdp.ms.autogestion.model.Ticket;
 import com.tdp.ms.autogestion.repository.datasource.api.entities.TicketApiRequest;
 import com.tdp.ms.autogestion.repository.datasource.api.entities.TicketApiResponse;
+import com.tdp.ms.autogestion.util.FunctionsUtil;
 import com.tdp.ms.autogestion.util.SSLClientFactory;
 import com.tdp.ms.autogestion.util.SSLClientFactory.HttpClientType;
 
@@ -31,6 +32,9 @@ public class TicketApi {
 
 	@Autowired
 	private PropertiesConfig config;
+
+	@Autowired
+	private FunctionsUtil functionsUtil;
 
 	public Ticket generate(OAuth pOAuth, Ticket pTicket) {
 		RestTemplate restTemplate = new RestTemplate(
@@ -61,11 +65,20 @@ public class TicketApi {
 			if (ticketResponse != null && ticketResponse.getId() != null) {
 				return ticketResponse.fromThis(pTicket);
 			} else {
+				functionsUtil.saveLogData(0, pTicket.getCustomer().getNationalId(),
+						pTicket.getCustomer().getNationalType(), pTicket.getChannelId(), "ERROR", new Gson().toJson(entity),
+						"TicketResponse inválido", "generateTicekt");
 				throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		} catch (HttpClientErrorException e) {
+			functionsUtil.saveLogData(0, pTicket.getCustomer().getNationalId(),
+					pTicket.getCustomer().getNationalType(), pTicket.getChannelId(), "ERROR", new Gson().toJson(entity),
+					e.getLocalizedMessage(), "generateTicekt");
 			throw e;
 		} catch (Exception e) {
+			functionsUtil.saveLogData(0, pTicket.getCustomer().getNationalId(),
+					pTicket.getCustomer().getNationalType(), pTicket.getChannelId(), "ERROR", new Gson().toJson(entity),
+					e.getLocalizedMessage(), "generateTicekt");
 			throw e;
 		}
 	}
