@@ -2,7 +2,6 @@ package com.tdp.ms.autogestion.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
 
@@ -30,4 +29,5 @@ public interface TicketRepository {
 	
 	ResponseEntity<TicketStatusResponse> updateTicketStatus(int idTicket, String status);
 
+	ResponseEntity<TicketStatusResponse> retrieveTicketStatus(String idTicket);
 }

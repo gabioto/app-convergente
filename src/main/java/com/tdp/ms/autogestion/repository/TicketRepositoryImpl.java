@@ -2,6 +2,7 @@ package com.tdp.ms.autogestion.repository;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,11 +16,14 @@ import org.springframework.stereotype.Repository;
 import com.tdp.ms.autogestion.model.OAuth;
 import com.tdp.ms.autogestion.model.Ticket;
 import com.tdp.ms.autogestion.model.TicketStatusResponse;
+import com.tdp.ms.autogestion.model.TicketStatusResponse.ClienteData;
 import com.tdp.ms.autogestion.repository.datasource.api.TicketApi;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaCustomerRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaTicketRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaEquivalenceRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaEquivalenceNotificationRepository;
+import com.tdp.ms.autogestion.repository.datasource.db.entities.TblAdditionalData;
+import com.tdp.ms.autogestion.repository.datasource.db.entities.TblAttachment;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblCustomer;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblCustomerPK;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblEquivalence;
@@ -141,6 +145,97 @@ public class TicketRepositoryImpl implements TicketRepository {
 			return new ResponseEntity<>(ticketStatusResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
+	}
+	
+	@Override
+	public ResponseEntity<TicketStatusResponse> retrieveTicketStatus(String idTicket) {
+		
+		TicketStatusResponse ticketStatusResponse = null;
+		if (idTicket != null) {
+			Optional<List<TblTicket>> tableTicket = jpaTicketRepository.getTicketStatus(Integer.parseInt(idTicket));
+			if (tableTicket.isPresent()) {
+				List<ClienteData> lstClienteData = new ArrayList<ClienteData>();
+
+				ClienteData clienteData = new ClienteData();
+				clienteData.setKey("status");
+				clienteData.setValue(tableTicket.get().get(0).getStatus());
+				lstClienteData.add(clienteData);
+
+				List<TblAttachment> lstAttachment = tableTicket.get().get(0).getTblAttachments();
+				if (lstAttachment != null && lstAttachment.size() > 0) {
+					Optional<List<TblEquivalence>> tableEquivalence = jpaEquivalenceRepository
+							.getEquivalence(tableTicket.get().get(0).getIdTicket());
+					if (tableEquivalence.isPresent()) {
+						List<TblEquivalence> lstEquivalence = tableEquivalence.get();
+						for (TblEquivalence tblEquivalence : lstEquivalence) {
+							clienteData = new ClienteData();
+							clienteData.setKey(tblEquivalence.getAttachmentName());
+							clienteData.setValue(tblEquivalence.getNameEquivalence());
+							lstClienteData.add(clienteData);
+						}
+					}
+				}
+				List<TblAdditionalData> lstAdditionalData = tableTicket.get().get(0).getTblAdditionalData();
+				if (lstAdditionalData != null && lstAdditionalData.size() > 0) {
+					for (TblAdditionalData tblAdditionalData : lstAdditionalData) {
+						if (tblAdditionalData.getKeyAdditional().equals("notification-id")) {
+							Optional<TblEquivalenceNotification> tableEquivalence = jpaEquivalenceNotificationRepository
+									.getEquivalence(tblAdditionalData.getValueAdditional());
+							if (tableEquivalence.isPresent()) {
+								TblEquivalenceNotification equivalence = tableEquivalence.get();
+
+								clienteData = new ClienteData();
+								clienteData.setKey("action");
+								clienteData.setValue(equivalence.getAction() != null ? equivalence.getAction() : "");
+								lstClienteData.add(clienteData);
+
+								clienteData = new ClienteData();
+								clienteData.setKey("title");
+								clienteData.setValue(equivalence.getTitle() != null ? equivalence.getTitle() : "");
+								lstClienteData.add(clienteData);
+
+								clienteData = new ClienteData();
+								clienteData.setKey("description_title");
+								clienteData.setValue(
+										equivalence.getDescriptiontitle() != null ? equivalence.getDescriptiontitle()
+												: "");
+								lstClienteData.add(clienteData);
+
+								clienteData = new ClienteData();
+								clienteData.setKey("body");
+								clienteData.setValue(equivalence.getBody() != null ? equivalence.getBody() : "");
+								lstClienteData.add(clienteData);
+
+								clienteData = new ClienteData();
+								clienteData.setKey("footer");
+								clienteData.setValue(equivalence.getFooter() != null ? equivalence.getFooter() : "");
+								lstClienteData.add(clienteData);
+
+								clienteData = new ClienteData();
+								clienteData.setKey("icon");
+								clienteData.setValue(equivalence.getIcon() != null ? equivalence.getIcon() : "");
+								lstClienteData.add(clienteData);
+							}
+						}
+					}
+				}
+				ticketStatusResponse = new TicketStatusResponse(tableTicket.get().get(0).getStatusChangeDate(),
+						idTicket, tableTicket.get().get(0).getStatusTicket(), lstClienteData);
+				
+				functionsUtil.saveLogData(tableTicket.get().get(0).getIdTicketTriage(), tableTicket.get().get(0).getTblCustomer().getId().getDocumentNumber(),						
+						tableTicket.get().get(0).getTblCustomer().getId().getDocumentType(), "Retrieve Ticket Status", "event", null, ticketStatusResponse.toString(), "Retrieve Ticket Status");
+				
+				return new ResponseEntity<>(ticketStatusResponse, HttpStatus.OK);
+			} else {
+				functionsUtil.saveLogData(Integer.parseInt(idTicket), null, null, "Retrieve Ticket Status", "event", null, "Ticket No Existe", "Retrieve Ticket Status");
+				
+				return new ResponseEntity<>(ticketStatusResponse, HttpStatus.NOT_FOUND);
+			}
+		} else {
+			functionsUtil.saveLogData(0, null, null, "Retrieve Ticket Status", "event", null, "Ticket Nulo", "Retrieve Ticket Status");
+			
+			return new ResponseEntity<>(ticketStatusResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+		}		
 	}
 	
 }
