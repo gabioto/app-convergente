@@ -4,8 +4,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.http.ResponseEntity;
+
 import com.tdp.ms.autogestion.model.OAuth;
 import com.tdp.ms.autogestion.model.Ticket;
+import com.tdp.ms.autogestion.model.TicketStatusResponse;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblEquivalence;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblEquivalenceNotification;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblTicket;
@@ -24,5 +27,7 @@ public interface TicketRepository {
 	List<TblEquivalence> getEquivalence(int idTicket);
 
 	TblEquivalenceNotification getEquivalenceNotification(String code);
+	
+	ResponseEntity<TicketStatusResponse> updateTicketStatus(int idTicket, String status);
 
 }
