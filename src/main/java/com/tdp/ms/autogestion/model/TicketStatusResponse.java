@@ -3,10 +3,6 @@ package com.tdp.ms.autogestion.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import javax.validation.constraints.NotEmpty;
-
-import com.tdp.ms.autogestion.util.Constants;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -35,23 +31,27 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = false)
 public class TicketStatusResponse {
 
+	private Integer ticketId;
+
+	private String description;
+
+	private LocalDateTime creationDate;
+
+	private String type;
+
 	private LocalDateTime statusChangeDate;
-	
-	private String ticketId;
-	
+
 	private String ticketStatus;
-	
-	private List<ClienteData> clienteData;
-	
+
+	private List<AdditionalData> additionalData;
+
 	@Data
 	@NoArgsConstructor
 	@AllArgsConstructor
 	@EqualsAndHashCode(callSuper = false)
-	public static class ClienteData {
-		@NotEmpty(message = Constants.MSG_NOT_EMPTY)
+	public static class AdditionalData {
 		private String key;
 
-		@NotEmpty(message = Constants.MSG_NOT_EMPTY)
 		private String value;
 	}
 }

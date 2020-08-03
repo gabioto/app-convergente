@@ -41,7 +41,7 @@ public class TicketCreateResponse {
 
 	private String creationDate;
 
-	private String statusTicket;
+	private String ticketStatus;
 
 	private List<TicketAdditionalData> additionalData = new ArrayList<>();
 
@@ -50,7 +50,7 @@ public class TicketCreateResponse {
 		response.setDescription(ticket.getDescription());
 		response.setHref(ticket.getHref());
 		response.setId(ticket.getId());
-		response.setStatusTicket(TicketStatus.CREATED.name());
+		response.setTicketStatus(TicketStatus.CREATED.name());
 		response.setCreationDate(ticket.getCreationDate().toString());
 		response.setType(ticket.getType());
 		response.getAdditionalData().add(new TicketAdditionalData("status", ticket.getStatus()));
