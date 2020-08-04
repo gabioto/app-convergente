@@ -2,24 +2,23 @@ spring:
   application:
     name: trazabilidad-autogestion
   jpa:
-    hibernate:
-      use-new-id-generator-mappings: true
-    show-sql: false
+    show-sql: true
     properties:
       hibernate:
         temp:
           use_jdbc_metadata_defaults : false
         jdbc:
           batch_size: 5
-        ##default_schema: public
-    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
+        default_schema: public
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
   datasource:
     hikari:
       connectionTimeout: 20000
       maximumPoolSize: 5
-    url: jdbc:postgresql:postgres://1ca72738-f3c8-4479-a5a4-e693416200d8.b2b5a92ee2df47d58bad0fa448c15585.databases.appdomain.cloud:31174/ibmclouddb?sslmode=verify-full
+    url: jdbc:postgresql://1ca72738-f3c8-4479-a5a4-e693416200d8.b2b5a92ee2df47d58bad0fa448c15585.databases.appdomain.cloud:31174/ibmclouddb
     username: user_averia
     password: SyDe2VrKZH
+    driverClassName: org.postgresql.Driver
   kafka:
     bootstrap-servers: cap-sg-prd-1.securegateway.appdomain.cloud:18007 
 app:

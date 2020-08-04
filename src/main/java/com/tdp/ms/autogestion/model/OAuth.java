@@ -27,7 +27,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class OAuth {
-
+	
 	private String tokenKey;
 
 	private String tokenType;

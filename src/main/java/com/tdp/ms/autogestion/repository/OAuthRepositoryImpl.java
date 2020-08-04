@@ -22,9 +22,10 @@ public class OAuthRepositoryImpl implements OAuthRepository {
 
 	@Override
 	public OAuth getOAuthValues() {
+		System.out.println("ingreso tblOauth:: ");
 		Optional<TblOauth> tblOauth = jpaOAuthRepository.findById(1);
 		System.out.println("ingreso tblOauth:: " + tblOauth.get().getIdOauth());
-
+		System.out.println("ingreso tblOauth:: " + tblOauth.get().getIdOauth());
 		OAuth oAuth = tblOauth.get().fromThis();
 
 		long timeDiff = new Date().getTime() - (Long.parseLong(oAuth.getConsentedOn()) * 1000);

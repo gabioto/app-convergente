@@ -41,6 +41,7 @@ import com.tdp.ms.autogestion.util.DateUtil;
 import com.tdp.ms.autogestion.util.FunctionsUtil;
 import com.tdp.ms.autogestion.util.Constants;
 
+
 @EnableAsync
 @Component
 public class ReceiverKafkaController {
