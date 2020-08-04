@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.tdp.ms.autogestion.business.RetrieveTicketStatusUseCase;
-import com.tdp.ms.autogestion.model.TicketStatus;
 import com.tdp.ms.autogestion.model.TicketStatusResponse;
 import com.tdp.ms.autogestion.model.TicketStatusResponse.AdditionalData;
 import com.tdp.ms.autogestion.repository.datasource.api.TicketApi;
@@ -23,7 +22,6 @@ import com.tdp.ms.autogestion.repository.datasource.db.JpaEquivalenceRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaTicketRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblAdditionalData;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblAttachment;
-import com.tdp.ms.autogestion.repository.datasource.db.entities.TblAttachmentAdditionalData;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblEquivalence;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblEquivalenceNotification;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblTicket;
@@ -162,67 +160,5 @@ public class RetrieveTicketStatusUseCaseImpl implements RetrieveTicketStatusUseC
 			return new ResponseEntity<>(ticketStatusResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-
-	public String getTicketStatus(int idTicket) {
-		String status = TicketStatus.IN_PROGRESS.toString();
-		Boolean indicadorReset = Boolean.FALSE;
-
-		Optional<List<TblTicket>> tableTicket = ticketRepository.getTicketStatus(idTicket);
-		if (tableTicket.isPresent()) {
-			List<TblAttachment> lstAttachment = tableTicket.get().get(0).getTblAttachments();
-			if (lstAttachment != null && lstAttachment.size() > 0) {
-				// Obtener los attachments mapeados para el sistema
-				Optional<List<TblEquivalence>> tableEquivalence = equivalenceRepository
-						.getEquivalence(tableTicket.get().get(0).getIdTicket());
-				if (tableEquivalence.isPresent()) {
-					List<TblEquivalence> lstEquivalence = tableEquivalence.get();
-					for (TblEquivalence tblEquivalence : lstEquivalence) {
-						for (TblAttachment tblAttachment : lstAttachment) {
-							// Validar si el attachment existe en la tabla de equivalencias
-							if (tblAttachment.getNameAttachment().equals(tblEquivalence.getAttachmentName())) {
-								List<TblAttachmentAdditionalData> lstAttachmentAdditionalData = tblAttachment
-										.getTblAttachmentAdditionalData();
-								for (TblAttachmentAdditionalData tblAttachmentAdditionalData : lstAttachmentAdditionalData) {
-									// Validamos si se realizo un reset
-									if (tblAttachmentAdditionalData.getKeyAttachmentAdditional()
-											.equals("estado-reset-modem-ok")) {
-										status = TicketStatus.RESET.toString();
-										indicadorReset = Boolean.TRUE;
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-
-			List<TblAdditionalData> lstAdditionalData = tableTicket.get().get(0).getTblAdditionalData();
-			if (lstAdditionalData != null && lstAdditionalData.size() > 0) {
-				for (TblAdditionalData tblAdditionalData : lstAdditionalData) {
-					// Validar si existe un notification_id
-					if (tblAdditionalData.getKeyAdditional().equals("notification-id")) {
-						Optional<TblEquivalenceNotification> tblEquivalenceNotification = equivalenceNotificationRepository
-								.getEquivalence(tblAdditionalData.getValueAdditional());
-						if (tblEquivalenceNotification.isPresent()) {
-							TblEquivalenceNotification equivalence = tblEquivalenceNotification.get();
-
-							// Validar el estado del notification_id
-							if (equivalence.getAction().equals("ok") && indicadorReset) {
-								status = TicketStatus.RESET_SOLVED.toString();
-							} else if (equivalence.getAction().equals("ok") && !indicadorReset) {
-								status = TicketStatus.SOLVED.toString();
-							} else if (equivalence.getAction().equals("averia")) {
-								status = TicketStatus.FAULT.toString();
-							} else if (equivalence.getAction().equals("whastapp")) {
-								status = TicketStatus.WHATSAPP.toString();
-							} else if (equivalence.getAction().equals("generico")) {
-								status = TicketStatus.GENERIC.toString();
-							}
-						}
-					}
-				}
-			}
-		}
-		return status;
-	}
+	
 }

@@ -23,5 +23,5 @@ public interface TicketRepository {
 	List<TblEquivalence> getEquivalence(int idTicket);
 
 	TblEquivalenceNotification getEquivalenceNotification(String code);
-
+	
 }
