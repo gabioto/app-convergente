@@ -1,7 +1,9 @@
-package com.tdp.ms.autogestion.model;
+package com.tdp.ms.autogestion.expose.entities;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.tdp.ms.autogestion.model.TicketAdditionalData;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
