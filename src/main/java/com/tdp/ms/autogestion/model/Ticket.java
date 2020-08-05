@@ -1,5 +1,7 @@
 package com.tdp.ms.autogestion.model;
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,13 +30,13 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = false)
 public class Ticket {
 
-	private String id;
+	private Integer id;
 
 	private String href;
 
 	private String description;
 
-	private String creationDate;
+	private LocalDateTime creationDate;
 
 	private String severity;
 
@@ -42,7 +44,7 @@ public class Ticket {
 
 	private String status;
 
-	private String statusChangeDate;
+	private LocalDateTime statusChangeDate;
 
 	private String statusChangeReason;
 
@@ -61,5 +63,9 @@ public class Ticket {
 	private String channelName;
 
 	private Customer customer;
+	
+	private String ticketStatus;
+	
+	private LocalDateTime modifiedDateTicket;
 
 }

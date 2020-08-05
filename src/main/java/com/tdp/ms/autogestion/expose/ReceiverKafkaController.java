@@ -17,10 +17,10 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.Gson;
+import com.tdp.ms.autogestion.expose.entities.TicketKafkaResponse;
+import com.tdp.ms.autogestion.expose.entities.TicketKafkaResponse.Event.TroubleTicket.Attachment;
+import com.tdp.ms.autogestion.expose.entities.TicketKafkaResponse.Event.TroubleTicket.Attachment.AdditionalData;
 import com.tdp.ms.autogestion.model.TicketAdditionalData;
-import com.tdp.ms.autogestion.model.TicketKafkaResponse;
-import com.tdp.ms.autogestion.model.TicketKafkaResponse.Event.TroubleTicket.Attachment;
-import com.tdp.ms.autogestion.model.TicketKafkaResponse.Event.TroubleTicket.Attachment.AdditionalData;
 import com.tdp.ms.autogestion.model.TicketStatus;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaAdditionalDataRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaAttachmentAdditionalDataRepository;

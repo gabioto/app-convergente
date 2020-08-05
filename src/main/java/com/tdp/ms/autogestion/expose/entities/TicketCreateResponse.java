@@ -1,7 +1,11 @@
-package com.tdp.ms.autogestion.model;
+package com.tdp.ms.autogestion.expose.entities;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.tdp.ms.autogestion.model.Ticket;
+import com.tdp.ms.autogestion.model.TicketAdditionalData;
+import com.tdp.ms.autogestion.model.TicketStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,7 +35,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = false)
 public class TicketCreateResponse {
 
-	private String id;
+	private Integer id;
 
 	private String href;
 
