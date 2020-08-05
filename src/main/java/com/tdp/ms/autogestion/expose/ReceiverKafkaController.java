@@ -207,17 +207,17 @@ public class ReceiverKafkaController {
 							TblEquivalenceNotification equivalence = tblEquivalenceNotification.get();
 
 							// Validar el estado del notification_id
-							if (equivalence.getAction().equals("ok") && indicadorReset) {
+							if (equivalence.getAction().equals(TicketStatus.RESET_SOLVED) && indicadorReset) {
 								status = TicketStatus.RESET_SOLVED.toString();
-							} else if (equivalence.getAction().equals("ok") && !indicadorReset) {
+							} else if (equivalence.getAction().equals(TicketStatus.RESET_SOLVED) && !indicadorReset) {
 								status = TicketStatus.SOLVED.toString();
-							} else if (equivalence.getAction().equals("averia")) {
+							} else if (equivalence.getAction().equals(TicketStatus.FAULT)) {
 								status = TicketStatus.FAULT.toString();
-							} else if (equivalence.getAction().equals("whastapp")) {
+							} else if (equivalence.getAction().equals(TicketStatus.WHATSAPP)) {
 								status = TicketStatus.WHATSAPP.toString();
-							} else if (equivalence.getAction().equals("generico")) {
+							} else if (equivalence.getAction().equals(TicketStatus.GENERIC)) {
 								status = TicketStatus.GENERIC.toString();
-							} else if (equivalence.getAction().equals("traza")) {
+							} else if (equivalence.getAction().equals(TicketStatus.FAULT_TRAZA)) {
 								status = TicketStatus.FAULT_TRAZA.toString();
 							}
 						}
