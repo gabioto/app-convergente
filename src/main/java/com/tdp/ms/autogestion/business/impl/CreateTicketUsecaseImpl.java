@@ -61,7 +61,7 @@ public class CreateTicketUsecaseImpl implements CreateTicketUseCase {
 			ticket.setSubOperationCode(subOperationCode);
 
 			// Invocación a API generación de ticket
-			//oAuth = serviceDao.getOauth(1);
+			oAuth = serviceDao.getOauth(1);
 			oAuth = oAuthRepository.getOAuthValues();
 			ticket = ticketRepository.generateTicket(oAuth, ticket);
 
