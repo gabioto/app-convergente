@@ -16,12 +16,14 @@ import com.tdp.ms.autogestion.model.TicketStatusResponse;
 import com.tdp.ms.autogestion.model.TicketStatusResponse.AdditionalData;
 import com.tdp.ms.autogestion.repository.datasource.api.TicketApi;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaAdditionalDataRepository;
+import com.tdp.ms.autogestion.repository.datasource.db.JpaAttachmentAdditionalDataRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaCustomerRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaEquivalenceNotificationRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaEquivalenceRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaTicketRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblAdditionalData;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblAttachment;
+import com.tdp.ms.autogestion.repository.datasource.db.entities.TblAttachmentAdditionalData;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblEquivalence;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblEquivalenceNotification;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblTicket;
@@ -63,6 +65,9 @@ public class RetrieveTicketStatusUseCaseImpl implements RetrieveTicketStatusUseC
 	JpaEquivalenceRepository equivalenceRepository;
 
 	@Autowired
+	JpaAttachmentAdditionalDataRepository attachmentAdditionalDataRepository;
+	
+	@Autowired
 	JpaEquivalenceNotificationRepository equivalenceNotificationRepository;
 
 	@Autowired
@@ -86,6 +91,45 @@ public class RetrieveTicketStatusUseCaseImpl implements RetrieveTicketStatusUseC
 
 				List<TblAttachment> lstAttachment = tableTicket.get().get(0).getTblAttachments();
 				if (lstAttachment != null && lstAttachment.size() > 0) {
+					for (TblAttachment tblAttachment : lstAttachment) {
+						// Obtener el monto adeudado por el cliente
+						if (tblAttachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-deuda-amdocs") ||
+							tblAttachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-deuda-cms") ||
+							tblAttachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-deuda-atis")) {
+							
+							Optional<List<TblAttachmentAdditionalData>> tableAttachmentAdditionalData = attachmentAdditionalDataRepository
+									.getMontoDeuda(tblAttachment.getIdAttachment(), "monto");
+							if (tableAttachmentAdditionalData.isPresent()) {
+								List<TblAttachmentAdditionalData> lstAttachmentAdditionalData = tableAttachmentAdditionalData.get();
+								for (TblAttachmentAdditionalData tblAttachmentAdditionalData : lstAttachmentAdditionalData) {
+									clienteData = new AdditionalData();
+									clienteData.setKey("monto");
+									clienteData.setValue(tblAttachmentAdditionalData.getValueAttachmentAdditional());
+									lstClienteData.add(clienteData);
+								}
+							}							
+						}
+						if (tblAttachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-amdocs") ||
+							tblAttachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-cms") ||
+							tblAttachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-gestel")) {
+							
+							Optional<List<TblAttachmentAdditionalData>> tableAttachmentAdditionalData = attachmentAdditionalDataRepository
+									.getInfoAveria(tblAttachment.getIdAttachment());
+							if (tableAttachmentAdditionalData.isPresent()) {
+								List<TblAttachmentAdditionalData> lstAttachmentAdditionalData = tableAttachmentAdditionalData.get();
+								for (TblAttachmentAdditionalData tblAttachmentAdditionalData : lstAttachmentAdditionalData) {									
+									if (tblAttachmentAdditionalData.getKeyAttachmentAdditional().equals("codigo_averia")) {									
+										clienteData = new AdditionalData();
+										clienteData.setKey("codigo-averia");
+										clienteData.setValue(tblAttachmentAdditionalData.getValueAttachmentAdditional());
+										lstClienteData.add(clienteData);
+									}
+								}
+							}
+						}
+					}
+					
+					// Equivalencias
 					Optional<List<TblEquivalence>> tableEquivalence = equivalenceRepository
 							.getEquivalence(tableTicket.get().get(0).getIdTicket());
 					if (tableEquivalence.isPresent()) {
@@ -131,6 +175,22 @@ public class RetrieveTicketStatusUseCaseImpl implements RetrieveTicketStatusUseC
 								clienteData.setKey("icon");
 								clienteData.setValue(equivalence.getIcon() != null ? equivalence.getIcon() : "");
 								lstClienteData.add(clienteData);
+								
+								clienteData = new AdditionalData();
+								clienteData.setKey("button");
+								clienteData.setValue(equivalence.getButton() != null ? equivalence.getButton() : "");
+								lstClienteData.add(clienteData);
+								
+								clienteData = new AdditionalData();
+								clienteData.setKey("image");
+								clienteData.setValue(equivalence.getImage() != null ? equivalence.getImage() : "");
+								lstClienteData.add(clienteData);
+								
+								clienteData = new AdditionalData();
+								clienteData.setKey("actionbbutton");
+								clienteData.setValue(equivalence.getActionbutton() != null ? equivalence.getActionbutton() : "");
+								lstClienteData.add(clienteData);
+								
 							}
 						}
 					}
