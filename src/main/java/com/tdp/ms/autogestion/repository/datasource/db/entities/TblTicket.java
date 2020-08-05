@@ -23,9 +23,7 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 import com.tdp.ms.autogestion.model.Ticket;
-import com.tdp.ms.autogestion.model.TicketStatus;
 import com.tdp.ms.autogestion.util.Constants;
-import com.tdp.ms.autogestion.util.DateUtil;
 
 /**
  * The persistent class for the tbl_ticket database table.
@@ -311,37 +309,29 @@ public class TblTicket implements Serializable {
 		this.statusChangeDate = statusChangeDate;
 	}
 
-	public static TblTicket from(Ticket ticket, TblCustomer tableCustomer) {
+	public static TblTicket from(Ticket ticket, TblCustomer tableCustomer, String status) {
 		TblTicket tableTicket = new TblTicket();
 		tableTicket.setIdTicketTriage(Integer.valueOf(ticket.getId()));
 		tableTicket.setDescription(ticket.getDescription());
-		tableTicket.setCreationDate(DateUtil.formatStringToLocalDateTime(ticket.getCreationDate()));
+		tableTicket.setCreationDate(ticket.getCreationDate());
 		tableTicket.setCreationDateTicket(LocalDateTime.now(ZoneOffset.of(Constants.ZONE_OFFSET)));
 		tableTicket.setSeverity(ticket.getSeverity());
 		tableTicket.setTicketType(ticket.getType());
 		tableTicket.setStatus(ticket.getStatus());
-		tableTicket.setStatusChangeDate(DateUtil.formatStringToLocalDateTime(ticket.getStatusChangeDate()));
+		tableTicket.setStatusChangeDate(ticket.getStatusChangeDate());
 		tableTicket.setStatusChangeReason(ticket.getStatusChangeReason());
 		tableTicket.setPriority(ticket.getPriority());
 		tableTicket.setInvolvement(ticket.getInvolvement());
-		tableTicket.setStatusTicket(TicketStatus.CREATED.name());
+		tableTicket.setStatusTicket(status);
 		tableTicket.setIdUseCase(ticket.getUseCaseId());
 		tableTicket.setTechnology(ticket.getTechnology());
 		tableTicket.setTblCustomer(tableCustomer);
 		return tableTicket;
 	}
 
-//	eturn new Product(
-//            new Identity(id),
-//            name,
-//            description,
-//            price,
-//            store.fromThis()
-//    );
-
 	public Ticket fromThis() {
-		return new Ticket(String.valueOf(idTicket), "", description, creationDate.toString(), severity, ticketType,
-				status, statusChangeDate.toString(), statusChangeReason, priority, technology, idUseCase, "",
-				involvement, "", "", tblCustomer.fromThis());
+		return new Ticket(idTicket, "", description, creationDate, severity, ticketType,
+				status, statusChangeDate, statusChangeReason, priority, technology, idUseCase, "",
+				involvement, "", "", tblCustomer.fromThis(), statusTicket, modifiedDateTicket);
 	}
 }
