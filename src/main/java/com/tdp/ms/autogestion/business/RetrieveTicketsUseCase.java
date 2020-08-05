@@ -2,8 +2,8 @@ package com.tdp.ms.autogestion.business;
 
 import org.springframework.http.ResponseEntity;
 
-import com.tdp.ms.autogestion.model.TicketRetrieveRequest;
-import com.tdp.ms.autogestion.model.TicketStatusResponse;
+import com.tdp.ms.autogestion.expose.entities.TicketRetrieveRequest;
+import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
 
 /**
  * Class: TrazabilidadpruebaService. <br/>

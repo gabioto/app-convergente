@@ -1,10 +1,11 @@
-package com.tdp.ms.autogestion.model;
+package com.tdp.ms.autogestion.expose.entities;
 
 import java.util.List;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import com.tdp.ms.autogestion.model.Ticket;
 import com.tdp.ms.autogestion.util.Constants;
 
 import lombok.AllArgsConstructor;

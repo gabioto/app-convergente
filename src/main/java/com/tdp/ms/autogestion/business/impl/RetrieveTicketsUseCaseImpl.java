@@ -13,10 +13,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.tdp.ms.autogestion.business.RetrieveTicketsUseCase;
-import com.tdp.ms.autogestion.model.TicketRetrieveRequest;
+import com.tdp.ms.autogestion.expose.entities.TicketRetrieveRequest;
+import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
+import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse.AdditionalData;
 import com.tdp.ms.autogestion.model.TicketStatus;
-import com.tdp.ms.autogestion.model.TicketStatusResponse;
-import com.tdp.ms.autogestion.model.TicketStatusResponse.AdditionalData;
 import com.tdp.ms.autogestion.repository.TicketRepository;
 import com.tdp.ms.autogestion.repository.datasource.api.TicketApi;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaAdditionalDataRepository;
@@ -169,7 +169,7 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 
 						ticketStatusResponse = new TicketStatusResponse(tblTicket.getIdTicket(),
 								tblTicket.getDescription(), tblTicket.getCreationDate(), tblTicket.getTicketType(),
-								tblTicket.getStatusChangeDate(), tblTicket.getStatusTicket(), fillTicket(tblTicket));
+								tblTicket.getStatusChangeDate(), tblTicket.getStatusTicket(), tblTicket.getModifiedDateTicket(), fillTicket(tblTicket));
 
 						return new ResponseEntity<>(ticketStatusResponse, HttpStatus.OK);
 					} else {
@@ -188,7 +188,7 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 
 						ticketStatusResponse = new TicketStatusResponse(tblTicket.getIdTicket(),
 								tblTicket.getDescription(), tblTicket.getCreationDate(), tblTicket.getTicketType(),
-								tblTicket.getStatusChangeDate(), tblTicket.getStatusTicket(), fillTicket(tblTicket));
+								tblTicket.getStatusChangeDate(), tblTicket.getStatusTicket(), tblTicket.getModifiedDateTicket(), fillTicket(tblTicket));
 
 						return new ResponseEntity<>(ticketStatusResponse, HttpStatus.OK);
 					} else {

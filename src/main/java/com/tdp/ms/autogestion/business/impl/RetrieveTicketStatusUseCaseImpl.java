@@ -4,20 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.tdp.ms.autogestion.business.RetrieveTicketStatusUseCase;
+import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
+import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse.AdditionalData;
 import com.tdp.ms.autogestion.model.TicketStatus;
-import com.tdp.ms.autogestion.model.TicketStatusResponse;
-import com.tdp.ms.autogestion.model.TicketStatusResponse.AdditionalData;
-import com.tdp.ms.autogestion.repository.datasource.api.TicketApi;
-import com.tdp.ms.autogestion.repository.datasource.db.JpaAdditionalDataRepository;
-import com.tdp.ms.autogestion.repository.datasource.db.JpaCustomerRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaEquivalenceNotificationRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaEquivalenceRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaTicketRepository;
@@ -49,17 +44,8 @@ import com.tdp.ms.autogestion.util.FunctionsUtil;
 @Service
 public class RetrieveTicketStatusUseCaseImpl implements RetrieveTicketStatusUseCase {
 
-	private static final Log log = LogFactory.getLog(RetrieveTicketStatusUseCaseImpl.class);
-	private static final String TAG = RetrieveTicketStatusUseCaseImpl.class.getCanonicalName();
-
-	@Autowired
-	TicketApi ticketApi;
-
 	@Autowired
 	JpaTicketRepository ticketRepository;
-
-	@Autowired
-	JpaAdditionalDataRepository additionalDataRepository;
 
 	@Autowired
 	JpaEquivalenceRepository equivalenceRepository;
@@ -68,14 +54,18 @@ public class RetrieveTicketStatusUseCaseImpl implements RetrieveTicketStatusUseC
 	JpaEquivalenceNotificationRepository equivalenceNotificationRepository;
 
 	@Autowired
-	JpaCustomerRepository customerRepository;
-
-	@Autowired
 	FunctionsUtil functionsUtil;
 
 	@Override
 	public ResponseEntity<TicketStatusResponse> retrieveTicketStatus(String idTicket) {
+		
 		TicketStatusResponse ticketStatusResponse = null;
+		
+		try {
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 		if (idTicket != null) {
 			Optional<List<TblTicket>> tableTicket = ticketRepository.getTicketStatus(Integer.parseInt(idTicket));
 			if (tableTicket.isPresent()) {
@@ -149,7 +139,7 @@ public class RetrieveTicketStatusUseCaseImpl implements RetrieveTicketStatusUseC
 
 				ticketStatusResponse = new TicketStatusResponse(tblTicket.getIdTicket(), tblTicket.getDescription(),
 						tblTicket.getCreationDate(), tblTicket.getTicketType(), tblTicket.getStatusChangeDate(),
-						tblTicket.getStatusTicket(), lstClienteData);
+						tblTicket.getStatusTicket(), tblTicket.getModifiedDateTicket(), lstClienteData);
 
 				functionsUtil.saveLogData(tableTicket.get().get(0).getIdTicketTriage(),
 						tableTicket.get().get(0).getTblCustomer().getId().getDocumentNumber(),

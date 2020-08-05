@@ -1,4 +1,4 @@
-package com.tdp.ms.autogestion.model;
+package com.tdp.ms.autogestion.expose.entities;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;

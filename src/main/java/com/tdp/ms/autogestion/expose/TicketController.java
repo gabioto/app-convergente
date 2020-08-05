@@ -17,10 +17,10 @@ import com.tdp.ms.autogestion.business.CreateTicketUseCase;
 import com.tdp.ms.autogestion.business.RetrieveTicketStatusUseCase;
 import com.tdp.ms.autogestion.business.RetrieveTicketsUseCase;
 import com.tdp.ms.autogestion.business.UpdateTicketStatusUseCase;
-import com.tdp.ms.autogestion.model.TicketCreateRequest;
-import com.tdp.ms.autogestion.model.TicketCreateResponse;
-import com.tdp.ms.autogestion.model.TicketRetrieveRequest;
-import com.tdp.ms.autogestion.model.TicketStatusResponse;
+import com.tdp.ms.autogestion.expose.entities.TicketCreateRequest;
+import com.tdp.ms.autogestion.expose.entities.TicketCreateResponse;
+import com.tdp.ms.autogestion.expose.entities.TicketRetrieveRequest;
+import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
 
 @RestController
 @CrossOrigin(origins = "*")
