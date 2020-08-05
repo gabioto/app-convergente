@@ -1,7 +1,9 @@
-package com.tdp.ms.autogestion.model;
+package com.tdp.ms.autogestion.expose.entities;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import com.tdp.ms.autogestion.model.Ticket;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -43,6 +45,8 @@ public class TicketStatusResponse {
 
 	private String ticketStatus;
 
+	private LocalDateTime modifiedDateTicket;
+
 	private List<AdditionalData> additionalData;
 
 	@Data
@@ -53,5 +57,16 @@ public class TicketStatusResponse {
 		private String key;
 
 		private String value;
+	}
+
+	public static TicketStatusResponse from(Ticket ticket) {
+		TicketStatusResponse response = new TicketStatusResponse();
+		response.setDescription(ticket.getDescription());
+		response.setTicketId(Integer.valueOf(ticket.getId()));
+		response.setTicketStatus(ticket.getTicketStatus());
+		response.setCreationDate(ticket.getCreationDate());
+		response.setType(ticket.getType());
+		response.setModifiedDateTicket(ticket.getModifiedDateTicket());
+		return response;
 	}
 }

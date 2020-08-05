@@ -9,12 +9,12 @@ import org.springframework.stereotype.Service;
 
 import com.tdp.ms.autogestion.business.CreateTicketUseCase;
 import com.tdp.ms.autogestion.dao.ServiceDao;
+import com.tdp.ms.autogestion.expose.entities.TicketCreateRequest;
+import com.tdp.ms.autogestion.expose.entities.TicketCreateRequest.AdditionalData;
+import com.tdp.ms.autogestion.expose.entities.TicketCreateResponse;
 import com.tdp.ms.autogestion.model.Customer;
 import com.tdp.ms.autogestion.model.OAuth;
 import com.tdp.ms.autogestion.model.Ticket;
-import com.tdp.ms.autogestion.model.TicketCreateRequest;
-import com.tdp.ms.autogestion.model.TicketCreateRequest.AdditionalData;
-import com.tdp.ms.autogestion.model.TicketCreateResponse;
 import com.tdp.ms.autogestion.repository.OAuthRepository;
 import com.tdp.ms.autogestion.repository.TicketRepository;
 

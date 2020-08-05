@@ -1,6 +1,7 @@
 package com.tdp.ms.autogestion.repository;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import com.tdp.ms.autogestion.model.OAuth;
 import com.tdp.ms.autogestion.model.Ticket;
+import com.tdp.ms.autogestion.model.TicketStatus;
 import com.tdp.ms.autogestion.repository.datasource.api.TicketApi;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaCustomerRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaEquivalenceNotificationRepository;
@@ -21,25 +23,26 @@ import com.tdp.ms.autogestion.repository.datasource.db.entities.TblCustomerPK;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblEquivalence;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblEquivalenceNotification;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblTicket;
+import com.tdp.ms.autogestion.util.Constants;
 
 @Repository
 public class TicketRepositoryImpl implements TicketRepository {
 
 	private static final Log log = LogFactory.getLog(TicketRepositoryImpl.class);
 	private static final String TAG = TicketRepositoryImpl.class.getCanonicalName();
-	
+
 	@Autowired
 	private TicketApi ticketApi;
 
 	@Autowired
 	private JpaCustomerRepository jpaCustomerRepository;
-	
+
 	@Autowired
 	private JpaTicketRepository jpaTicketRepository;
-	
+
 	@Autowired
 	private JpaEquivalenceRepository jpaEquivalenceRepository;
-	
+
 	@Autowired
 	private JpaEquivalenceNotificationRepository jpaEquivalenceNotificationRepository;
 
@@ -57,7 +60,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 
 		tableCustomerPk = TblCustomerPK.from(pTicket);
 		tableCustomer.setId(tableCustomerPk);
-		tableTicket = TblTicket.from(pTicket, tableCustomer);
+		tableTicket = TblTicket.from(pTicket, tableCustomer, TicketStatus.CREATED.name());
 
 		optCustomer = jpaCustomerRepository.findById(tableCustomerPk);
 
@@ -70,6 +73,24 @@ public class TicketRepositoryImpl implements TicketRepository {
 	}
 
 	@Override
+	public Ticket updateTicketStatus(int idTicket, String status) throws Exception {
+		LocalDateTime sysDate = LocalDateTime.now(ZoneOffset.of(Constants.ZONE_OFFSET));
+		Optional<List<TblTicket>> list = jpaTicketRepository.getTicketStatus(idTicket);
+
+		if (list.isPresent()) {
+			TblTicket tblTicket = list.get().get(0);
+			tblTicket.setStatusTicket(status);
+			tblTicket.setModifiedDateTicket(sysDate);
+			tblTicket = jpaTicketRepository.save(tblTicket);
+
+			return tblTicket.fromThis();
+		} else {
+			throw new Exception();
+		}
+
+	}
+
+	@Override
 	public Ticket getTicketStatus(String idTicket) {
 //		jpaTicketRepository.getTicketStatus(Integer.parseInt(idTicket));
 		return null;
@@ -78,22 +99,25 @@ public class TicketRepositoryImpl implements TicketRepository {
 	@Override
 	public List<TblTicket> findByCustomerAndUseCase(String docType, String docNumber, String reference,
 			String involvement, LocalDateTime creationDate, LocalDateTime endDate) {
-		return jpaTicketRepository.findByCustomerAndUseCase(docType, docNumber, reference, involvement, creationDate, endDate);
-		
+		return jpaTicketRepository.findByCustomerAndUseCase(docType, docNumber, reference, involvement, creationDate,
+				endDate);
+
 	}
 
 	@Override
 	public List<TblEquivalence> getEquivalence(int idTicket) {
-		
-		Optional<List<TblEquivalence>> list = jpaEquivalenceRepository.getEquivalence(idTicket);;
+
+		Optional<List<TblEquivalence>> list = jpaEquivalenceRepository.getEquivalence(idTicket);
+		;
 		return list.get();
 	}
 
 	@Override
 	public TblEquivalenceNotification getEquivalenceNotification(String code) {
-		Optional<TblEquivalenceNotification> tblEquivalenceNotification = jpaEquivalenceNotificationRepository.getEquivalence(code);
-		
+		Optional<TblEquivalenceNotification> tblEquivalenceNotification = jpaEquivalenceNotificationRepository
+				.getEquivalence(code);
+
 		return tblEquivalenceNotification.get();
 	}
-	
+
 }

@@ -1,6 +1,7 @@
 package com.tdp.ms.autogestion.repository.datasource.api.entities;
 
 import com.tdp.ms.autogestion.model.Ticket;
+import com.tdp.ms.autogestion.util.DateUtil;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -51,14 +52,14 @@ public class TicketApiResponse {
 	private Integer priority;
 
 	public Ticket fromThis(Ticket pTicket) {
-		pTicket.setId(id);
+		pTicket.setId(Integer.valueOf(id));
 		pTicket.setHref(href);
 		pTicket.setDescription(description);
-		pTicket.setCreationDate(creationDate);
+		pTicket.setCreationDate(DateUtil.formatStringToLocalDateTime(creationDate));
 		pTicket.setSeverity(severity);
 		pTicket.setType(type);
 		pTicket.setStatus(status);
-		pTicket.setStatusChangeDate(statusChangeDate);
+		pTicket.setStatusChangeDate(DateUtil.formatStringToLocalDateTime(statusChangeDate));
 		pTicket.setStatusChangeReason(statusChangeReason);
 		return pTicket;
 	}
