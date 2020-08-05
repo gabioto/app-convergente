@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,11 +21,13 @@ import com.tdp.ms.autogestion.model.TicketStatusResponse.AdditionalData;
 import com.tdp.ms.autogestion.repository.TicketRepository;
 import com.tdp.ms.autogestion.repository.datasource.api.TicketApi;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaAdditionalDataRepository;
+import com.tdp.ms.autogestion.repository.datasource.db.JpaAttachmentAdditionalDataRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaCustomerRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaEquivalenceNotificationRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaEquivalenceRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblAdditionalData;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblAttachment;
+import com.tdp.ms.autogestion.repository.datasource.db.entities.TblAttachmentAdditionalData;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblEquivalence;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblEquivalenceNotification;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblTicket;
@@ -63,6 +66,9 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 	JpaAdditionalDataRepository additionalDataRepository;
 
 	@Autowired
+	JpaAttachmentAdditionalDataRepository attachmentAdditionalDataRepository;
+	
+	@Autowired
 	JpaEquivalenceRepository equivalenceRepository;
 
 	@Autowired
@@ -81,10 +87,50 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 		lstClienteData.add(clienteData);
 
 		List<TblAttachment> lstAttachment = tableTicket.getTblAttachments();
-		if (lstAttachment.size() > 0 && lstAttachment.size() > 0) {
-			List<TblEquivalence> tableEquivalence = ticketRepository.getEquivalence(tableTicket.getIdTicket());
-			if (tableEquivalence != null) {
-				List<TblEquivalence> lstEquivalence = tableEquivalence;
+		if (lstAttachment != null && lstAttachment.size() > 0) {
+			for (TblAttachment tblAttachment : lstAttachment) {
+				// Obtener el monto adeudado por el cliente
+				if (tblAttachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-deuda-amdocs") ||
+					tblAttachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-deuda-cms") ||
+					tblAttachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-deuda-atis")) {
+					
+					Optional<List<TblAttachmentAdditionalData>> tableAttachmentAdditionalData = attachmentAdditionalDataRepository
+							.getMontoDeuda(tblAttachment.getIdAttachment(), "monto");
+					if (tableAttachmentAdditionalData.isPresent()) {
+						List<TblAttachmentAdditionalData> lstAttachmentAdditionalData = tableAttachmentAdditionalData.get();
+						for (TblAttachmentAdditionalData tblAttachmentAdditionalData : lstAttachmentAdditionalData) {
+							clienteData = new AdditionalData();
+							clienteData.setKey("monto");
+							clienteData.setValue(tblAttachmentAdditionalData.getValueAttachmentAdditional());
+							lstClienteData.add(clienteData);
+						}
+					}							
+				}
+				if (tblAttachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-amdocs") ||
+					tblAttachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-cms") ||
+					tblAttachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-gestel")) {
+					
+					Optional<List<TblAttachmentAdditionalData>> tableAttachmentAdditionalData = attachmentAdditionalDataRepository
+							.getInfoAveria(tblAttachment.getIdAttachment());
+					if (tableAttachmentAdditionalData.isPresent()) {
+						List<TblAttachmentAdditionalData> lstAttachmentAdditionalData = tableAttachmentAdditionalData.get();
+						for (TblAttachmentAdditionalData tblAttachmentAdditionalData : lstAttachmentAdditionalData) {									
+							if (tblAttachmentAdditionalData.getKeyAttachmentAdditional().equals("codigo_averia")) {									
+								clienteData = new AdditionalData();
+								clienteData.setKey("codigo-averia");
+								clienteData.setValue(tblAttachmentAdditionalData.getValueAttachmentAdditional());
+								lstClienteData.add(clienteData);
+							}
+						}
+					}
+				}
+			}
+			
+			// Equivalencias
+			Optional<List<TblEquivalence>> tableEquivalence = equivalenceRepository
+					.getEquivalence(tableTicket.getIdTicket());
+			if (tableEquivalence.isPresent()) {
+				List<TblEquivalence> lstEquivalence = tableEquivalence.get();
 				for (TblEquivalence tblEquivalence : lstEquivalence) {
 					clienteData = new AdditionalData();
 					clienteData.setKey(tblEquivalence.getAttachmentName());
@@ -94,13 +140,13 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 			}
 		}
 		List<TblAdditionalData> lstAdditionalData = tableTicket.getTblAdditionalData();
-		if (lstAdditionalData.size() > 0 && lstAdditionalData.size() > 0) {
+		if (lstAdditionalData != null && lstAdditionalData.size() > 0) {
 			for (TblAdditionalData tblAdditionalData : lstAdditionalData) {
 				if (tblAdditionalData.getKeyAdditional().equals("notification-id")) {
-					TblEquivalenceNotification tableEquivalence = ticketRepository
-							.getEquivalenceNotification(tblAdditionalData.getValueAdditional());
-					if (tableEquivalence != null) {
-						TblEquivalenceNotification equivalence = tableEquivalence;
+					Optional<TblEquivalenceNotification> tableEquivalence = equivalenceNotificationRepository
+							.getEquivalence(tblAdditionalData.getValueAdditional());
+					if (tableEquivalence.isPresent()) {
+						TblEquivalenceNotification equivalence = tableEquivalence.get();
 
 						clienteData = new AdditionalData();
 						clienteData.setKey("action");
@@ -115,7 +161,8 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 						clienteData = new AdditionalData();
 						clienteData.setKey("description_title");
 						clienteData.setValue(
-								equivalence.getDescriptiontitle() != null ? equivalence.getDescriptiontitle() : "");
+								equivalence.getDescriptiontitle() != null ? equivalence.getDescriptiontitle()
+										: "");
 						lstClienteData.add(clienteData);
 
 						clienteData = new AdditionalData();
@@ -132,11 +179,26 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 						clienteData.setKey("icon");
 						clienteData.setValue(equivalence.getIcon() != null ? equivalence.getIcon() : "");
 						lstClienteData.add(clienteData);
+						
+						clienteData = new AdditionalData();
+						clienteData.setKey("button");
+						clienteData.setValue(equivalence.getButton() != null ? equivalence.getButton() : "");
+						lstClienteData.add(clienteData);
+						
+						clienteData = new AdditionalData();
+						clienteData.setKey("image");
+						clienteData.setValue(equivalence.getImage() != null ? equivalence.getImage() : "");
+						lstClienteData.add(clienteData);
+						
+						clienteData = new AdditionalData();
+						clienteData.setKey("actionbbutton");
+						clienteData.setValue(equivalence.getActionbutton() != null ? equivalence.getActionbutton() : "");
+						lstClienteData.add(clienteData);
+						
 					}
-
 				}
 			}
-		}
+		}		
 
 		return lstClienteData;
 	}
