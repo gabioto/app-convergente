@@ -34,6 +34,12 @@ public class TblEquivalenceNotification implements Serializable {
 	private String footer;
 	
 	private String icon;
+	
+	private String button;
+	
+	private String image;
+	
+	private String actionbutton;
 
 	public TblEquivalenceNotification() {
 	}
@@ -108,6 +114,30 @@ public class TblEquivalenceNotification implements Serializable {
 
 	public void setIcon(String icon) {
 		this.icon = icon;
+	}
+
+	public String getButton() {
+		return button;
+	}
+
+	public String getImage() {
+		return image;
+	}
+
+	public String getActionbutton() {
+		return actionbutton;
+	}
+
+	public void setButton(String button) {
+		this.button = button;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
+	}
+
+	public void setActionbutton(String actionbutton) {
+		this.actionbutton = actionbutton;
 	}
 
 }

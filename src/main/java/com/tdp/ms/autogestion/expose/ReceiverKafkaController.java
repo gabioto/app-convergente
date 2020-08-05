@@ -216,10 +216,11 @@ public class ReceiverKafkaController {
 								status = TicketStatus.WHATSAPP.toString();
 							} else if (equivalence.getAction().equals("generico")) {
 								status = TicketStatus.GENERIC.toString();
+							} else if (equivalence.getAction().equals("traza")) {
+								status = TicketStatus.FAULT_TRAZA.toString();
 							}
 						}
 					}
-
 				}
 
 				System.out.println("status ticket:: " + status);
