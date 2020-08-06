@@ -20,7 +20,7 @@ public interface TicketRepository {
 	List<TblTicket> findByCustomerAndUseCase(String docType, String docNumber, String reference, String involvement,
 			LocalDateTime creationDate, LocalDateTime endDate);
 
-	Ticket getTicketStatus(String idTicket);
+	TblTicket getTicket(int idTicket);
 
 	List<TblEquivalence> getEquivalence(int idTicket);
 

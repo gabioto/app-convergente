@@ -91,8 +91,13 @@ public class TicketRepositoryImpl implements TicketRepository {
 	}
 
 	@Override
-	public Ticket getTicketStatus(String idTicket) {
-//		jpaTicketRepository.getTicketStatus(Integer.parseInt(idTicket));
+	public TblTicket getTicket(int idTicket) {
+		Optional<List<TblTicket>> list = jpaTicketRepository.getTicketStatus(idTicket);
+		if (list.isPresent()) {
+			TblTicket tblTicket = list.get().get(0);
+			
+			return tblTicket;
+		}
 		return null;
 	}
 
@@ -101,14 +106,11 @@ public class TicketRepositoryImpl implements TicketRepository {
 			String involvement, LocalDateTime creationDate, LocalDateTime endDate) {
 		return jpaTicketRepository.findByCustomerAndUseCase(docType, docNumber, reference, involvement, creationDate,
 				endDate);
-
 	}
 
 	@Override
 	public List<TblEquivalence> getEquivalence(int idTicket) {
-
-		Optional<List<TblEquivalence>> list = jpaEquivalenceRepository.getEquivalence(idTicket);
-		;
+		Optional<List<TblEquivalence>> list = jpaEquivalenceRepository.getEquivalence(idTicket);		
 		return list.get();
 	}
 
@@ -116,7 +118,6 @@ public class TicketRepositoryImpl implements TicketRepository {
 	public TblEquivalenceNotification getEquivalenceNotification(String code) {
 		Optional<TblEquivalenceNotification> tblEquivalenceNotification = jpaEquivalenceNotificationRepository
 				.getEquivalence(code);
-
 		return tblEquivalenceNotification.get();
 	}
 

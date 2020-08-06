@@ -37,7 +37,7 @@ public interface JpaTicketRepository extends JpaRepository<TblTicket, Integer> {
 			+ "AND t.tblCustomer.id.serviceCode = ?3 "
 			+ "AND t.involvement = ?4 "
 			+ "AND t.creationDate >= ?5 AND t.creationDate < ?6 "
-			+ "ORDER BY t.creationDate ASC")
+			+ "ORDER BY t.idTicketTriage,t.creationDateTicket ASC")
 	List<TblTicket> findByCustomerAndUseCase(String docType, String docNumber,
 			String reference, String involvement, LocalDateTime creationDate, LocalDateTime endDate);
 

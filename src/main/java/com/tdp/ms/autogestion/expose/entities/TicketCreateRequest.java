@@ -25,8 +25,10 @@ public class TicketCreateRequest {
 
 	private String type = "TroubleTicket";
 
+	@NotNull(message = Constants.MSG_NOT_EMPTY)
 	private int priority = 1;
 
+	@NotNull(message = Constants.MSG_NOT_EMPTY)
 	private Channel channel;
 
 	@NotNull(message = Constants.MSG_NOT_EMPTY)
