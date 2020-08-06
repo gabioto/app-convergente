@@ -240,10 +240,10 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 					TblTicket tblTicket = ticketRepository.getTicket(lstId.get(0));
 					
 					// Cuando solo tiene un ticket
-					if (!tblTicket.getStatus().equalsIgnoreCase(TicketStatus.SOLVED.name()) || 
-						!tblTicket.getStatus().equalsIgnoreCase(TicketStatus.WA_SOLVED.name()) ||
-						!tblTicket.getStatus().equalsIgnoreCase(TicketStatus.FAULT_SOLVED.name()) ||
-						!tblTicket.getStatus().equalsIgnoreCase(TicketStatus.GENERIC_SOLVED.name())) {
+					if (!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.SOLVED.name()) || 
+						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.WA_SOLVED.name()) ||
+						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.FAULT_SOLVED.name()) ||
+						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.GENERIC_SOLVED.name())) {
 
 						ticketStatusResponse = new TicketStatusResponse(tblTicket.getIdTicketTriage(),
 								tblTicket.getDescription(), tblTicket.getCreationDate(), tblTicket.getTicketType(),
@@ -257,10 +257,10 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 				} else {
 					TblTicket tblTicket = ticketRepository.getTicket(lstId.get(1));
 					
-					if (!tblTicket.getStatus().equalsIgnoreCase(TicketStatus.SOLVED.name()) ||
-						!tblTicket.getStatus().equalsIgnoreCase(TicketStatus.WA_SOLVED.name()) ||
-						!tblTicket.getStatus().equalsIgnoreCase(TicketStatus.FAULT_SOLVED.name()) ||
-						!tblTicket.getStatus().equalsIgnoreCase(TicketStatus.GENERIC_SOLVED.name())) {
+					if (!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.SOLVED.name()) ||
+						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.WA_SOLVED.name()) ||
+						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.FAULT_SOLVED.name()) ||
+						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.GENERIC_SOLVED.name())) {
 
 						ticketStatusResponse = new TicketStatusResponse(tblTicket.getIdTicketTriage(),
 								tblTicket.getDescription(), tblTicket.getCreationDate(), tblTicket.getTicketType(),
