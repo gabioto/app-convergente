@@ -172,7 +172,7 @@ public class ReceiverKafkaController {
 				}
 				// Logica:: Update status_ticket
 
-				String status = TicketStatus.IN_PROGRESS.toString();
+				String status = TicketStatus.IN_PROGRESS.name();
 				Boolean indicadorReset = Boolean.FALSE;
 
 				Optional<List<TblEquivalence>> tableEquivalence = equivalenceRepository
@@ -189,7 +189,7 @@ public class ReceiverKafkaController {
 								for (AdditionalData attachmentAdditionalData : lstAttachmentAdditionalData) {
 									// Validamos si se realizo un reset
 									if (attachmentAdditionalData.getKey().equals("estado-reset-modem-ok")) {
-										status = TicketStatus.RESET.toString();
+										status = TicketStatus.RESET.name();
 										indicadorReset = Boolean.TRUE;
 									}
 								}
@@ -206,17 +206,17 @@ public class ReceiverKafkaController {
 							TblEquivalenceNotification equivalence = tblEquivalenceNotification.get();
 
 							// Validar el estado del notification_id
-							if (equivalence.getAction().equals(TicketStatus.RESET_SOLVED) && indicadorReset) {
+							if (equivalence.getAction().equals(TicketStatus.RESET_SOLVED.name()) && indicadorReset) {
 								status = TicketStatus.RESET_SOLVED.toString();
-							} else if (equivalence.getAction().equals(TicketStatus.RESET_SOLVED) && !indicadorReset) {
+							} else if (equivalence.getAction().equals(TicketStatus.RESET_SOLVED.name()) && !indicadorReset) {
 								status = TicketStatus.SOLVED.toString();
-							} else if (equivalence.getAction().equals(TicketStatus.FAULT)) {
+							} else if (equivalence.getAction().equals(TicketStatus.FAULT.name())) {
 								status = TicketStatus.FAULT.toString();
-							} else if (equivalence.getAction().equals(TicketStatus.WHATSAPP)) {
+							} else if (equivalence.getAction().equals(TicketStatus.WHATSAPP.name())) {
 								status = TicketStatus.WHATSAPP.toString();
-							} else if (equivalence.getAction().equals(TicketStatus.GENERIC)) {
+							} else if (equivalence.getAction().equals(TicketStatus.GENERIC.name())) {
 								status = TicketStatus.GENERIC.toString();
-							} else if (equivalence.getAction().equals(TicketStatus.FAULT_TRAZA)) {
+							} else if (equivalence.getAction().equals(TicketStatus.FAULT_TRAZA.name())) {
 								status = TicketStatus.FAULT_TRAZA.toString();
 							}
 						}

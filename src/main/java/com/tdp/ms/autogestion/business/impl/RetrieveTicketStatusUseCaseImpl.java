@@ -63,13 +63,7 @@ public class RetrieveTicketStatusUseCaseImpl implements RetrieveTicketStatusUseC
 	public ResponseEntity<TicketStatusResponse> retrieveTicketStatus(String idTicket) {
 		
 		TicketStatusResponse ticketStatusResponse = null;
-		
-		try {
-			
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-		if (idTicket != null) {
+		try {			
 			Optional<List<TblTicket>> tableTicket = ticketRepository.getTicketStatus(Integer.parseInt(idTicket));
 			if (tableTicket.isPresent()) {
 				List<AdditionalData> lstClienteData = new ArrayList<AdditionalData>();
@@ -123,10 +117,11 @@ public class RetrieveTicketStatusUseCaseImpl implements RetrieveTicketStatusUseC
 					Optional<List<TblEquivalence>> tableEquivalence = equivalenceRepository
 							.getEquivalence(tableTicket.get().get(0).getIdTicket());
 					if (tableEquivalence.isPresent()) {
+						int index = 1;
 						List<TblEquivalence> lstEquivalence = tableEquivalence.get();
 						for (TblEquivalence tblEquivalence : lstEquivalence) {
 							clienteData = new AdditionalData();
-							clienteData.setKey(tblEquivalence.getAttachmentName());
+							clienteData.setKey("Attachment-".concat(String.valueOf(index)));
 							clienteData.setValue(tblEquivalence.getNameEquivalence());
 							lstClienteData.add(clienteData);
 						}
@@ -186,8 +181,7 @@ public class RetrieveTicketStatusUseCaseImpl implements RetrieveTicketStatusUseC
 								clienteData = new AdditionalData();
 								clienteData.setKey("actionbbutton");
 								clienteData.setValue(equivalence.getActionbutton() != null ? equivalence.getActionbutton() : "");
-								lstClienteData.add(clienteData);
-								
+								lstClienteData.add(clienteData);								
 							}
 						}
 					}
@@ -195,25 +189,26 @@ public class RetrieveTicketStatusUseCaseImpl implements RetrieveTicketStatusUseC
 
 				TblTicket tblTicket = tableTicket.get().get(0);
 
-				ticketStatusResponse = new TicketStatusResponse(tblTicket.getIdTicket(), tblTicket.getDescription(),
+				ticketStatusResponse = new TicketStatusResponse(tblTicket.getIdTicketTriage(), tblTicket.getDescription(),
 						tblTicket.getCreationDate(), tblTicket.getTicketType(), tblTicket.getStatusChangeDate(),
 						tblTicket.getStatusTicket(), tblTicket.getModifiedDateTicket(), lstClienteData);
 
 				functionsUtil.saveLogData(tableTicket.get().get(0).getIdTicketTriage(),
 						tableTicket.get().get(0).getTblCustomer().getId().getDocumentNumber(),
 						tableTicket.get().get(0).getTblCustomer().getId().getDocumentType(), "Retrieve Ticket Status",
-						"event", null, ticketStatusResponse.toString(), "Retrieve Ticket Status");
+						"OK", null, ticketStatusResponse.toString(), "Retrieve Ticket Status");
 
 				return new ResponseEntity<>(ticketStatusResponse, HttpStatus.OK);
 			} else {
-				functionsUtil.saveLogData(Integer.parseInt(idTicket), null, null, "Retrieve Ticket Status", "event",
+				functionsUtil.saveLogData(Integer.parseInt(idTicket), null, null, "Retrieve Ticket Status", "NOT_FOUND",
 						null, "Ticket No Existe", "Retrieve Ticket Status");
 
-				return new ResponseEntity<>(ticketStatusResponse, HttpStatus.NO_CONTENT);
-			}
-		} else {
-			functionsUtil.saveLogData(0, null, null, "Retrieve Ticket Status", "event", null, "Ticket Nulo",
+				return new ResponseEntity<>(ticketStatusResponse, HttpStatus.NOT_FOUND);
+			}			
+		} catch (Exception exception) {
+			functionsUtil.saveLogData(0, null, null, "Retrieve Ticket Status", "ERROR", null, "Ticket Nulo",
 					"Retrieve Ticket Status");
+			
 			return new ResponseEntity<>(ticketStatusResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
