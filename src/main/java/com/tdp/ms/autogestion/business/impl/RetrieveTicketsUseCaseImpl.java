@@ -234,8 +234,7 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 				}
 			}
 			
-			if (lstId.size() > 0) {
-				ticketStatusResponse = new TicketStatusResponse();
+			if (lstId.size() > 0) {				
 				if (lstId.size() == 1) {
 					TblTicket tblTicket = ticketRepository.getTicket(lstId.get(0));
 					

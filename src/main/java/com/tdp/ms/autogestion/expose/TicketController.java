@@ -47,7 +47,7 @@ public class TicketController {
 	}
 
 	// Consulta de bandeja
-	@PostMapping("/retrieveTickets")
+	@GetMapping("/retrieveTickets")
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<TicketStatusResponse> retrieveTickets(@RequestBody TicketRetrieveRequest request) {
 		return retrieveTicketsUseCase.pendingTicket(request);
