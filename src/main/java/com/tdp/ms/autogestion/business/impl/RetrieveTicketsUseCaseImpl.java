@@ -163,8 +163,7 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 
 						clienteData.setKey(Constants.LABEL_TITLE_DESC);
 						clienteData.setValue(
-								equivalence.getDescriptiontitle() != null ? equivalence.getDescriptiontitle()
-										: "");
+								equivalence.getDescription() != null ? equivalence.getDescription() : "");
 						lstClienteData.add(clienteData);
 
 						clienteData = new AdditionalData();
