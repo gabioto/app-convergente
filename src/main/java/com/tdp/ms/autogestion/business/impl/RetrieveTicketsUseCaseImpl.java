@@ -240,9 +240,9 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 					TblTicket tblTicket = ticketRepository.getTicket(lstId.get(0));
 					
 					// Cuando solo tiene un ticket
-					if (!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.SOLVED.name()) || 
-						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.WA_SOLVED.name()) ||
-						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.FAULT_SOLVED.name()) ||
+					if (!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.SOLVED.name()) &&
+						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.WA_SOLVED.name()) &&
+						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.FAULT_SOLVED.name()) &&
 						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.GENERIC_SOLVED.name())) {
 
 						ticketStatusResponse = new TicketStatusResponse(tblTicket.getIdTicketTriage(),
@@ -257,9 +257,9 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 				} else {
 					TblTicket tblTicket = ticketRepository.getTicket(lstId.get(1));
 					
-					if (!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.SOLVED.name()) ||
-						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.WA_SOLVED.name()) ||
-						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.FAULT_SOLVED.name()) ||
+					if (!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.SOLVED.name()) &&
+						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.WA_SOLVED.name()) &&
+						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.FAULT_SOLVED.name()) &&
 						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.GENERIC_SOLVED.name())) {
 
 						ticketStatusResponse = new TicketStatusResponse(tblTicket.getIdTicketTriage(),
