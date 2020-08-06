@@ -33,6 +33,6 @@ public interface JpaAttachmentRepository extends JpaRepository<TblAttachment, In
 	@Query					
 	(value = "SELECT ta FROM TblAttachment ta "
 			+ "JOIN TblEquivalence te ON te.attachmentName = ta.nameAttachment "
-			+ "WHERE ta.tblTicket.idTicket = ?1")
+			+ "WHERE ta.tblTicket.idTicket = ?1 ORDER BY ta.idAttachmentKafka ASC")
 	Optional<List<TblAdditionalData>> getTicketAdditionalData(int idTicket);
 }
