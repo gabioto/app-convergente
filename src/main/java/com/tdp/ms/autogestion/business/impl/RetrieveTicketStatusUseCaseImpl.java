@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.tdp.ms.autogestion.business.RetrieveTicketStatusUseCase;
+import com.tdp.ms.autogestion.dao.ServiceDao;
 import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
 import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse.AdditionalData;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaAttachmentAdditionalDataRepository;
@@ -59,11 +60,15 @@ public class RetrieveTicketStatusUseCaseImpl implements RetrieveTicketStatusUseC
 
 	@Autowired
 	FunctionsUtil functionsUtil;
+	
+	@Autowired
+	ServiceDao serviceDao;
 
 	@Override
 	public ResponseEntity<TicketStatusResponse> retrieveTicketStatus(String idTicket) {
 
 		TicketStatusResponse ticketStatusResponse = null;
+		serviceDao.getOauth(1);
 		try {
 			Optional<List<TblTicket>> tableTicket = ticketRepository.getTicketStatus(Integer.parseInt(idTicket));
 			if (tableTicket.isPresent()) {
