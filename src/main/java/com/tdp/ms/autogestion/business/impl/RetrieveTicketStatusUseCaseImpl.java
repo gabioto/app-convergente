@@ -162,8 +162,7 @@ public class RetrieveTicketStatusUseCaseImpl implements RetrieveTicketStatusUseC
 
 								clienteData.setKey(Constants.LABEL_TITLE_DESC);
 								clienteData.setValue(
-										equivalence.getDescription() != null ? equivalence.getDescription()
-												: "");
+										equivalence.getDescription() != null ? equivalence.getDescription() : "");
 								lstClienteData.add(clienteData);
 
 								clienteData = new AdditionalData();
