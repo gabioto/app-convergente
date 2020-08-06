@@ -90,7 +90,7 @@ public class ReceiverKafkaController {
 
 			if (listTblTicket.isPresent()) {
 				TblTicket tblTicket = new TblTicket();
-				tblTicket.setEventTimeKafka(DateUtil.formatStringToLocalDateTime(ticketKafkaResponse.getEventTime()));
+				tblTicket.setEventTimeKafka(DateUtil.formatStringToLocalDateTimeKafka(ticketKafkaResponse.getEventTime()));
 				tblTicket
 						.setIdTicketTriage(Integer.parseInt(ticketKafkaResponse.getEvent().getTroubleTicket().getId()));
 				tblTicket.setStatusChangeDate(DateUtil.formatStringToLocalDateTime(
