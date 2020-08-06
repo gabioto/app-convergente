@@ -9,5 +9,16 @@ public class Constants {
 //	public static final String STATUS_DONE = "DONE";
 //	public static final String STATUS_WHATSAPP = "WHATSAPP";
 	public static final String ZONE_OFFSET = "-05:00";
-
+	public static final String LABEL_FRONT_END = "ATTACHMENT-";
+	public static final String LABEL_ACTION = "ACTION";
+	public static final String LABEL_TITLE = "TITLE";
+	public static final String LABEL_TITLE_DESC = "TITLE_DESC";
+	public static final String LABEL_BODY = "BODY";
+	public static final String LABEL_FOOTER = "FOOTER";
+	public static final String LABEL_ICON = "ICON";
+	public static final String LABEL_IMAGE = "IMAGE";
+	public static final String LABEL_BUTTON = "BUTTON";
+	public static final String LABEL_ACTION_BUTTON = "ACTION_BUTTON";
+	public static final String LABEL_MONTO = "MONTO";
+	public static final String LABEL_COD_AVERIA = "COD_AVERIA";
 }
