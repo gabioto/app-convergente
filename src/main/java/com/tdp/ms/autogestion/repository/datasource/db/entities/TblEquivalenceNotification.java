@@ -38,7 +38,7 @@ public class TblEquivalenceNotification implements Serializable {
 
 	private String actionbutton;
 
-	private String descriptionTitle;
+	private String descriptiontitle;
 
 	public TblEquivalenceNotification() {
 	}
@@ -131,12 +131,12 @@ public class TblEquivalenceNotification implements Serializable {
 		this.actionbutton = actionbutton;
 	}
 
-	public String getDescriptionTitle() {
-		return descriptionTitle;
+	public String getDescriptiontitle() {
+		return descriptiontitle;
 	}
 
-	public void setDescriptionTitle(String descriptionTitle) {
-		this.descriptionTitle = descriptionTitle;
+	public void setDescriptiontitle(String descriptiontitle) {
+		this.descriptiontitle = descriptiontitle;
 	}
 
 }
