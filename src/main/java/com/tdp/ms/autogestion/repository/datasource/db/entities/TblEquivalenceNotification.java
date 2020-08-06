@@ -3,41 +3,42 @@ package com.tdp.ms.autogestion.repository.datasource.db.entities;
 import java.io.Serializable;
 import javax.persistence.*;
 
-
 /**
  * The persistent class for the tbl_equivalence_notification database table.
  * 
  */
 @Entity
-@Table(name="tbl_equivalence_notification")
-@NamedQuery(name="TblEquivalenceNotification.findAll", query="SELECT t FROM TblEquivalenceNotification t")
+@Table(name = "tbl_equivalence_notification")
+@NamedQuery(name = "TblEquivalenceNotification.findAll", query = "SELECT t FROM TblEquivalenceNotification t")
 public class TblEquivalenceNotification implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Id
-	@Column(name="id_equivalence_notification")
+	@Column(name = "id_equivalence_notification")
 	private Integer idEquivalenceNotification;
 
 	private String code;
 
 	private String description;
-	
+
 	private String action;
-	
+
 	private String title;
-		
+
 	private String body;
-	
+
 	private String footer;
-	
+
 	private String icon;
-	
+
 	private String button;
-	
+
 	private String image;
-	
+
 	private String actionbutton;
+
+	private String descriptionTitle;
 
 	public TblEquivalenceNotification() {
 	}
@@ -128,6 +129,14 @@ public class TblEquivalenceNotification implements Serializable {
 
 	public void setActionbutton(String actionbutton) {
 		this.actionbutton = actionbutton;
+	}
+
+	public String getDescriptionTitle() {
+		return descriptionTitle;
+	}
+
+	public void setDescriptionTitle(String descriptionTitle) {
+		this.descriptionTitle = descriptionTitle;
 	}
 
 }
