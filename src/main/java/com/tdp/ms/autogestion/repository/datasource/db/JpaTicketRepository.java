@@ -43,7 +43,7 @@ public interface JpaTicketRepository extends JpaRepository<TblTicket, Integer> {
 
 	@Query					
 	(value = "SELECT t FROM TblTicket t "
-			+ "WHERE t.idTicketTriage = ?1 ORDER BY creation_date_ticket DESC")
+			+ "WHERE t.idTicketTriage = ?1 ORDER BY statusChangeDate DESC")
 	Optional<List<TblTicket>> getTicketStatus(int idTicket);
 	
 	@Query
