@@ -124,6 +124,7 @@ public class RetrieveTicketStatusUseCaseImpl implements RetrieveTicketStatusUseC
 							clienteData.setKey("Attachment-".concat(String.valueOf(index)));
 							clienteData.setValue(tblEquivalence.getNameEquivalence());
 							lstClienteData.add(clienteData);
+							index++;
 						}
 					}
 				}
