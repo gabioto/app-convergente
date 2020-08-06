@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.tdp.ms.autogestion.business.RetrieveTicketsUseCase;
-import com.tdp.ms.autogestion.expose.entities.TicketRetrieveRequest;
 import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
 import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse.AdditionalData;
 import com.tdp.ms.autogestion.model.TicketStatus;
@@ -204,17 +203,16 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 	}
 
 	@Override
-	public ResponseEntity<TicketStatusResponse> pendingTicket(TicketRetrieveRequest request) {
+	public ResponseEntity<TicketStatusResponse> pendingTicket(String type, String involvement, String reference,
+			String nationalIdType, String nationalId) {
 
 		LocalDate today = LocalDate.now(ZoneOffset.of(Constants.ZONE_OFFSET));
 
 		TicketStatusResponse ticketStatusResponse = null;
 
 		try {
-			List<TblTicket> tableTicket = ticketRepository.findByCustomerAndUseCase(request.getNationalIdType(),
-					request.getNationalId(), request.getRelatedObject().getReference(),
-					request.getRelatedObject().getInvolvement(), today.atStartOfDay(),
-					today.atStartOfDay().plusDays(1));
+			List<TblTicket> tableTicket = ticketRepository.findByCustomerAndUseCase(nationalIdType, nationalId,
+					reference, involvement, today.atStartOfDay(), today.atStartOfDay().plusDays(1));
 
 			List<Integer> lstId = new ArrayList<Integer>();
 			if (tableTicket != null && tableTicket.size() > 0) {
@@ -222,28 +220,27 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 				for (TblTicket tblTicket : tableTicket) {
 					if (idTicketTriage.equals("")) {
 						idTicketTriage = tblTicket.getIdTicketTriage().toString();
-						lstId.add(new Integer(tblTicket.getIdTicketTriage()));
+						lstId.add(tblTicket.getIdTicketTriage());
 						log.info("1 - Id Ticket: " + idTicketTriage);
 					} else {
 						if (!idTicketTriage.equals(tblTicket.getIdTicketTriage().toString())) {
 							idTicketTriage = tblTicket.getIdTicketTriage().toString();
-							lstId.add(new Integer(tblTicket.getIdTicketTriage()));
+							lstId.add(tblTicket.getIdTicketTriage());
 							log.info("2 - Id Ticket: " + idTicketTriage);
 						}
 					}
 				}
 			}
 			
-			if (lstId.size() > 0) {
-				ticketStatusResponse = new TicketStatusResponse();
+			if (lstId.size() > 0) {				
 				if (lstId.size() == 1) {
 					TblTicket tblTicket = ticketRepository.getTicket(lstId.get(0));
 					
 					// Cuando solo tiene un ticket
-					if (!tblTicket.getStatus().equalsIgnoreCase(TicketStatus.SOLVED.name()) || 
-						!tblTicket.getStatus().equalsIgnoreCase(TicketStatus.WA_SOLVED.name()) ||
-						!tblTicket.getStatus().equalsIgnoreCase(TicketStatus.FAULT_SOLVED.name()) ||
-						!tblTicket.getStatus().equalsIgnoreCase(TicketStatus.GENERIC_SOLVED.name())) {
+					if (!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.SOLVED.name()) &&
+						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.WA_SOLVED.name()) &&
+						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.FAULT_SOLVED.name()) &&
+						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.GENERIC_SOLVED.name())) {
 
 						ticketStatusResponse = new TicketStatusResponse(tblTicket.getIdTicketTriage(),
 								tblTicket.getDescription(), tblTicket.getCreationDate(), tblTicket.getTicketType(),
@@ -257,10 +254,10 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 				} else {
 					TblTicket tblTicket = ticketRepository.getTicket(lstId.get(1));
 					
-					if (!tblTicket.getStatus().equalsIgnoreCase(TicketStatus.SOLVED.name()) ||
-						!tblTicket.getStatus().equalsIgnoreCase(TicketStatus.WA_SOLVED.name()) ||
-						!tblTicket.getStatus().equalsIgnoreCase(TicketStatus.FAULT_SOLVED.name()) ||
-						!tblTicket.getStatus().equalsIgnoreCase(TicketStatus.GENERIC_SOLVED.name())) {
+					if (!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.SOLVED.name()) &&
+						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.WA_SOLVED.name()) &&
+						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.FAULT_SOLVED.name()) &&
+						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.GENERIC_SOLVED.name())) {
 
 						ticketStatusResponse = new TicketStatusResponse(tblTicket.getIdTicketTriage(),
 								tblTicket.getDescription(), tblTicket.getCreationDate(), tblTicket.getTicketType(),

@@ -59,10 +59,10 @@ public class TicketStatusResponse {
 		private String value;
 	}
 
-	public static TicketStatusResponse from(Ticket ticket) {
+	public static TicketStatusResponse from(Ticket ticket, int idTicket) {
 		TicketStatusResponse response = new TicketStatusResponse();
 		response.setDescription(ticket.getDescription());
-		response.setTicketId(Integer.valueOf(ticket.getId()));
+		response.setTicketId(idTicket);
 		response.setTicketStatus(ticket.getTicketStatus());
 		response.setCreationDate(ticket.getCreationDate());
 		response.setType(ticket.getType());
