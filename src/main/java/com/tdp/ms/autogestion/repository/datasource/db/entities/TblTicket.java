@@ -82,8 +82,7 @@ public class TblTicket implements Serializable {
 	@Convert(converter = LocalDateTimeConverter.class)
 	@Column(name = "modified_date_ticket")
 	private LocalDateTime modifiedDateTicket;
-	
-	
+		
 	@Convert(converter = LocalDateTimeConverter.class)
 	@Column(name = "event_time_kafka")
 	private LocalDateTime eventTimeKafka;
@@ -119,8 +118,6 @@ public class TblTicket implements Serializable {
 	public void setEventTimeKafka(LocalDateTime eventTimeKafka) {
 		this.eventTimeKafka = eventTimeKafka;
 	}
-
-
 
 	public LocalDateTime getModifiedDateTicket() {
 		return modifiedDateTicket;
@@ -341,6 +338,7 @@ public class TblTicket implements Serializable {
 		tableTicket.setIdUseCase(ticket.getUseCaseId());
 		tableTicket.setTechnology(ticket.getTechnology());
 		tableTicket.setTblCustomer(tableCustomer);
+		tableTicket.setEventTimeKafka(LocalDateTime.now(ZoneOffset.of(Constants.ZONE_OFFSET)));
 		return tableTicket;
 	}
 
@@ -349,4 +347,5 @@ public class TblTicket implements Serializable {
 				status, statusChangeDate, statusChangeReason, priority, technology, idUseCase, "",
 				involvement, "", "", tblCustomer.fromThis(), statusTicket, modifiedDateTicket);
 	}
+
 }
