@@ -82,6 +82,11 @@ public class TblTicket implements Serializable {
 	@Convert(converter = LocalDateTimeConverter.class)
 	@Column(name = "modified_date_ticket")
 	private LocalDateTime modifiedDateTicket;
+	
+	
+	@Convert(converter = LocalDateTimeConverter.class)
+	@Column(name = "event_time_kafka")
+	private LocalDateTime eventTimeKafka;
 
 	// bi-directional many-to-one association to TblAdditionalData
 	@OneToMany(mappedBy = "tblTicket", targetEntity = TblAdditionalData.class)
@@ -106,6 +111,16 @@ public class TblTicket implements Serializable {
 
 	public TblTicket() {
 	}
+
+	public LocalDateTime getEventTimeKafka() {
+		return eventTimeKafka;
+	}
+
+	public void setEventTimeKafka(LocalDateTime eventTimeKafka) {
+		this.eventTimeKafka = eventTimeKafka;
+	}
+
+
 
 	public LocalDateTime getModifiedDateTicket() {
 		return modifiedDateTicket;
