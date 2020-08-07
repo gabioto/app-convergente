@@ -67,7 +67,6 @@ public class TicketRepositoryImpl implements TicketRepository {
 		if (!optCustomer.isPresent()) {
 			jpaCustomerRepository.save(tableCustomer);
 		}
-
 		tableTicket = jpaTicketRepository.save(tableTicket);
 		log.info(TAG + "createTicket: " + tableTicket.getIdTicket());
 	}
@@ -76,18 +75,22 @@ public class TicketRepositoryImpl implements TicketRepository {
 	public Ticket updateTicketStatus(int idTicket, String status) throws Exception {
 		LocalDateTime sysDate = LocalDateTime.now(ZoneOffset.of(Constants.ZONE_OFFSET));
 		Optional<List<TblTicket>> list = jpaTicketRepository.getTicketStatus(idTicket);
-
 		if (list.isPresent()) {
-			TblTicket tblTicket = list.get().get(0);
+			TblTicket tblTicket;
+			if (list.get().size() == 1) {				
+				tblTicket = list.get().get(0);
+			} else {
+				tblTicket = list.get().get(1);
+			}			
 			tblTicket.setStatusTicket(status);
 			tblTicket.setModifiedDateTicket(sysDate);
+			tblTicket.setEventTimeKafka(sysDate);
 			tblTicket = jpaTicketRepository.save(tblTicket);
 
 			return tblTicket.fromThis();
 		} else {
 			throw new Exception();
 		}
-
 	}
 
 	@Override
@@ -108,6 +111,11 @@ public class TicketRepositoryImpl implements TicketRepository {
 				endDate);
 	}
 
+	@Override
+	public List<TblTicket> findByCustomerAndUseCasePast(String docType, String docNumber, String reference, String involvement) {
+		return jpaTicketRepository.findByCustomerAndUseCasePast(docType, docNumber, reference, involvement);
+	}
+	
 	@Override
 	public List<TblEquivalence> getEquivalence(int idTicket) {
 		Optional<List<TblEquivalence>> list = jpaEquivalenceRepository.getEquivalence(idTicket);		

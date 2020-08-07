@@ -41,6 +41,16 @@ public interface JpaTicketRepository extends JpaRepository<TblTicket, Integer> {
 	List<TblTicket> findByCustomerAndUseCase(String docType, String docNumber,
 			String reference, String involvement, LocalDateTime creationDate, LocalDateTime endDate);
 
+	@Query
+	(value = "SELECT t FROM TblTicket t "
+			+ "WHERE t.tblCustomer.id.documentType = ?1 "
+			+ "AND t.tblCustomer.id.documentNumber = ?2 "
+			+ "AND t.tblCustomer.id.serviceCode = ?3 "
+			+ "AND t.involvement = ?4 "			
+			+ "ORDER BY t.idTicketTriage,t.eventTimeKafka DESC")
+	List<TblTicket> findByCustomerAndUseCasePast(String docType, String docNumber,
+			String reference, String involvement);
+	
 	@Query					
 	(value = "SELECT t FROM TblTicket t "			
 			+ "WHERE t.idTicketTriage = ?1 ORDER BY t.eventTimeKafka DESC")
