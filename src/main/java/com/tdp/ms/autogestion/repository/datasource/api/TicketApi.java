@@ -16,6 +16,8 @@ import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.Gson;
 import com.tdp.ms.autogestion.config.PropertiesConfig;
+import com.tdp.ms.autogestion.exception.ErrorCategory;
+import com.tdp.ms.autogestion.exception.ExternalServerException;
 import com.tdp.ms.autogestion.model.OAuth;
 import com.tdp.ms.autogestion.model.Ticket;
 import com.tdp.ms.autogestion.repository.datasource.api.entities.TicketApiRequest;
@@ -74,7 +76,7 @@ public class TicketApi {
 			functionsUtil.saveLogData(0, pTicket.getCustomer().getNationalId(),
 					pTicket.getCustomer().getNationalType(), pTicket.getChannelId(), "ERROR", new Gson().toJson(entity),
 					e.getLocalizedMessage(), "generateTicekt");
-			throw e;
+			throw new ExternalServerException(ErrorCategory.EXTERNAL_ERROR, e.getLocalizedMessage());
 		} catch (Exception e) {
 			functionsUtil.saveLogData(0, pTicket.getCustomer().getNationalId(),
 					pTicket.getCustomer().getNationalType(), pTicket.getChannelId(), "ERROR", new Gson().toJson(entity),

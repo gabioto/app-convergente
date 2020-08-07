@@ -35,7 +35,7 @@ public class OAuthApi {
 	@Autowired
 	private PropertiesConfig config;
 
-	public OAuth generate(OAuth pOAuth) {
+	public OAuth generate(OAuth pOAuth) throws Exception, HttpClientErrorException {
 		RestTemplate restTemplate = new RestTemplate(
 				SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
@@ -69,17 +69,17 @@ public class OAuthApi {
 				return authResponse.fromThis();
 			} else {
 				System.out.println(" getFromService body: else ");
-				return null;
+				throw new Exception("Error when get OAuth response");
 			}
 		} catch (HttpClientErrorException e) {
 			System.out.println(TAG + " Exception: " + e.getMessage());
 			log.info(TAG + " Exception: " + e.getMessage());
 			log.info(TAG + " Exception: " + e.getResponseBodyAsString());
-			return null;
+			throw e;
 		} catch (Exception e) {
 			System.out.println(TAG + " Exception: " + e.getMessage());
 			log.info(TAG + " Exception: " + e.getMessage());
-			return null;
+			throw e;
 		}
 	}
 }

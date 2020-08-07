@@ -19,10 +19,13 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = false)
 public class TicketCreateRequest {
 
+	@NotEmpty(message = Constants.MSG_NOT_EMPTY)
 	private String description = "averia";
 
+	@NotEmpty(message = Constants.MSG_NOT_EMPTY)
 	private String severity = "minor";
 
+	@NotEmpty(message = Constants.MSG_NOT_EMPTY)
 	private String type = "TroubleTicket";
 
 	@NotNull(message = Constants.MSG_NOT_EMPTY)
@@ -31,7 +34,7 @@ public class TicketCreateRequest {
 	@NotNull(message = Constants.MSG_NOT_EMPTY)
 	private Channel channel;
 
-	@NotNull(message = Constants.MSG_NOT_EMPTY)
+	@NotNull
 	private RelatedObject relatedObject;
 
 	@NotNull(message = Constants.MSG_NOT_EMPTY)

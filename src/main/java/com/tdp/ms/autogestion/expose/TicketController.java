@@ -1,5 +1,7 @@
 package com.tdp.ms.autogestion.expose;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +44,7 @@ public class TicketController {
 	// Creación de ticket
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public ResponseEntity<TicketCreateResponse> createTicket(@RequestBody TicketCreateRequest request) {
+	public ResponseEntity<TicketCreateResponse> createTicket(@Valid @RequestBody TicketCreateRequest request) throws Exception{
 		return createTicketUseCase.createTicket(request);
 	}
 

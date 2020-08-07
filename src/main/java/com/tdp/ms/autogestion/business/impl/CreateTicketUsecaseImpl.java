@@ -8,9 +8,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.tdp.ms.autogestion.business.CreateTicketUseCase;
+import com.tdp.ms.autogestion.exception.DomainException;
+import com.tdp.ms.autogestion.exception.ErrorCategory;
+import com.tdp.ms.autogestion.exception.ValidRequestException;
 import com.tdp.ms.autogestion.expose.entities.TicketCreateRequest;
-import com.tdp.ms.autogestion.expose.entities.TicketCreateResponse;
 import com.tdp.ms.autogestion.expose.entities.TicketCreateRequest.AdditionalData;
+import com.tdp.ms.autogestion.expose.entities.TicketCreateResponse;
 import com.tdp.ms.autogestion.model.Customer;
 import com.tdp.ms.autogestion.model.OAuth;
 import com.tdp.ms.autogestion.model.Ticket;
@@ -27,12 +30,13 @@ public class CreateTicketUsecaseImpl implements CreateTicketUseCase {
 	private TicketRepository ticketRepository;
 
 	@Override
-	public ResponseEntity<TicketCreateResponse> createTicket(TicketCreateRequest request) {
+	public ResponseEntity<TicketCreateResponse> createTicket(TicketCreateRequest request) throws Exception {
 		OAuth oAuth;
 		Ticket ticket;
 
 		try {
 			// Validación de campos
+			// TODO: Migrar a Validator
 			String documentType = validateRequestAdditionalData(request.getAdditionalData(), "nationalIdType");
 
 			String documentNumber = validateRequestAdditionalData(request.getAdditionalData(), "nationalId");
@@ -47,7 +51,15 @@ public class CreateTicketUsecaseImpl implements CreateTicketUseCase {
 			boolean validParams = technology.isEmpty() || useCaseId.isEmpty() || subOperationCode.isEmpty();
 
 			if (validCustomer || validParams) {
-				return new ResponseEntity<>(new TicketCreateResponse(), HttpStatus.UNAUTHORIZED);
+
+				String emptyFields = documentType.isEmpty() ? "nationalIdType is empty or null" : "";
+				emptyFields = emptyFields.concat(documentNumber.isEmpty() ? ", nationalId is empty or null" : "");
+				emptyFields = emptyFields.concat(technology.isEmpty() ? ", technology is empty or null" : "");
+				emptyFields = emptyFields.concat(useCaseId.isEmpty() ? ", use-case-id is empty or null" : "");
+				emptyFields = emptyFields
+						.concat(subOperationCode.isEmpty() ? ", sub-operation-code is empty or null" : "");
+
+				throw new ValidRequestException(ErrorCategory.MISSING_MANDATORY, emptyFields);
 			}
 
 			ticket = request.fromThis();
@@ -64,14 +76,15 @@ public class CreateTicketUsecaseImpl implements CreateTicketUseCase {
 			ticketRepository.saveGeneratedTicket(ticket);
 
 			return new ResponseEntity<>(TicketCreateResponse.from(ticket), HttpStatus.OK);
+		} catch (DomainException e) {
+			throw e;
 		} catch (Exception e) {
-			return new ResponseEntity<>(new TicketCreateResponse(), HttpStatus.INTERNAL_SERVER_ERROR);
+			throw e;
 		}
 	}
 
 	private String validateRequestAdditionalData(List<AdditionalData> data, String value) {
 		AdditionalData field = data.stream().filter(item -> value.equals(item.getKey())).findFirst().orElse(null);
-
 		return (field != null && field.getValue() != null) ? field.getValue() : "";
 	}
 

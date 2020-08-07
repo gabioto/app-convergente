@@ -7,5 +7,5 @@ import com.tdp.ms.autogestion.expose.entities.TicketCreateResponse;
 
 public interface CreateTicketUseCase {
 	
-	ResponseEntity<TicketCreateResponse> createTicket(TicketCreateRequest request);
+	ResponseEntity<TicketCreateResponse> createTicket(TicketCreateRequest request) throws Exception;
 }

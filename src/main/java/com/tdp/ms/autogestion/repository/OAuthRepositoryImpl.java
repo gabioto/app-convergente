@@ -21,22 +21,32 @@ public class OAuthRepositoryImpl implements OAuthRepository {
 	private JpaOAuthRepository jpaOAuthRepository;
 
 	@Override
-	public OAuth getOAuthValues() {
-		Optional<TblOauth> tblOauth = jpaOAuthRepository.findById(1);
-		System.out.println("ingreso tblOauth:: " + tblOauth.get().getIdOauth());
+	public OAuth getOAuthValues() throws Exception {
+		OAuth oAuth = null;
 
-		OAuth oAuth = tblOauth.get().fromThis();
+		try {
+			Optional<TblOauth> tblOauth = jpaOAuthRepository.findById(1);
+			if (tblOauth.isPresent()) {
 
-		long timeDiff = new Date().getTime() - (Long.parseLong(oAuth.getConsentedOn()) * 1000);
+				oAuth = tblOauth.get().fromThis();
 
-		if (timeDiff >= ((Integer.parseInt(oAuth.getExpiresIn()) - 5) * 1000)) {
-			oAuth = generateOAuth2Token(oAuth);
+				long timeDiff = new Date().getTime() - (Long.parseLong(oAuth.getConsentedOn()) * 1000);
+
+				if (timeDiff >= ((Integer.parseInt(oAuth.getExpiresIn()) - 5) * 1000)) {
+					oAuth = generateOAuth2Token(oAuth);
+				}
+
+			} else {
+				throw new Exception();
+			}
+		} catch (Exception e) {
+			throw e;
 		}
 
 		return oAuth;
 	}
 
-	private OAuth generateOAuth2Token(OAuth pOAuth) {
+	private OAuth generateOAuth2Token(OAuth pOAuth) throws Exception {
 		OAuth lOAuthResponse = oAuthApi.generate(pOAuth);
 
 		if (lOAuthResponse != null) {

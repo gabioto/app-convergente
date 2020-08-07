@@ -53,23 +53,27 @@ public class TicketRepositoryImpl implements TicketRepository {
 
 	@Override
 	public void saveGeneratedTicket(Ticket pTicket) {
-		Optional<TblCustomer> optCustomer;
-		TblCustomer tableCustomer = new TblCustomer();
-		TblCustomerPK tableCustomerPk;
-		TblTicket tableTicket;
+		try {
+			Optional<TblCustomer> optCustomer;
+			TblCustomer tableCustomer = new TblCustomer();
+			TblCustomerPK tableCustomerPk;
+			TblTicket tableTicket;
 
-		tableCustomerPk = TblCustomerPK.from(pTicket);
-		tableCustomer.setId(tableCustomerPk);
-		tableTicket = TblTicket.from(pTicket, tableCustomer, TicketStatus.CREATED.name());
+			tableCustomerPk = TblCustomerPK.from(pTicket);
+			tableCustomer.setId(tableCustomerPk);
+			tableTicket = TblTicket.from(pTicket, tableCustomer, TicketStatus.CREATED.name());
 
-		optCustomer = jpaCustomerRepository.findById(tableCustomerPk);
+			optCustomer = jpaCustomerRepository.findById(tableCustomerPk);
 
-		if (!optCustomer.isPresent()) {
-			jpaCustomerRepository.save(tableCustomer);
+			if (!optCustomer.isPresent()) {
+				jpaCustomerRepository.save(tableCustomer);
+			}
+
+			tableTicket = jpaTicketRepository.save(tableTicket);
+			log.info(TAG + "createTicket: " + tableTicket.getIdTicket());
+		} catch (Exception e) {
+			throw e;
 		}
-
-		tableTicket = jpaTicketRepository.save(tableTicket);
-		log.info(TAG + "createTicket: " + tableTicket.getIdTicket());
 	}
 
 	@Override
@@ -95,7 +99,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 		Optional<List<TblTicket>> list = jpaTicketRepository.getTicketStatus(idTicket);
 		if (list.isPresent()) {
 			TblTicket tblTicket = list.get().get(0);
-			
+
 			return tblTicket;
 		}
 		return null;
@@ -110,7 +114,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 
 	@Override
 	public List<TblEquivalence> getEquivalence(int idTicket) {
-		Optional<List<TblEquivalence>> list = jpaEquivalenceRepository.getEquivalence(idTicket);		
+		Optional<List<TblEquivalence>> list = jpaEquivalenceRepository.getEquivalence(idTicket);
 		return list.get();
 	}
 
