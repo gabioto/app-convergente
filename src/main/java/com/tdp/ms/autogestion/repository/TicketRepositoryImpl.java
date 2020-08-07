@@ -75,7 +75,6 @@ public class TicketRepositoryImpl implements TicketRepository {
 	public Ticket updateTicketStatus(int idTicket, String status) throws Exception {
 		LocalDateTime sysDate = LocalDateTime.now(ZoneOffset.of(Constants.ZONE_OFFSET));
 		Optional<List<TblTicket>> list = jpaTicketRepository.getTicketStatus(idTicket);
-
 		if (list.isPresent()) {
 			TblTicket tblTicket;
 			if (list.get().size() == 1) {				
