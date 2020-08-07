@@ -72,14 +72,21 @@ public class RetrieveTicketStatusUseCaseImpl implements RetrieveTicketStatusUseC
 		try {
 			Optional<List<TblTicket>> tableTicket = ticketRepository.getTicketStatus(Integer.parseInt(idTicket));
 			if (tableTicket.isPresent()) {
+				TblTicket tblTicket;
+				if (tableTicket.get().size() == 1) {				
+					tblTicket = tableTicket.get().get(0);
+				} else {
+					tblTicket = tableTicket.get().get(1);
+				}
+				
 				List<AdditionalData> lstClienteData = new ArrayList<AdditionalData>();
 
 				AdditionalData clienteData = new AdditionalData();
-				clienteData.setKey("status");
-				clienteData.setValue(tableTicket.get().get(0).getStatus());
+				clienteData.setKey(Constants.LABEL_STATUS);
+				clienteData.setValue(tblTicket.getStatus());
 				lstClienteData.add(clienteData);
 
-				List<TblAttachment> lstAttachment = tableTicket.get().get(0).getTblAttachments();
+				List<TblAttachment> lstAttachment = tblTicket.getTblAttachments();
 				if (lstAttachment != null && lstAttachment.size() > 0) {
 					for (TblAttachment tblAttachment : lstAttachment) {
 						// Obtener el monto adeudado por el cliente
@@ -131,7 +138,7 @@ public class RetrieveTicketStatusUseCaseImpl implements RetrieveTicketStatusUseC
 
 					// Equivalencias
 					Optional<List<TblEquivalence>> tableEquivalence = equivalenceRepository
-							.getEquivalence(tableTicket.get().get(0).getIdTicket());
+							.getEquivalence(tblTicket.getIdTicket());
 					if (tableEquivalence.isPresent()) {
 						int index = 1;
 						List<TblEquivalence> lstEquivalence = tableEquivalence.get();
@@ -144,7 +151,7 @@ public class RetrieveTicketStatusUseCaseImpl implements RetrieveTicketStatusUseC
 						}
 					}
 				}
-				List<TblAdditionalData> lstAdditionalData = tableTicket.get().get(0).getTblAdditionalData();
+				List<TblAdditionalData> lstAdditionalData = tblTicket.getTblAdditionalData();
 				if (lstAdditionalData != null && lstAdditionalData.size() > 0) {
 					for (TblAdditionalData tblAdditionalData : lstAdditionalData) {
 						if (tblAdditionalData.getKeyAdditional().equals("notification-id")) {
@@ -205,16 +212,14 @@ public class RetrieveTicketStatusUseCaseImpl implements RetrieveTicketStatusUseC
 					}
 				}
 
-				TblTicket tblTicket = tableTicket.get().get(0);
-
 				ticketStatusResponse = new TicketStatusResponse(tblTicket.getIdTicketTriage(),
 						tblTicket.getDescription(), tblTicket.getCreationDate(), tblTicket.getTicketType(),
 						tblTicket.getStatusChangeDate(), tblTicket.getStatusTicket(), tblTicket.getModifiedDateTicket(),
 						lstClienteData);
 
-				functionsUtil.saveLogData(tableTicket.get().get(0).getIdTicketTriage(),
-						tableTicket.get().get(0).getTblCustomer().getId().getDocumentNumber(),
-						tableTicket.get().get(0).getTblCustomer().getId().getDocumentType(), "Retrieve Ticket Status",
+				functionsUtil.saveLogData(tblTicket.getIdTicketTriage(),
+						tblTicket.getTblCustomer().getId().getDocumentNumber(),
+						tblTicket.getTblCustomer().getId().getDocumentType(), "Retrieve Ticket Status",
 						"OK", null, ticketStatusResponse.toString(), "Retrieve Ticket Status");
 
 				return new ResponseEntity<>(ticketStatusResponse, HttpStatus.OK);

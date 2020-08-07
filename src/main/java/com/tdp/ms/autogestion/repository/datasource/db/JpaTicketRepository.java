@@ -46,6 +46,11 @@ public interface JpaTicketRepository extends JpaRepository<TblTicket, Integer> {
 			+ "WHERE t.idTicketTriage = ?1 ORDER BY t.eventTimeKafka DESC")
 	Optional<List<TblTicket>> getTicketStatus(int idTicket);
 	
+	@Query					
+	(value = "SELECT t FROM TblTicket t "
+			+ "WHERE t.idTicket = ?1")
+	Optional<List<TblTicket>> getTicket(int idTicket);
+	
 	@Query
 	(value = "SELECT t FROM TblTicket t where t.idTicketTriage = ?1")
 	Optional<List<TblTicket>> findByIdTicketTriage(int idTicketTriage);	

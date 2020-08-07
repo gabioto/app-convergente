@@ -80,7 +80,7 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 		List<AdditionalData> lstClienteData = new ArrayList<AdditionalData>();
 
 		AdditionalData clienteData = new AdditionalData();
-		clienteData.setKey("status");
+		clienteData.setKey(Constants.LABEL_STATUS);
 		clienteData.setValue(tableTicket.getStatus());
 		lstClienteData.add(clienteData);
 
@@ -216,22 +216,43 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 
 			List<Integer> lstId = new ArrayList<Integer>();
 			if (tableTicket != null && tableTicket.size() > 0) {
-				String idTicketTriage = "";				
+				String idTicketTriage = "";
+				int recorrido = 0;
 				for (TblTicket tblTicket : tableTicket) {
 					if (idTicketTriage.equals("")) {
 						idTicketTriage = tblTicket.getIdTicketTriage().toString();
-						lstId.add(tblTicket.getIdTicketTriage());
-						log.info("1 - Id Ticket: " + idTicketTriage);
+						lstId.add(0, tblTicket.getIdTicket());
+												
+						log.info("1 - Id Ticket Triaje: " + idTicketTriage);
 					} else {
 						if (!idTicketTriage.equals(tblTicket.getIdTicketTriage().toString())) {
 							idTicketTriage = tblTicket.getIdTicketTriage().toString();
-							lstId.add(tblTicket.getIdTicketTriage());
-							log.info("2 - Id Ticket: " + idTicketTriage);
+							lstId.add(1, tblTicket.getIdTicket());
+							recorrido = 2;
+							
+							log.info("2 - Id Ticket Triaje: " + idTicketTriage);
+						} else {
+							if (recorrido == 0) {
+								idTicketTriage = tblTicket.getIdTicketTriage().toString();
+								lstId.remove(0);
+								lstId.add(0, tblTicket.getIdTicket());
+								recorrido++;
+								
+								log.info("1 - Id Ticket Triaje Actualizado: " + idTicketTriage);
+							}
+							if (recorrido == 2) {
+								idTicketTriage = tblTicket.getIdTicketTriage().toString();
+								lstId.remove(1);
+								lstId.add(1, tblTicket.getIdTicket());
+								recorrido++;
+								
+								log.info("2 - Id Ticket Triaje Actualizado: " + idTicketTriage);
+							}
 						}
 					}
 				}
 			}
-			
+
 			if (lstId.size() > 0) {				
 				if (lstId.size() == 1) {
 					TblTicket tblTicket = ticketRepository.getTicket(lstId.get(0));

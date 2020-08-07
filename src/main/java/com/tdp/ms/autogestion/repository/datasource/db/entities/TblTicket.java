@@ -337,8 +337,7 @@ public class TblTicket implements Serializable {
 		tableTicket.setStatusTicket(status);
 		tableTicket.setIdUseCase(ticket.getUseCaseId());
 		tableTicket.setTechnology(ticket.getTechnology());
-		tableTicket.setTblCustomer(tableCustomer);
-		tableTicket.setEventTimeKafka(LocalDateTime.now(ZoneOffset.of(Constants.ZONE_OFFSET)));
+		tableTicket.setTblCustomer(tableCustomer);		
 		return tableTicket;
 	}
 
