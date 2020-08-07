@@ -77,7 +77,12 @@ public class TicketRepositoryImpl implements TicketRepository {
 		Optional<List<TblTicket>> list = jpaTicketRepository.getTicketStatus(idTicket);
 
 		if (list.isPresent()) {
-			TblTicket tblTicket = list.get().get(0);
+			TblTicket tblTicket;
+			if (list.get().size() == 1) {				
+				tblTicket = list.get().get(0);
+			} else {
+				tblTicket = list.get().get(1);
+			}			
 			tblTicket.setStatusTicket(status);
 			tblTicket.setModifiedDateTicket(sysDate);
 			tblTicket.setEventTimeKafka(sysDate);
