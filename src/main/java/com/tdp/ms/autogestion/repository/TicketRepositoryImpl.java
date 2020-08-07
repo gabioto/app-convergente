@@ -92,7 +92,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 
 	@Override
 	public TblTicket getTicket(int idTicket) {
-		Optional<List<TblTicket>> list = jpaTicketRepository.getTicketStatus(idTicket);
+		Optional<List<TblTicket>> list = jpaTicketRepository.getTicket(idTicket);
 		if (list.isPresent()) {
 			TblTicket tblTicket = list.get().get(0);
 			
