@@ -67,7 +67,6 @@ public class TicketRepositoryImpl implements TicketRepository {
 		if (!optCustomer.isPresent()) {
 			jpaCustomerRepository.save(tableCustomer);
 		}
-
 		tableTicket = jpaTicketRepository.save(tableTicket);
 		log.info(TAG + "createTicket: " + tableTicket.getIdTicket());
 	}
@@ -81,13 +80,13 @@ public class TicketRepositoryImpl implements TicketRepository {
 			TblTicket tblTicket = list.get().get(0);
 			tblTicket.setStatusTicket(status);
 			tblTicket.setModifiedDateTicket(sysDate);
+			tblTicket.setEventTimeKafka(sysDate);
 			tblTicket = jpaTicketRepository.save(tblTicket);
 
 			return tblTicket.fromThis();
 		} else {
 			throw new Exception();
 		}
-
 	}
 
 	@Override
@@ -108,6 +107,11 @@ public class TicketRepositoryImpl implements TicketRepository {
 				endDate);
 	}
 
+	@Override
+	public List<TblTicket> findByCustomerAndUseCasePast(String docType, String docNumber, String reference, String involvement) {
+		return jpaTicketRepository.findByCustomerAndUseCasePast(docType, docNumber, reference, involvement);
+	}
+	
 	@Override
 	public List<TblEquivalence> getEquivalence(int idTicket) {
 		Optional<List<TblEquivalence>> list = jpaEquivalenceRepository.getEquivalence(idTicket);		

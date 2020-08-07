@@ -198,7 +198,6 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 				}
 			}
 		}
-
 		return lstClienteData;
 	}
 
@@ -210,7 +209,8 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 
 		TicketStatusResponse ticketStatusResponse = null;
 
-		try {
+		try {			
+			// Validar si tiene tickets en el dia
 			List<TblTicket> tableTicket = ticketRepository.findByCustomerAndUseCase(nationalIdType, nationalId,
 					reference, involvement, today.atStartOfDay(), today.atStartOfDay().plusDays(1));
 
@@ -223,14 +223,14 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 						idTicketTriage = tblTicket.getIdTicketTriage().toString();
 						lstId.add(0, tblTicket.getIdTicket());
 												
-						log.info("1 - Id Ticket Triaje: " + idTicketTriage);
+						log.info("1 - Id Ticket Triaje (Dia Actual): " + idTicketTriage);
 					} else {
 						if (!idTicketTriage.equals(tblTicket.getIdTicketTriage().toString())) {
 							idTicketTriage = tblTicket.getIdTicketTriage().toString();
 							lstId.add(1, tblTicket.getIdTicket());
 							recorrido = 2;
 							
-							log.info("2 - Id Ticket Triaje: " + idTicketTriage);
+							log.info("2 - Id Ticket Triaje (Dia Actual): " + idTicketTriage);
 						} else {
 							if (recorrido == 0) {
 								idTicketTriage = tblTicket.getIdTicketTriage().toString();
@@ -238,7 +238,7 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 								lstId.add(0, tblTicket.getIdTicket());
 								recorrido++;
 								
-								log.info("1 - Id Ticket Triaje Actualizado: " + idTicketTriage);
+								log.info("1 - Id Ticket Triaje Actualizado (Dia Actual): " + idTicketTriage);
 							}
 							if (recorrido == 2) {
 								idTicketTriage = tblTicket.getIdTicketTriage().toString();
@@ -246,7 +246,7 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 								lstId.add(1, tblTicket.getIdTicket());
 								recorrido++;
 								
-								log.info("2 - Id Ticket Triaje Actualizado: " + idTicketTriage);
+								log.info("2 - Id Ticket Triaje Actualizado (Dia Actual): " + idTicketTriage);
 							}
 						}
 					}
@@ -291,10 +291,68 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 					}
 				}
 			}
+			
+			// Validar si tiene tickets en dias anteriores
+			tableTicket = ticketRepository.findByCustomerAndUseCasePast(nationalIdType, nationalId, reference, involvement);
+
+			lstId = new ArrayList<Integer>();
+			if (tableTicket != null && tableTicket.size() > 0) {
+				String idTicketTriage = "";
+				int recorrido = 0;
+				for (TblTicket tblTicket : tableTicket) {
+					if (idTicketTriage.equals("")) {
+						idTicketTriage = tblTicket.getIdTicketTriage().toString();
+						lstId.add(0, tblTicket.getIdTicket());
+												
+						log.info("1 - Id Ticket Triaje (Dia Anterior): " + idTicketTriage);
+					} else {
+						if (!idTicketTriage.equals(tblTicket.getIdTicketTriage().toString())) {
+							idTicketTriage = tblTicket.getIdTicketTriage().toString();
+							lstId.add(1, tblTicket.getIdTicket());
+							recorrido = 2;
+							
+							log.info("2 - Id Ticket Triaje: " + idTicketTriage);
+						} else {
+							if (recorrido == 0) {
+								idTicketTriage = tblTicket.getIdTicketTriage().toString();
+								lstId.remove(0);
+								lstId.add(0, tblTicket.getIdTicket());
+								recorrido++;
+								
+								log.info("1 - Id Ticket Triaje Actualizado (Dia Anterior): " + idTicketTriage);								
+							}
+							break;
+						}
+					}
+				}
+			}
+						
+			if (lstId.size() > 0) {				
+				if (lstId.size() == 1) {
+					TblTicket tblTicket = ticketRepository.getTicket(lstId.get(0));
+					
+					// Cuando solo tiene un ticket
+					if (!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.SOLVED.name()) &&
+						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.WA_SOLVED.name()) &&
+						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.FAULT_SOLVED.name()) &&
+						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.GENERIC_SOLVED.name())) {
+
+						ticketStatusResponse = new TicketStatusResponse(tblTicket.getIdTicketTriage(),
+								tblTicket.getDescription(), tblTicket.getCreationDate(), tblTicket.getTicketType(),
+								tblTicket.getStatusChangeDate(), tblTicket.getStatusTicket(), tblTicket.getModifiedDateTicket(), fillTicket(tblTicket));
+
+						return new ResponseEntity<>(ticketStatusResponse, HttpStatus.OK);
+					} else {
+						// Puede crear Ticket
+						return new ResponseEntity<>(ticketStatusResponse, HttpStatus.NO_CONTENT);
+					}
+				}
+			}
+			
 			return new ResponseEntity<>(ticketStatusResponse, HttpStatus.NO_CONTENT);
 		} catch (Exception e) {
 			return new ResponseEntity<>(ticketStatusResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-
+	
 }
