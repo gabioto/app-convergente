@@ -7,4 +7,3 @@ public class ValidRequestException extends DomainException{
 		super(userMessage, error);
 	}	
 }
-//4627

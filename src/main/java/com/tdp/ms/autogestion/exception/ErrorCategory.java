@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCategory {
 
 	// From Request
-
 	INVALID_REQUEST("invalid-request", HttpStatus.BAD_REQUEST, "SVC0001",
 			"Generic Client Error: invalid-request - additional info", "API Generic wildcard fault response"), // 400:
 																												// Bad
@@ -17,13 +16,17 @@ public enum ErrorCategory {
 	ARGUMENT_MISMATCH("argument-mismatch", HttpStatus.BAD_REQUEST, "SVC0001", "", ""), // 400: Bad Request
 	UNAUTHORIZED("unauthorized", HttpStatus.UNAUTHORIZED, "SVC0001", "", ""), // 401: Unauthorized
 	FORBIDDEN("forbidden", HttpStatus.FORBIDDEN, "SVC0001", "", ""), // 403: Forbidden
-	RESOURCE_NOT_FOUND("resource-not-found", HttpStatus.NOT_FOUND, "SVC0001", "", ""), // 404: Not found
+	RESOURCE_NOT_FOUND("Not existing Resource Id", HttpStatus.NOT_FOUND, "SVC1006",
+			"Resource %s does not exist. Resource Identifier",
+			"Reference to a resource identifier which does not exist in the collection/repository referred (e.g.: invalid Id)"), // 404:
+																																	// Not
+																																	// found
 	CONFLICT("conflict", HttpStatus.CONFLICT, "SVC0001", "", ""), // 409: Conflict
 	PRECONDITION_FAILED("precondition-failed", HttpStatus.PRECONDITION_FAILED, "SVC0001", "", ""), // 412: Precondition
 																									// failed
 	INVALID_HEADER("invalid-header", HttpStatus.BAD_REQUEST, "SVC0001", "", ""), // 400: Bad Request
-	// From Server
 
+	// From Server
 	EXTERNAL_ERROR("Generic Server Fault", HttpStatus.INTERNAL_SERVER_ERROR, "SVR1000", "Generic Server Error",
 			"There was a problem in the Service Providers network that prevented to carry out the request"), // 500:
 																												// Internal

@@ -15,10 +15,10 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @ControllerAdvice
-public class ConvergenciaExceptionHandler extends ResponseEntityExceptionHandler {
+public class DomainExceptionHandler extends ResponseEntityExceptionHandler {
 
-	@ExceptionHandler(value = { ValidRequestException.class })
-	ResponseEntity<ExceptionResponse> handleValidRequestException(ValidRequestException ex) {
+	@ExceptionHandler(value = { DomainException.class })
+	ResponseEntity<ExceptionResponse> handleDomainException(DomainException ex) {
 
 		ErrorCategory category = ex.getError();
 
@@ -26,6 +26,16 @@ public class ConvergenciaExceptionHandler extends ResponseEntityExceptionHandler
 				category.getExceptionText(), category.getMoreInfo(), category.getHttpStatus(), ex.getMessage()),
 				category.getHttpStatus());
 	}
+	
+//	@ExceptionHandler(value = { ValidRequestException.class })
+//	ResponseEntity<ExceptionResponse> handleValidRequestException(ValidRequestException ex) {
+//
+//		ErrorCategory category = ex.getError();
+//
+//		return new ResponseEntity<>(new ExceptionResponse(category.getExceptionId(), category.getUserMessage(),
+//				category.getExceptionText(), category.getMoreInfo(), category.getHttpStatus(), ex.getMessage()),
+//				category.getHttpStatus());
+//	}
 
 	@ExceptionHandler({ Exception.class })
 	public ResponseEntity<Object> handleAll(Exception ex, WebRequest request) {

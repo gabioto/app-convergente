@@ -6,6 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.tdp.ms.autogestion.business.UpdateTicketStatusUseCase;
+import com.tdp.ms.autogestion.exception.DomainException;
+import com.tdp.ms.autogestion.exception.ErrorCategory;
+import com.tdp.ms.autogestion.exception.ResourceNotFoundException;
+import com.tdp.ms.autogestion.exception.ValidRequestException;
 import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
 import com.tdp.ms.autogestion.model.Ticket;
 import com.tdp.ms.autogestion.model.TicketStatus;
@@ -35,7 +39,7 @@ public class UpdateTicketStatusUseCaseImpl implements UpdateTicketStatusUseCase 
 	TicketRepository ticketRepository;
 
 	@Override
-	public ResponseEntity<TicketStatusResponse> updateTicketStatus(int idTicket, String status) {
+	public ResponseEntity<TicketStatusResponse> updateTicketStatus(int idTicket, String status) throws Exception {
 
 		try {
 			if (idTicket != 0) {
@@ -47,12 +51,16 @@ public class UpdateTicketStatusUseCaseImpl implements UpdateTicketStatusUseCase 
 					}
 				}
 
-				return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+				throw new ValidRequestException(ErrorCategory.MISSING_MANDATORY, "invalid status param");
 			} else {
-				return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+				throw new ValidRequestException(ErrorCategory.MISSING_MANDATORY, "idTicket is empty or null");
 			}
+		} catch (ResourceNotFoundException e) {
+			throw e;
+		} catch (DomainException e) {
+			throw e;
 		} catch (Exception e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			throw e;
 		}
 	}
 

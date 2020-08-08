@@ -23,6 +23,6 @@ import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
  */
 public interface UpdateTicketStatusUseCase {
 
-	ResponseEntity<TicketStatusResponse> updateTicketStatus(int idTicket, String status);
+	ResponseEntity<TicketStatusResponse> updateTicketStatus(int idTicket, String status) throws Exception;
 
 }

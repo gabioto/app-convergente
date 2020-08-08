@@ -51,7 +51,7 @@ public class TicketController {
 	// Consulta de bandeja
 	@PostMapping("/retrieveTickets")
 	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity<TicketStatusResponse> retrieveTickets(@RequestBody TicketRetrieveRequest request) {
+	public ResponseEntity<TicketStatusResponse> retrieveTickets(@RequestBody TicketRetrieveRequest request) throws Exception {
 		return retrieveTicketsUseCase.pendingTicket(request);
 	}
 
@@ -65,7 +65,7 @@ public class TicketController {
 	// Actualización de estado de tickets
 	@PatchMapping("/{id}/{status}")
 	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity<TicketStatusResponse> updateTicketStatus(@PathVariable int id, @PathVariable String status) {
+	public ResponseEntity<TicketStatusResponse> updateTicketStatus(@PathVariable int id, @PathVariable String status) throws Exception{
 		return updateTicketStatusUseCase.updateTicketStatus(id, status);
 	}
 

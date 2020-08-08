@@ -15,7 +15,7 @@ public interface TicketRepository {
 
 	void saveGeneratedTicket(Ticket pTicket);
 	
-	Ticket updateTicketStatus(int idTicket, String status) throws Exception;
+	Ticket updateTicketStatus(int idTicket, String status);
 
 	List<TblTicket> findByCustomerAndUseCase(String docType, String docNumber, String reference, String involvement,
 			LocalDateTime creationDate, LocalDateTime endDate);

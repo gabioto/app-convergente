@@ -10,6 +10,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.tdp.ms.autogestion.exception.ErrorCategory;
+import com.tdp.ms.autogestion.exception.ResourceNotFoundException;
 import com.tdp.ms.autogestion.model.OAuth;
 import com.tdp.ms.autogestion.model.Ticket;
 import com.tdp.ms.autogestion.model.TicketStatus;
@@ -77,7 +79,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 	}
 
 	@Override
-	public Ticket updateTicketStatus(int idTicket, String status) throws Exception {
+	public Ticket updateTicketStatus(int idTicket, String status) {
 		LocalDateTime sysDate = LocalDateTime.now(ZoneOffset.of(Constants.ZONE_OFFSET));
 		Optional<List<TblTicket>> list = jpaTicketRepository.getTicketStatus(idTicket);
 
@@ -89,7 +91,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 
 			return tblTicket.fromThis();
 		} else {
-			throw new Exception();
+			throw new ResourceNotFoundException(ErrorCategory.RESOURCE_NOT_FOUND.getExceptionText(), "idTicket");
 		}
 
 	}
