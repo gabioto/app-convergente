@@ -9,11 +9,11 @@ server:
   port: 8080
 
 spring:
-  datasource:
-    generate-unique-name: true
-  jmx:
-    default-domain: jmx_${random.long}
-    unique-names: true
+  ##datasource:
+    ##generate-unique-name: true
+  ##jmx:
+    ##default-domain: jmx_${random.long}
+    ##unique-names: true
   profiles:
     active:
-    - traza_dev
+    - traza_cert

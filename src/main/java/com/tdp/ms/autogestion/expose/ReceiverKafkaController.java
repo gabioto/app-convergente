@@ -41,6 +41,7 @@ import com.tdp.ms.autogestion.util.DateUtil;
 import com.tdp.ms.autogestion.util.FunctionsUtil;
 import com.tdp.ms.autogestion.util.Constants;
 
+
 @EnableAsync
 @Component
 public class ReceiverKafkaController {
@@ -89,6 +90,7 @@ public class ReceiverKafkaController {
 
 			if (listTblTicket.isPresent()) {
 				TblTicket tblTicket = new TblTicket();
+				tblTicket.setEventTimeKafka(DateUtil.formatStringToLocalDateTimeKafka(ticketKafkaResponse.getEventTime()));
 				tblTicket
 						.setIdTicketTriage(Integer.parseInt(ticketKafkaResponse.getEvent().getTroubleTicket().getId()));
 				tblTicket.setStatusChangeDate(DateUtil.formatStringToLocalDateTime(

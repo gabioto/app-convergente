@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,7 +22,6 @@ import com.tdp.ms.autogestion.business.RetrieveTicketsUseCase;
 import com.tdp.ms.autogestion.business.UpdateTicketStatusUseCase;
 import com.tdp.ms.autogestion.expose.entities.TicketCreateRequest;
 import com.tdp.ms.autogestion.expose.entities.TicketCreateResponse;
-import com.tdp.ms.autogestion.expose.entities.TicketRetrieveRequest;
 import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
 
 @RestController
@@ -49,10 +49,11 @@ public class TicketController {
 	}
 
 	// Consulta de bandeja
-	@PostMapping("/retrieveTickets")
+	@GetMapping("/retrieveTickets")
 	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity<TicketStatusResponse> retrieveTickets(@RequestBody TicketRetrieveRequest request) throws Exception {
-		return retrieveTicketsUseCase.pendingTicket(request);
+	public ResponseEntity<TicketStatusResponse> retrieveTickets(@RequestParam String type, @RequestParam String involvement,
+			@RequestParam String reference, @RequestParam String nationalIdType, @RequestParam String nationalId) {
+		return retrieveTicketsUseCase.pendingTicket(type, involvement, reference, nationalIdType, nationalId);
 	}
 
 	// Datos del ticket

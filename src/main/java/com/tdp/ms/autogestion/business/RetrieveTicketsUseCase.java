@@ -2,7 +2,6 @@ package com.tdp.ms.autogestion.business;
 
 import org.springframework.http.ResponseEntity;
 
-import com.tdp.ms.autogestion.expose.entities.TicketRetrieveRequest;
 import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
 
 /**
@@ -24,6 +23,7 @@ import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
  */
 public interface RetrieveTicketsUseCase {
 
-	ResponseEntity<TicketStatusResponse> pendingTicket(TicketRetrieveRequest request);
+	ResponseEntity<TicketStatusResponse> pendingTicket(String type, String involvement, String reference,
+			String nationalIdType, String nationalId);
 
 }

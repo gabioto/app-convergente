@@ -19,6 +19,8 @@ public interface TicketRepository {
 
 	List<TblTicket> findByCustomerAndUseCase(String docType, String docNumber, String reference, String involvement,
 			LocalDateTime creationDate, LocalDateTime endDate);
+	
+	List<TblTicket> findByCustomerAndUseCasePast(String docType, String docNumber, String reference, String involvement);	
 
 	TblTicket getTicket(int idTicket);
 

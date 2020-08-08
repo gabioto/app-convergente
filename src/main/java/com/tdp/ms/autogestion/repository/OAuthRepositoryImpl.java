@@ -21,13 +21,13 @@ public class OAuthRepositoryImpl implements OAuthRepository {
 	private JpaOAuthRepository jpaOAuthRepository;
 
 	@Override
+
 	public OAuth getOAuthValues() throws Exception {
 		OAuth oAuth = null;
 
 		try {
 			Optional<TblOauth> tblOauth = jpaOAuthRepository.findById(1);
 			if (tblOauth.isPresent()) {
-
 				oAuth = tblOauth.get().fromThis();
 
 				long timeDiff = new Date().getTime() - (Long.parseLong(oAuth.getConsentedOn()) * 1000);

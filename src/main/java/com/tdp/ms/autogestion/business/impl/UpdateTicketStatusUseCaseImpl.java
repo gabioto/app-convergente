@@ -47,7 +47,7 @@ public class UpdateTicketStatusUseCaseImpl implements UpdateTicketStatusUseCase 
 					if (elemento.name().equals(status)) {
 						Ticket ticket = ticketRepository.updateTicketStatus(idTicket, status);
 
-						return new ResponseEntity<>(TicketStatusResponse.from(ticket), HttpStatus.OK);
+						return new ResponseEntity<>(TicketStatusResponse.from(ticket, idTicket), HttpStatus.OK);
 					}
 				}
 

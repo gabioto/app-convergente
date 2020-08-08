@@ -82,6 +82,10 @@ public class TblTicket implements Serializable {
 	@Convert(converter = LocalDateTimeConverter.class)
 	@Column(name = "modified_date_ticket")
 	private LocalDateTime modifiedDateTicket;
+		
+	@Convert(converter = LocalDateTimeConverter.class)
+	@Column(name = "event_time_kafka")
+	private LocalDateTime eventTimeKafka;
 
 	// bi-directional many-to-one association to TblAdditionalData
 	@OneToMany(mappedBy = "tblTicket", targetEntity = TblAdditionalData.class)
@@ -105,6 +109,14 @@ public class TblTicket implements Serializable {
 	private TblCustomer tblCustomer;
 
 	public TblTicket() {
+	}
+
+	public LocalDateTime getEventTimeKafka() {
+		return eventTimeKafka;
+	}
+
+	public void setEventTimeKafka(LocalDateTime eventTimeKafka) {
+		this.eventTimeKafka = eventTimeKafka;
 	}
 
 	public LocalDateTime getModifiedDateTicket() {
@@ -325,7 +337,7 @@ public class TblTicket implements Serializable {
 		tableTicket.setStatusTicket(status);
 		tableTicket.setIdUseCase(ticket.getUseCaseId());
 		tableTicket.setTechnology(ticket.getTechnology());
-		tableTicket.setTblCustomer(tableCustomer);
+		tableTicket.setTblCustomer(tableCustomer);		
 		return tableTicket;
 	}
 
@@ -334,4 +346,5 @@ public class TblTicket implements Serializable {
 				status, statusChangeDate, statusChangeReason, priority, technology, idUseCase, "",
 				involvement, "", "", tblCustomer.fromThis(), statusTicket, modifiedDateTicket);
 	}
+
 }

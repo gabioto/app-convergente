@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.tdp.ms.autogestion.business.CreateTicketUseCase;
+import com.tdp.ms.autogestion.dao.ServiceDao;
 import com.tdp.ms.autogestion.exception.DomainException;
 import com.tdp.ms.autogestion.exception.ErrorCategory;
 import com.tdp.ms.autogestion.exception.ValidRequestException;
@@ -28,6 +29,9 @@ public class CreateTicketUsecaseImpl implements CreateTicketUseCase {
 
 	@Autowired
 	private TicketRepository ticketRepository;
+	
+	@Autowired
+	ServiceDao serviceDao;
 
 	@Override
 	public ResponseEntity<TicketCreateResponse> createTicket(TicketCreateRequest request) throws Exception {
@@ -69,6 +73,7 @@ public class CreateTicketUsecaseImpl implements CreateTicketUseCase {
 			ticket.setSubOperationCode(subOperationCode);
 
 			// Invocación a API generación de ticket
+			// oAuth = serviceDao.getOauth(1);
 			oAuth = oAuthRepository.getOAuthValues();
 			ticket = ticketRepository.generateTicket(oAuth, ticket);
 
