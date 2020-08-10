@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -14,22 +13,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.tdp.ms.autogestion.business.RetrieveTicketsUseCase;
+import com.tdp.ms.autogestion.exception.DomainException;
+import com.tdp.ms.autogestion.exception.ForbiddenException;
+import com.tdp.ms.autogestion.exception.ResourceNotFoundException;
 import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
-import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse.AdditionalData;
+import com.tdp.ms.autogestion.model.Ticket;
 import com.tdp.ms.autogestion.model.TicketStatus;
 import com.tdp.ms.autogestion.repository.TicketRepository;
-import com.tdp.ms.autogestion.repository.datasource.api.TicketApi;
-import com.tdp.ms.autogestion.repository.datasource.db.JpaAdditionalDataRepository;
-import com.tdp.ms.autogestion.repository.datasource.db.JpaAttachmentAdditionalDataRepository;
-import com.tdp.ms.autogestion.repository.datasource.db.JpaCustomerRepository;
-import com.tdp.ms.autogestion.repository.datasource.db.JpaEquivalenceNotificationRepository;
-import com.tdp.ms.autogestion.repository.datasource.db.JpaEquivalenceRepository;
-import com.tdp.ms.autogestion.repository.datasource.db.entities.TblAdditionalData;
-import com.tdp.ms.autogestion.repository.datasource.db.entities.TblAttachment;
-import com.tdp.ms.autogestion.repository.datasource.db.entities.TblAttachmentAdditionalData;
-import com.tdp.ms.autogestion.repository.datasource.db.entities.TblEquivalence;
-import com.tdp.ms.autogestion.repository.datasource.db.entities.TblEquivalenceNotification;
-import com.tdp.ms.autogestion.repository.datasource.db.entities.TblTicket;
 import com.tdp.ms.autogestion.util.Constants;
 
 /**
@@ -52,154 +42,10 @@ import com.tdp.ms.autogestion.util.Constants;
 @Service
 public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 
-	private static final Log log = LogFactory.getLog(RetrieveTicketsUseCaseImpl.class);	
-
-	@Autowired
-	TicketApi ticketApi;
+	private static final Log log = LogFactory.getLog(RetrieveTicketsUseCaseImpl.class);
 
 	@Autowired
 	private TicketRepository ticketRepository;
-
-	@Autowired
-	JpaAdditionalDataRepository additionalDataRepository;
-
-	@Autowired
-	JpaAttachmentAdditionalDataRepository attachmentAdditionalDataRepository;
-	
-	@Autowired
-	JpaEquivalenceRepository equivalenceRepository;
-
-	@Autowired
-	JpaEquivalenceNotificationRepository equivalenceNotificationRepository;
-
-	@Autowired
-	JpaCustomerRepository customerRepository;
-
-	private List<AdditionalData> fillTicket(TblTicket tableTicket) {
-
-		List<AdditionalData> lstClienteData = new ArrayList<AdditionalData>();
-
-		AdditionalData clienteData = new AdditionalData();
-		clienteData.setKey(Constants.LABEL_STATUS);
-		clienteData.setValue(tableTicket.getStatus());
-		lstClienteData.add(clienteData);
-
-		List<TblAttachment> lstAttachment = tableTicket.getTblAttachments();
-		if (lstAttachment != null && lstAttachment.size() > 0) {
-			for (TblAttachment tblAttachment : lstAttachment) {
-				// Obtener el monto adeudado por el cliente
-				if (tblAttachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-deuda-amdocs") ||
-					tblAttachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-deuda-cms") ||
-					tblAttachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-deuda-atis")) {
-					
-					Optional<List<TblAttachmentAdditionalData>> tableAttachmentAdditionalData = attachmentAdditionalDataRepository
-							.getMontoDeuda(tblAttachment.getIdAttachment(), "monto");
-					if (tableAttachmentAdditionalData.isPresent()) {
-						List<TblAttachmentAdditionalData> lstAttachmentAdditionalData = tableAttachmentAdditionalData.get();
-						for (TblAttachmentAdditionalData tblAttachmentAdditionalData : lstAttachmentAdditionalData) {
-							clienteData = new AdditionalData();
-							clienteData.setKey(Constants.LABEL_MONTO);
-							clienteData.setValue(tblAttachmentAdditionalData.getValueAttachmentAdditional());
-							lstClienteData.add(clienteData);
-						}
-					}							
-				}
-				if (tblAttachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-amdocs") ||
-					tblAttachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-cms") ||
-					tblAttachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-gestel")) {
-					
-					Optional<List<TblAttachmentAdditionalData>> tableAttachmentAdditionalData = attachmentAdditionalDataRepository
-							.getInfoAveria(tblAttachment.getIdAttachment());
-					if (tableAttachmentAdditionalData.isPresent()) {
-						List<TblAttachmentAdditionalData> lstAttachmentAdditionalData = tableAttachmentAdditionalData.get();
-						for (TblAttachmentAdditionalData tblAttachmentAdditionalData : lstAttachmentAdditionalData) {									
-							if (tblAttachmentAdditionalData.getKeyAttachmentAdditional().equals("codigo_averia")) {									
-								clienteData = new AdditionalData();
-								clienteData.setKey(Constants.LABEL_COD_AVERIA);
-								clienteData.setValue(tblAttachmentAdditionalData.getValueAttachmentAdditional());
-								lstClienteData.add(clienteData);
-							}
-						}
-					}
-				}
-			}
-			
-			// Equivalencias
-			Optional<List<TblEquivalence>> tableEquivalence = equivalenceRepository
-					.getEquivalence(tableTicket.getIdTicket());
-			if (tableEquivalence.isPresent()) {
-				int index = 1;
-				List<TblEquivalence> lstEquivalence = tableEquivalence.get();
-				for (TblEquivalence tblEquivalence : lstEquivalence) {
-					clienteData = new AdditionalData();					
-					clienteData.setKey(Constants.LABEL_FRONT_END.concat(String.valueOf(index)));
-					clienteData.setValue(tblEquivalence.getNameEquivalence());
-					lstClienteData.add(clienteData);
-					index++;
-				}
-			}
-		}
-		List<TblAdditionalData> lstAdditionalData = tableTicket.getTblAdditionalData();
-		if (lstAdditionalData != null && lstAdditionalData.size() > 0) {
-			for (TblAdditionalData tblAdditionalData : lstAdditionalData) {
-				if (tblAdditionalData.getKeyAdditional().equals("notification-id")) {
-					Optional<TblEquivalenceNotification> tableEquivalence = equivalenceNotificationRepository
-							.getEquivalence(tblAdditionalData.getValueAdditional());
-					if (tableEquivalence.isPresent()) {
-						TblEquivalenceNotification equivalence = tableEquivalence.get();
-
-						clienteData = new AdditionalData();
-						clienteData.setKey(Constants.LABEL_ACTION);
-						clienteData.setValue(equivalence.getAction() != null ? equivalence.getAction() : "");
-						lstClienteData.add(clienteData);
-
-						clienteData = new AdditionalData();
-						clienteData.setKey(Constants.LABEL_TITLE);
-						clienteData.setValue(equivalence.getTitle() != null ? equivalence.getTitle() : "");
-						lstClienteData.add(clienteData);
-
-						clienteData = new AdditionalData();
-
-						clienteData.setKey(Constants.LABEL_TITLE_DESC);
-						clienteData.setValue(
-								equivalence.getDescription() != null ? equivalence.getDescription() : "");
-						lstClienteData.add(clienteData);
-
-						clienteData = new AdditionalData();
-						clienteData.setKey(Constants.LABEL_BODY);
-						clienteData.setValue(equivalence.getBody() != null ? equivalence.getBody() : "");
-						lstClienteData.add(clienteData);
-
-						clienteData = new AdditionalData();
-						clienteData.setKey(Constants.LABEL_FOOTER);
-						clienteData.setValue(equivalence.getFooter() != null ? equivalence.getFooter() : "");
-						lstClienteData.add(clienteData);
-
-						clienteData = new AdditionalData();
-						clienteData.setKey(Constants.LABEL_ICON);
-						clienteData.setValue(equivalence.getIcon() != null ? equivalence.getIcon() : "");
-						lstClienteData.add(clienteData);
-						
-						clienteData = new AdditionalData();
-						clienteData.setKey(Constants.LABEL_BUTTON);
-						clienteData.setValue(equivalence.getButton() != null ? equivalence.getButton() : "");
-						lstClienteData.add(clienteData);
-						
-						clienteData = new AdditionalData();
-						clienteData.setKey(Constants.LABEL_IMAGE);
-						clienteData.setValue(equivalence.getImage() != null ? equivalence.getImage() : "");
-						lstClienteData.add(clienteData);
-						
-						clienteData = new AdditionalData();
-						clienteData.setKey(Constants.LABEL_ACTION_BUTTON);
-						clienteData.setValue(equivalence.getActionbutton() != null ? equivalence.getActionbutton() : "");
-						lstClienteData.add(clienteData);						
-					}
-				}
-			}
-		}
-		return lstClienteData;
-	}
 
 	@Override
 	public ResponseEntity<TicketStatusResponse> pendingTicket(String type, String involvement, String reference,
@@ -207,152 +53,121 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 
 		LocalDate today = LocalDate.now(ZoneOffset.of(Constants.ZONE_OFFSET));
 
-		TicketStatusResponse ticketStatusResponse = null;
-
-		try {			
+		try {
 			// Validar si tiene tickets en el dia
-			List<TblTicket> tableTicket = ticketRepository.findByCustomerAndUseCase(nationalIdType, nationalId,
-					reference, involvement, today.atStartOfDay(), today.atStartOfDay().plusDays(1));
+			List<Ticket> tickets = ticketRepository.findByCustomerAndUseCase(nationalIdType, nationalId, reference,
+					involvement, today.atStartOfDay(), today.atStartOfDay().plusDays(1));
 
-			List<Integer> lstId = new ArrayList<Integer>();
-			if (tableTicket != null && tableTicket.size() > 0) {
-				String idTicketTriage = "";
-				int recorrido = 0;
-				for (TblTicket tblTicket : tableTicket) {
-					if (idTicketTriage.equals("")) {
-						idTicketTriage = tblTicket.getIdTicketTriage().toString();
-						lstId.add(0, tblTicket.getIdTicket());
-												
-						log.info("1 - Id Ticket Triaje (Dia Actual): " + idTicketTriage);
-					} else {
-						if (!idTicketTriage.equals(tblTicket.getIdTicketTriage().toString())) {
-							idTicketTriage = tblTicket.getIdTicketTriage().toString();
-							lstId.add(1, tblTicket.getIdTicket());
-							recorrido = 2;
-							
-							log.info("2 - Id Ticket Triaje (Dia Actual): " + idTicketTriage);
-						} else {
-							if (recorrido == 0) {
-								idTicketTriage = tblTicket.getIdTicketTriage().toString();
-								lstId.remove(0);
-								lstId.add(0, tblTicket.getIdTicket());
-								recorrido++;
-								
-								log.info("1 - Id Ticket Triaje Actualizado (Dia Actual): " + idTicketTriage);
-							}
-							if (recorrido == 2) {
-								idTicketTriage = tblTicket.getIdTicketTriage().toString();
-								lstId.remove(1);
-								lstId.add(1, tblTicket.getIdTicket());
-								recorrido++;
-								
-								log.info("2 - Id Ticket Triaje Actualizado (Dia Actual): " + idTicketTriage);
-							}
-						}
-					}
-				}
+			List<Integer> listIds = getListIds(tickets, true);
+
+			if (listIds.size() > 0) {
+				return evaluateTicketStatus(listIds);
 			}
 
-			if (lstId.size() > 0) {				
-				if (lstId.size() == 1) {
-					TblTicket tblTicket = ticketRepository.getTicket(lstId.get(0));
-					
-					// Cuando solo tiene un ticket
-					if (!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.SOLVED.name()) &&
-						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.WA_SOLVED.name()) &&
-						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.FAULT_SOLVED.name()) &&
-						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.GENERIC_SOLVED.name())) {
-
-						ticketStatusResponse = new TicketStatusResponse(tblTicket.getIdTicketTriage(),
-								tblTicket.getDescription(), tblTicket.getCreationDate(), tblTicket.getTicketType(),
-								tblTicket.getStatusChangeDate(), tblTicket.getStatusTicket(), tblTicket.getModifiedDateTicket(), fillTicket(tblTicket));
-
-						return new ResponseEntity<>(ticketStatusResponse, HttpStatus.OK);
-					} else {
-						// Puede crear Ticket
-						return new ResponseEntity<>(ticketStatusResponse, HttpStatus.NO_CONTENT);
-					}
-				} else {
-					TblTicket tblTicket = ticketRepository.getTicket(lstId.get(1));
-					
-					if (!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.SOLVED.name()) &&
-						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.WA_SOLVED.name()) &&
-						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.FAULT_SOLVED.name()) &&
-						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.GENERIC_SOLVED.name())) {
-
-						ticketStatusResponse = new TicketStatusResponse(tblTicket.getIdTicketTriage(),
-								tblTicket.getDescription(), tblTicket.getCreationDate(), tblTicket.getTicketType(),
-								tblTicket.getStatusChangeDate(), tblTicket.getStatusTicket(), tblTicket.getModifiedDateTicket(), fillTicket(tblTicket));
-
-						return new ResponseEntity<>(ticketStatusResponse, HttpStatus.OK);
-					} else {
-						// Ya no puede crear Ticket
-						return new ResponseEntity<>(ticketStatusResponse, HttpStatus.UNAUTHORIZED);
-					}
-				}
-			}
-			
 			// Validar si tiene tickets en dias anteriores
-			tableTicket = ticketRepository.findByCustomerAndUseCasePast(nationalIdType, nationalId, reference, involvement);
+			tickets = ticketRepository.findByCustomerAndUseCasePast(nationalIdType, nationalId, reference, involvement);
 
-			lstId = new ArrayList<Integer>();
-			if (tableTicket != null && tableTicket.size() > 0) {
-				String idTicketTriage = "";
-				int recorrido = 0;
-				for (TblTicket tblTicket : tableTicket) {
-					if (idTicketTriage.equals("")) {
-						idTicketTriage = tblTicket.getIdTicketTriage().toString();
-						lstId.add(0, tblTicket.getIdTicket());
-												
-						log.info("1 - Id Ticket Triaje (Dia Anterior): " + idTicketTriage);
-					} else {
-						if (!idTicketTriage.equals(tblTicket.getIdTicketTriage().toString())) {
-							idTicketTriage = tblTicket.getIdTicketTriage().toString();
-							lstId.add(1, tblTicket.getIdTicket());
-							recorrido = 2;
-							
-							log.info("2 - Id Ticket Triaje: " + idTicketTriage);
-						} else {
-							if (recorrido == 0) {
-								idTicketTriage = tblTicket.getIdTicketTriage().toString();
-								lstId.remove(0);
-								lstId.add(0, tblTicket.getIdTicket());
-								recorrido++;
-								
-								log.info("1 - Id Ticket Triaje Actualizado (Dia Anterior): " + idTicketTriage);								
-							}
-							break;
-						}
-					}
-				}
+			listIds = getListIds(tickets, false);
+
+			if (listIds.size() > 0) {
+				return evaluatePastTicketStatus(listIds);
 			}
-						
-			if (lstId.size() > 0) {				
-				if (lstId.size() == 1) {
-					TblTicket tblTicket = ticketRepository.getTicket(lstId.get(0));
-					
-					// Cuando solo tiene un ticket
-					if (!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.SOLVED.name()) &&
-						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.WA_SOLVED.name()) &&
-						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.FAULT_SOLVED.name()) &&
-						!tblTicket.getStatusTicket().equalsIgnoreCase(TicketStatus.GENERIC_SOLVED.name())) {
 
-						ticketStatusResponse = new TicketStatusResponse(tblTicket.getIdTicketTriage(),
-								tblTicket.getDescription(), tblTicket.getCreationDate(), tblTicket.getTicketType(),
-								tblTicket.getStatusChangeDate(), tblTicket.getStatusTicket(), tblTicket.getModifiedDateTicket(), fillTicket(tblTicket));
-
-						return new ResponseEntity<>(ticketStatusResponse, HttpStatus.OK);
-					} else {
-						// Puede crear Ticket
-						return new ResponseEntity<>(ticketStatusResponse, HttpStatus.NO_CONTENT);
-					}
-				}
-			}
-			
-			return new ResponseEntity<>(ticketStatusResponse, HttpStatus.NO_CONTENT);
+			return new ResponseEntity<>(new TicketStatusResponse(), HttpStatus.OK);
+		} catch (ResourceNotFoundException e) {
+			throw e;
+		} catch (ForbiddenException e) {
+			throw e;
+		} catch (DomainException e) {
+			throw e;
 		} catch (Exception e) {
-			return new ResponseEntity<>(ticketStatusResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+			throw e;
 		}
 	}
-	
+
+	private List<Integer> getListIds(List<Ticket> tickets, boolean isToday) {
+		List<Integer> listIds = new ArrayList<Integer>();
+
+		if (tickets != null && tickets.size() > 0) {
+			String idTicketTriage = "";
+			int count = 0;
+			for (Ticket ticket : tickets) {
+				if (idTicketTriage.isEmpty()) {
+					idTicketTriage = ticket.getIdTriage().toString();
+					listIds.add(0, ticket.getId());
+
+					log.info("1 - Id Ticket Triaje (Dia Actual): " + idTicketTriage);
+				} else {
+					if (!idTicketTriage.equals(ticket.getIdTriage().toString())) {
+						idTicketTriage = ticket.getIdTriage().toString();
+						listIds.add(1, ticket.getId());
+						count = 2;
+
+						log.info("2 - Id Ticket Triaje (Dia Actual): " + idTicketTriage);
+					} else {
+						if (count == 0) {
+							idTicketTriage = ticket.getIdTriage().toString();
+							listIds.remove(0);
+							listIds.add(0, ticket.getId());
+							count++;
+
+							log.info("1 - Id Ticket Triaje Actualizado (Dia Actual): " + idTicketTriage);
+						}
+						if (isToday && count == 2) {
+							idTicketTriage = ticket.getIdTriage().toString();
+							listIds.remove(1);
+							listIds.add(1, ticket.getId());
+							count++;
+
+							log.info("2 - Id Ticket Triaje Actualizado (Dia Actual): " + idTicketTriage);
+						}
+					}
+				}
+			}
+		}
+
+		return listIds;
+	}
+
+	private ResponseEntity<TicketStatusResponse> evaluateTicketStatus(List<Integer> listIds) {
+		Ticket ticket = ticketRepository.getTicket(listIds.get(listIds.size() == 1 ? 0 : 1));
+
+		if (validateStatus(ticket)) {
+			return new ResponseEntity<>(TicketStatusResponse.from(ticket, ticketRepository.getAdditionalData(ticket)),
+					HttpStatus.OK);
+		} else {
+			// Si tiene un ticket puede crear otro, en caso contrario no
+			// TODO: Validar si devuelve una excepción
+			if (listIds.size() == 1) {
+				return new ResponseEntity<>(new TicketStatusResponse(), HttpStatus.OK);
+			} else {
+				throw new ForbiddenException("User can´t create more tickets");
+			}
+		}
+	}
+
+	private ResponseEntity<TicketStatusResponse> evaluatePastTicketStatus(List<Integer> listIds) {
+		Ticket ticket = null;
+
+		if (listIds.size() == 1) {
+			ticket = ticketRepository.getTicket(listIds.get(0));
+		}
+
+		// Cuando solo tiene un ticket
+		if (ticket != null && validateStatus(ticket)) {
+			return new ResponseEntity<>(TicketStatusResponse.from(ticket, ticketRepository.getAdditionalData(ticket)),
+					HttpStatus.OK);
+		} else {
+			// Puede crear Ticket
+			return new ResponseEntity<>(new TicketStatusResponse(), HttpStatus.OK);
+		}
+
+	}
+
+	private boolean validateStatus(Ticket ticket) {
+		return !ticket.getTicketStatus().equalsIgnoreCase(TicketStatus.SOLVED.name())
+				&& !ticket.getTicketStatus().equalsIgnoreCase(TicketStatus.WA_SOLVED.name())
+				&& !ticket.getTicketStatus().equalsIgnoreCase(TicketStatus.FAULT_SOLVED.name())
+				&& !ticket.getTicketStatus().equalsIgnoreCase(TicketStatus.GENERIC_SOLVED.name());
+	}
 }

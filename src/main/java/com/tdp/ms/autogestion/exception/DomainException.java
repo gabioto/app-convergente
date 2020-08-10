@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public abstract class DomainException extends RuntimeException {
+
+	private static final long serialVersionUID = -1461096138865827919L;
+
 	ErrorCategory error;
 
 	public DomainException(String userMessage, ErrorCategory error) {
@@ -15,4 +18,3 @@ public abstract class DomainException extends RuntimeException {
 		this.error = error;
 	}
 }
-

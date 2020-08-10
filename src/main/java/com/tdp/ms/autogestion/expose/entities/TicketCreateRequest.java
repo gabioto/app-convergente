@@ -34,7 +34,7 @@ public class TicketCreateRequest {
 	@NotNull(message = Constants.MSG_NOT_EMPTY)
 	private Channel channel;
 
-	@NotNull
+	@NotNull(message = Constants.MSG_NOT_EMPTY)
 	private RelatedObject relatedObject;
 
 	@NotNull(message = Constants.MSG_NOT_EMPTY)

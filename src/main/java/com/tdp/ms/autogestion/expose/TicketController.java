@@ -34,39 +34,42 @@ public class TicketController {
 
 	@Autowired
 	private RetrieveTicketsUseCase retrieveTicketsUseCase;
-	
+
 	@Autowired
 	private RetrieveTicketStatusUseCase retrieveTicketStatusUseCase;
-	
+
 	@Autowired
 	private UpdateTicketStatusUseCase updateTicketStatusUseCase;
 
 	// Creación de ticket
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public ResponseEntity<TicketCreateResponse> createTicket(@Valid @RequestBody TicketCreateRequest request) throws Exception{
+	public ResponseEntity<TicketCreateResponse> createTicket(@Valid @RequestBody TicketCreateRequest request)
+			throws Exception {
 		return createTicketUseCase.createTicket(request);
 	}
 
 	// Consulta de bandeja
 	@GetMapping("/retrieveTickets")
 	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity<TicketStatusResponse> retrieveTickets(@RequestParam String type, @RequestParam String involvement,
-			@RequestParam String reference, @RequestParam String nationalIdType, @RequestParam String nationalId) {
+	public ResponseEntity<TicketStatusResponse> retrieveTickets(@Valid @RequestParam String type,
+			@Valid @RequestParam String involvement, @Valid @RequestParam String reference,
+			@Valid @RequestParam String nationalIdType, @Valid @RequestParam String nationalId) {
 		return retrieveTicketsUseCase.pendingTicket(type, involvement, reference, nationalIdType, nationalId);
 	}
 
 	// Datos del ticket
 	@GetMapping("/{id}/status")
 	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity<TicketStatusResponse> retrieveTicketStatus(@PathVariable String id) {
+	public ResponseEntity<TicketStatusResponse> retrieveTicketStatus(@Valid @PathVariable String id) {
 		return retrieveTicketStatusUseCase.retrieveTicketStatus(id);
 	}
 
 	// Actualización de estado de tickets
 	@PatchMapping("/{id}/{status}")
 	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity<TicketStatusResponse> updateTicketStatus(@PathVariable int id, @PathVariable String status) throws Exception{
+	public ResponseEntity<TicketStatusResponse> updateTicketStatus(@Valid @PathVariable int id,
+			@Valid @PathVariable String status) throws Exception {
 		return updateTicketStatusUseCase.updateTicketStatus(id, status);
 	}
 

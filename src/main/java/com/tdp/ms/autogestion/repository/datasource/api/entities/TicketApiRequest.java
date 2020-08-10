@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.tdp.ms.autogestion.model.Ticket;
-import com.tdp.ms.autogestion.model.TicketAdditionalData;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -46,6 +45,17 @@ public class TicketApiRequest {
 	@EqualsAndHashCode(callSuper = false)
 	private static class Channel {
 		private String id;
+	}
+
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@EqualsAndHashCode(callSuper = false)
+	public class TicketAdditionalData {
+
+		private String key;
+
+		private String value;
 	}
 
 }

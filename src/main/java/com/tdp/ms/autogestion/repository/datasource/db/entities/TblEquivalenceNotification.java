@@ -1,7 +1,18 @@
 package com.tdp.ms.autogestion.repository.datasource.db.entities;
 
 import java.io.Serializable;
-import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+
+import com.tdp.ms.autogestion.model.EquivalenceNotification;
 
 /**
  * The persistent class for the tbl_equivalence_notification database table.
@@ -129,4 +140,18 @@ public class TblEquivalenceNotification implements Serializable {
 		this.actionbutton = actionbutton;
 	}
 
+	public EquivalenceNotification fromThis() {
+		return new EquivalenceNotification(idEquivalenceNotification, code, description, action, title, body, footer,
+				icon, button, image, actionbutton);
+	}
+
+	public static List<EquivalenceNotification> listFromThis(List<TblEquivalenceNotification> equiNotList) {
+		List<EquivalenceNotification> equivalence = new ArrayList<>();
+
+		for (TblEquivalenceNotification tblEquiNotification : equiNotList) {
+			equivalence.add(tblEquiNotification.fromThis());
+		}
+
+		return equivalence;
+	}
 }

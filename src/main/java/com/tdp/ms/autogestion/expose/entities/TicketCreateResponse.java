@@ -3,8 +3,9 @@ package com.tdp.ms.autogestion.expose.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.tdp.ms.autogestion.model.Ticket;
-import com.tdp.ms.autogestion.model.TicketAdditionalData;
 import com.tdp.ms.autogestion.model.TicketStatus;
 
 import lombok.AllArgsConstructor;
@@ -33,6 +34,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
+@JsonInclude(Include.NON_NULL)
 public class TicketCreateResponse {
 
 	private Integer id;

@@ -1,9 +1,5 @@
 package com.tdp.ms.autogestion.model;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,50 +26,27 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class Ticket {
+public class EquivalenceNotification {
 
-	private Integer id;
+	private Integer idEquivalenceNotification;
 
-	private Integer idTriage;
-	
-	private String href;
+	private String code;
 
 	private String description;
 
-	private LocalDateTime creationDate;
+	private String action;
 
-	private String severity;
+	private String title;
 
-	private String type;
+	private String body;
 
-	private String status;
+	private String footer;
 
-	private LocalDateTime statusChangeDate;
+	private String icon;
 
-	private String statusChangeReason;
+	private String button;
 
-	private Integer priority;
+	private String image;
 
-	private String technology;
-
-	private String useCaseId;
-
-	private String subOperationCode;
-
-	private String involvement;
-
-	private String channelId;
-
-	private String channelName;
-
-	private Customer customer;
-	
-	private String ticketStatus;
-	
-	private LocalDateTime modifiedDateTicket;
-
-	private List<AdditionalData> additionalData = new ArrayList<>();
-
-	private List<Attachment> attachments = new ArrayList<>();
-
+	private String actionbutton;
 }

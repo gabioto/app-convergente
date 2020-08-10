@@ -1,8 +1,12 @@
 package com.tdp.ms.autogestion.expose.entities;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.tdp.ms.autogestion.model.AdditionalData;
 import com.tdp.ms.autogestion.model.Ticket;
 
 import lombok.AllArgsConstructor;
@@ -31,6 +35,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
+@JsonInclude(Include.NON_NULL)
 public class TicketStatusResponse {
 
 	private Integer ticketId;
@@ -47,26 +52,41 @@ public class TicketStatusResponse {
 
 	private LocalDateTime modifiedDateTicket;
 
-	private List<AdditionalData> additionalData;
+	private List<ResponseAdditionalData> additionalData;
 
 	@Data
 	@NoArgsConstructor
 	@AllArgsConstructor
 	@EqualsAndHashCode(callSuper = false)
-	public static class AdditionalData {
+	public static class ResponseAdditionalData {
 		private String key;
 
 		private String value;
 	}
 
-	public static TicketStatusResponse from(Ticket ticket, int idTicket) {
+	public static TicketStatusResponse from(Ticket ticket, List<AdditionalData> addDataList) {
 		TicketStatusResponse response = new TicketStatusResponse();
+		response.setTicketId(ticket.getIdTriage());
 		response.setDescription(ticket.getDescription());
-		response.setTicketId(idTicket);
-		response.setTicketStatus(ticket.getTicketStatus());
 		response.setCreationDate(ticket.getCreationDate());
 		response.setType(ticket.getType());
+		response.setStatusChangeDate(ticket.getStatusChangeDate());
+		response.setTicketStatus(ticket.getTicketStatus());
 		response.setModifiedDateTicket(ticket.getModifiedDateTicket());
+		response.setAdditionalData(from(addDataList));
 		return response;
+	}
+
+	private static List<ResponseAdditionalData> from(List<AdditionalData> additionalDataList) {
+		List<ResponseAdditionalData> respAdditionalData = new ArrayList<>();
+		for (AdditionalData additionalData : additionalDataList) {
+			respAdditionalData.add(from(additionalData));
+		}
+
+		return respAdditionalData;
+	}
+
+	private static ResponseAdditionalData from(AdditionalData additionalData) {
+		return new ResponseAdditionalData(additionalData.getKey(), additionalData.getValue());
 	}
 }

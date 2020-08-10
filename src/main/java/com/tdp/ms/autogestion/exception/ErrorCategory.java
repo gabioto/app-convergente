@@ -6,16 +6,12 @@ public enum ErrorCategory {
 
 	// From Request
 	INVALID_REQUEST("invalid-request", HttpStatus.BAD_REQUEST, "SVC0001",
-			"Generic Client Error: invalid-request - additional info", "API Generic wildcard fault response"), // 400:
-																												// Bad
-																												// Request
+			"Generic Client Error: invalid-request - additional info", "API Generic wildcard fault response"),
 	MISSING_MANDATORY("Missing mandatory parameter", HttpStatus.BAD_REQUEST, "SVC1000", "Missing mandatory parameter",
-			"API Request without mandatory field"), // 400:
-													// Bad
-													// Request
+			"API Request without mandatory field"), // 400: Bad Request
 	ARGUMENT_MISMATCH("argument-mismatch", HttpStatus.BAD_REQUEST, "SVC0001", "", ""), // 400: Bad Request
-	UNAUTHORIZED("unauthorized", HttpStatus.UNAUTHORIZED, "SVC0001", "", ""), // 401: Unauthorized
-	FORBIDDEN("forbidden", HttpStatus.FORBIDDEN, "SVC0001", "", ""), // 403: Forbidden
+	UNAUTHORIZED("unauthorized", HttpStatus.UNAUTHORIZED, "SVC1002", "", ""), // 401: Unauthorized
+	FORBIDDEN("forbidden", HttpStatus.FORBIDDEN, "SVC1002", "Ticket creation limit", "User can´t create more tickets"), // 403: Forbidden
 	RESOURCE_NOT_FOUND("Not existing Resource Id", HttpStatus.NOT_FOUND, "SVC1006",
 			"Resource %s does not exist. Resource Identifier",
 			"Reference to a resource identifier which does not exist in the collection/repository referred (e.g.: invalid Id)"), // 404:

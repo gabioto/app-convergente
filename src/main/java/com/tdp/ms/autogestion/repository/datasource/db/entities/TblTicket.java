@@ -26,8 +26,8 @@ import com.tdp.ms.autogestion.model.Ticket;
 import com.tdp.ms.autogestion.util.Constants;
 
 /**
- * The persistent class for the tbl_ticket database table.
- * , schema = "esqfcrautogestion"
+ * The persistent class for the tbl_ticket database table. , schema =
+ * "esqfcrautogestion"
  */
 @Entity
 @Table(name = "tbl_ticket")
@@ -82,7 +82,7 @@ public class TblTicket implements Serializable {
 	@Convert(converter = LocalDateTimeConverter.class)
 	@Column(name = "modified_date_ticket")
 	private LocalDateTime modifiedDateTicket;
-		
+
 	@Convert(converter = LocalDateTimeConverter.class)
 	@Column(name = "event_time_kafka")
 	private LocalDateTime eventTimeKafka;
@@ -337,14 +337,27 @@ public class TblTicket implements Serializable {
 		tableTicket.setStatusTicket(status);
 		tableTicket.setIdUseCase(ticket.getUseCaseId());
 		tableTicket.setTechnology(ticket.getTechnology());
-		tableTicket.setTblCustomer(tableCustomer);		
+		tableTicket.setTblCustomer(tableCustomer);
 		return tableTicket;
 	}
 
 	public Ticket fromThis() {
-		return new Ticket(idTicket, "", description, creationDate, severity, ticketType,
-				status, statusChangeDate, statusChangeReason, priority, technology, idUseCase, "",
-				involvement, "", "", tblCustomer.fromThis(), statusTicket, modifiedDateTicket);
+		return new Ticket(idTicket, idTicketTriage, "", description, creationDate, severity, ticketType, status,
+				statusChangeDate, statusChangeReason, priority, technology, idUseCase, "", involvement, "", "",
+				tblCustomer.fromThis(), statusTicket, modifiedDateTicket,
+				TblAdditionalData.listFromThis(tblAdditionalData), TblAttachment.listFromThis(tblAttachments));
+	}
+
+	public static List<Ticket> listFromThis(List<TblTicket> tblTickets) {
+		List<Ticket> tickets = new ArrayList<>();
+
+		if (tblTickets != null) {
+			for (TblTicket tblTicket : tblTickets) {
+				tickets.add(tblTicket.fromThis());
+			}
+		}
+
+		return tickets;
 	}
 
 }

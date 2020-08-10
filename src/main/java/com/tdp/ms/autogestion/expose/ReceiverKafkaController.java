@@ -18,9 +18,8 @@ import org.springframework.stereotype.Component;
 
 import com.google.gson.Gson;
 import com.tdp.ms.autogestion.expose.entities.TicketKafkaResponse;
+import com.tdp.ms.autogestion.expose.entities.TicketKafkaResponse.Event.TroubleTicket.AdditionalData;
 import com.tdp.ms.autogestion.expose.entities.TicketKafkaResponse.Event.TroubleTicket.Attachment;
-import com.tdp.ms.autogestion.expose.entities.TicketKafkaResponse.Event.TroubleTicket.Attachment.AdditionalData;
-import com.tdp.ms.autogestion.model.TicketAdditionalData;
 import com.tdp.ms.autogestion.model.TicketStatus;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaAdditionalDataRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaAttachmentAdditionalDataRepository;
@@ -37,10 +36,9 @@ import com.tdp.ms.autogestion.repository.datasource.db.entities.TblCustomerPK;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblEquivalence;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblEquivalenceNotification;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblTicket;
+import com.tdp.ms.autogestion.util.Constants;
 import com.tdp.ms.autogestion.util.DateUtil;
 import com.tdp.ms.autogestion.util.FunctionsUtil;
-import com.tdp.ms.autogestion.util.Constants;
-
 
 @EnableAsync
 @Component
@@ -68,7 +66,7 @@ public class ReceiverKafkaController {
 
 	@Autowired
 	JpaEquivalenceNotificationRepository equivalenceNotificationRepository;
-	
+
 	@Autowired
 	FunctionsUtil functionsUtil;
 
@@ -90,7 +88,8 @@ public class ReceiverKafkaController {
 
 			if (listTblTicket.isPresent()) {
 				TblTicket tblTicket = new TblTicket();
-				tblTicket.setEventTimeKafka(DateUtil.formatStringToLocalDateTimeKafka(ticketKafkaResponse.getEventTime()));
+				tblTicket.setEventTimeKafka(
+						DateUtil.formatStringToLocalDateTimeKafka(ticketKafkaResponse.getEventTime()));
 				tblTicket
 						.setIdTicketTriage(Integer.parseInt(ticketKafkaResponse.getEvent().getTroubleTicket().getId()));
 				tblTicket.setStatusChangeDate(DateUtil.formatStringToLocalDateTime(
@@ -101,14 +100,14 @@ public class ReceiverKafkaController {
 				tblTicket.setDescription(ticketKafkaResponse.getEvent().getTroubleTicket().getDescription());
 				tblTicket.setCreationDate(DateUtil.formatStringToLocalDateTime(
 						ticketKafkaResponse.getEvent().getTroubleTicket().getCreationDate()));
-				
+
 				tblTicket.setCreationDateTicket(LocalDateTime.now(ZoneOffset.of(Constants.ZONE_OFFSET)));
 				tblTicket.setPriority(ticketKafkaResponse.getEvent().getTroubleTicket().getPriority());
 				tblTicket.setSeverity(ticketKafkaResponse.getEvent().getTroubleTicket().getSeverity());
 				tblTicket.setStatusTicket(TicketStatus.CREATED.toString());
 				tblTicket.setTicketType(ticketKafkaResponse.getEvent().getTroubleTicket().getType());
 
-				TicketAdditionalData ticketAdditionalData = ticketKafkaResponse.getEvent().getTroubleTicket()
+				AdditionalData ticketAdditionalData = ticketKafkaResponse.getEvent().getTroubleTicket()
 						.getAdditionalData().stream().filter(x -> x.getKey().equals("use-case-id")).findAny()
 						.orElse(null);
 				tblTicket.setIdUseCase(ticketAdditionalData.getValue());
@@ -159,12 +158,12 @@ public class ReceiverKafkaController {
 
 					}
 				}
-				List<TicketAdditionalData> AdditionalDataList = ticketKafkaResponse.getEvent().getTroubleTicket()
+				List<AdditionalData> AdditionalDataList = ticketKafkaResponse.getEvent().getTroubleTicket()
 						.getAdditionalData();
 				TblAdditionalData tblAdditionalData = null;
 
 				if (AdditionalDataList != null && AdditionalDataList.size() > 0) {
-					for (TicketAdditionalData ticketAdditional : AdditionalDataList) {
+					for (AdditionalData ticketAdditional : AdditionalDataList) {
 						tblAdditionalData = new TblAdditionalData();
 						tblAdditionalData.setKeyAdditional(ticketAdditional.getKey());
 						tblAdditionalData.setValueAdditional(ticketAdditional.getValue());
@@ -200,7 +199,7 @@ public class ReceiverKafkaController {
 					}
 				}
 
-				for (TicketAdditionalData additionalData : AdditionalDataList) {
+				for (AdditionalData additionalData : AdditionalDataList) {
 					if (additionalData.getKey().equals("notification-id")) {
 						Optional<TblEquivalenceNotification> tblEquivalenceNotification = equivalenceNotificationRepository
 								.getEquivalence(tblAdditionalData.getValueAdditional());
@@ -210,7 +209,8 @@ public class ReceiverKafkaController {
 							// Validar el estado del notification_id
 							if (equivalence.getAction().equals(TicketStatus.RESET_SOLVED.name()) && indicadorReset) {
 								status = TicketStatus.RESET_SOLVED.toString();
-							} else if (equivalence.getAction().equals(TicketStatus.RESET_SOLVED.name()) && !indicadorReset) {
+							} else if (equivalence.getAction().equals(TicketStatus.RESET_SOLVED.name())
+									&& !indicadorReset) {
 								status = TicketStatus.SOLVED.toString();
 							} else if (equivalence.getAction().equals(TicketStatus.FAULT.name())) {
 								status = TicketStatus.FAULT.toString();
@@ -230,14 +230,16 @@ public class ReceiverKafkaController {
 				tblTicket.setStatusTicket(status);
 				tblTicket.setModifiedDateTicket(sysDate);
 				ticketRepository.save(tblTicket);
-				functionsUtil.saveLogData(tblTicket.getIdTicketTriage(), tblTicket.getTblCustomer().getId().getDocumentNumber(), 
-						tblTicket.getTblCustomer().getId().getDocumentType(), "Kafka listener", "event", message, "Ok", "Insert Ticket Fcr");
+				functionsUtil.saveLogData(tblTicket.getIdTicketTriage(),
+						tblTicket.getTblCustomer().getId().getDocumentNumber(),
+						tblTicket.getTblCustomer().getId().getDocumentType(), "Kafka listener", "event", message, "Ok",
+						"Insert Ticket Fcr");
 
 			}
 
 		} catch (Exception e) {
 			System.out.println("Error::: " + e.getMessage());
-			functionsUtil.saveLogData(Integer.parseInt(ticketKafkaResponse.getEvent().getTroubleTicket().getId()), "", 
+			functionsUtil.saveLogData(Integer.parseInt(ticketKafkaResponse.getEvent().getTroubleTicket().getId()), "",
 					"", "Kafka listener", "event", message, e.getMessage(), "Insert Ticket Fcr");
 		}
 

@@ -1,5 +1,7 @@
 package com.tdp.ms.autogestion.business.impl;
 
+import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,8 +48,8 @@ public class UpdateTicketStatusUseCaseImpl implements UpdateTicketStatusUseCase 
 				for (TicketStatus elemento : TicketStatus.values()) {
 					if (elemento.name().equals(status)) {
 						Ticket ticket = ticketRepository.updateTicketStatus(idTicket, status);
-
-						return new ResponseEntity<>(TicketStatusResponse.from(ticket, idTicket), HttpStatus.OK);
+						return new ResponseEntity<>(TicketStatusResponse.from(ticket, new ArrayList<>()),
+								HttpStatus.OK);
 					}
 				}
 

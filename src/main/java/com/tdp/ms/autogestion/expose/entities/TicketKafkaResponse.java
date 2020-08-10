@@ -3,8 +3,6 @@ package com.tdp.ms.autogestion.expose.entities;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.tdp.ms.autogestion.model.TicketAdditionalData;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -51,7 +49,7 @@ public class TicketKafkaResponse {
 			private Channel channel;
 			private List<StatusHistory> statusHistory = new ArrayList<>();
 			private List<Attachment> attachment = new ArrayList<>();
-			private List<TicketAdditionalData> additionalData = new ArrayList<>();
+			private List<AdditionalData> additionalData = new ArrayList<>();
 
 			@Data
 			@NoArgsConstructor
@@ -82,15 +80,15 @@ public class TicketKafkaResponse {
 				private String creationDate;
 				private String name;
 				private List<AdditionalData> additionalData = new ArrayList<>();
+			}
 
-				@Data
-				@NoArgsConstructor
-				@AllArgsConstructor
-				@EqualsAndHashCode(callSuper = false)
-				public static class AdditionalData {
-					private String key;
-					private String value;
-				}
+			@Data
+			@NoArgsConstructor
+			@AllArgsConstructor
+			@EqualsAndHashCode(callSuper = false)
+			public static class AdditionalData {
+				private String key;
+				private String value;
 			}
 		}
 

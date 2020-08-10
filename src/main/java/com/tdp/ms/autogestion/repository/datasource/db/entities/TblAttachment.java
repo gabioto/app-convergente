@@ -1,8 +1,8 @@
 package com.tdp.ms.autogestion.repository.datasource.db.entities;
 
 import java.io.Serializable;
-
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -20,6 +20,8 @@ import javax.persistence.Table;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
+import com.tdp.ms.autogestion.model.Attachment;
+
 /**
  * The persistent class for the tbl_attachment database table.
  * 
@@ -34,7 +36,7 @@ public class TblAttachment implements Serializable {
 	@Id
 	@Column(name = "id_attachment")
 	private Integer idAttachment;
-	
+
 	@Column(name = "id_attachment_kafka")
 	private Integer idAttachmentKafka;
 
@@ -51,7 +53,7 @@ public class TblAttachment implements Serializable {
 	private TblTicket tblTicket;
 
 	// bi-directional many-to-one association to TblAttachmentAdditionalData
-	@OneToMany(mappedBy = "tblAttachment",targetEntity=TblAttachmentAdditionalData.class)
+	@OneToMany(mappedBy = "tblAttachment", targetEntity = TblAttachmentAdditionalData.class)
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private List<TblAttachmentAdditionalData> tblAttachmentAdditionalData;
 
@@ -123,4 +125,17 @@ public class TblAttachment implements Serializable {
 		return tblAttachmentAdditionalData;
 	}
 
+	public Attachment fromThis() {
+		return new Attachment(idAttachment, idAttachmentKafka, creationDate, nameAttachment,
+				TblAttachmentAdditionalData.listFromThis(tblAttachmentAdditionalData));
+	}
+
+	public static List<Attachment> listFromThis(List<TblAttachment> tblAttachmentList) {
+		List<Attachment> attachmentList = new ArrayList<>();
+		for (TblAttachment tblAttachment : tblAttachmentList) {
+			attachmentList.add(tblAttachment.fromThis());
+		}
+
+		return attachmentList;
+	}
 }

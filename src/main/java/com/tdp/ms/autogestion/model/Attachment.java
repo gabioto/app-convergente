@@ -1,7 +1,6 @@
 package com.tdp.ms.autogestion.model;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -30,50 +29,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class Ticket {
+public class Attachment {
 
-	private Integer id;
-
-	private Integer idTriage;
+private Integer idAttachment;
 	
-	private String href;
-
-	private String description;
+	private Integer idAttachmentKafka;
 
 	private LocalDateTime creationDate;
 
-	private String severity;
-
-	private String type;
-
-	private String status;
-
-	private LocalDateTime statusChangeDate;
-
-	private String statusChangeReason;
-
-	private Integer priority;
-
-	private String technology;
-
-	private String useCaseId;
-
-	private String subOperationCode;
-
-	private String involvement;
-
-	private String channelId;
-
-	private String channelName;
-
-	private Customer customer;
+	private String nameAttachment;
 	
-	private String ticketStatus;
-	
-	private LocalDateTime modifiedDateTicket;
-
-	private List<AdditionalData> additionalData = new ArrayList<>();
-
-	private List<Attachment> attachments = new ArrayList<>();
-
+	private List<AdditionalData> additionalData;
 }
