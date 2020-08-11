@@ -42,15 +42,15 @@ public class TicketStatusResponse {
 
 	private String description;
 
-	private LocalDateTime creationDate;
+	private String creationDate;
 
 	private String type;
 
-	private LocalDateTime statusChangeDate;
+	private String statusChangeDate;
 
 	private String ticketStatus;
 
-	private LocalDateTime modifiedDateTicket;
+	private String modifiedDateTicket;
 
 	private List<ResponseAdditionalData> additionalData;
 
@@ -68,11 +68,11 @@ public class TicketStatusResponse {
 		TicketStatusResponse response = new TicketStatusResponse();
 		response.setTicketId(ticket.getIdTriage());
 		response.setDescription(ticket.getDescription());
-		response.setCreationDate(ticket.getCreationDate());
+		response.setCreationDate(ticket.getCreationDate().toString());
 		response.setType(ticket.getType());
-		response.setStatusChangeDate(ticket.getStatusChangeDate());
+		response.setStatusChangeDate(ticket.getStatusChangeDate().toString());
 		response.setTicketStatus(ticket.getTicketStatus());
-		response.setModifiedDateTicket(ticket.getModifiedDateTicket());
+		response.setModifiedDateTicket(ticket.getModifiedDateTicket().toString());
 		response.setAdditionalData(from(addDataList));
 		return response;
 	}
