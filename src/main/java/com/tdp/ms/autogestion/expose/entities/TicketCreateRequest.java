@@ -5,9 +5,9 @@ import java.util.List;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 import com.tdp.ms.autogestion.model.Ticket;
+import com.tdp.ms.autogestion.util.AdditionalValid;
 import com.tdp.ms.autogestion.util.Constants;
 
 import lombok.AllArgsConstructor;
