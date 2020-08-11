@@ -1,10 +1,13 @@
 package com.tdp.ms.autogestion.expose;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -23,8 +26,10 @@ import com.tdp.ms.autogestion.business.UpdateTicketStatusUseCase;
 import com.tdp.ms.autogestion.expose.entities.TicketCreateRequest;
 import com.tdp.ms.autogestion.expose.entities.TicketCreateResponse;
 import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
+import com.tdp.ms.autogestion.util.Constants;
 
 @RestController
+@Validated
 @CrossOrigin(origins = "*")
 @RequestMapping("/trazabilidad/v1/tickets")
 public class TicketController {
@@ -52,24 +57,25 @@ public class TicketController {
 	// Consulta de bandeja
 	@GetMapping("/retrieveTickets")
 	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity<TicketStatusResponse> retrieveTickets(@Valid @RequestParam String type,
-			@Valid @RequestParam String involvement, @Valid @RequestParam String reference,
-			@Valid @RequestParam String nationalIdType, @Valid @RequestParam String nationalId) {
+	public ResponseEntity<TicketStatusResponse> retrieveTickets(@NotEmpty @RequestParam String type,
+			@NotEmpty @RequestParam String involvement, @NotEmpty @RequestParam String reference,
+			@NotEmpty @RequestParam String nationalIdType, @NotEmpty @RequestParam String nationalId) {
 		return retrieveTicketsUseCase.pendingTicket(type, involvement, reference, nationalIdType, nationalId);
 	}
 
 	// Datos del ticket
 	@GetMapping("/{id}/status")
 	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity<TicketStatusResponse> retrieveTicketStatus(@Valid @PathVariable String id) {
+	public ResponseEntity<TicketStatusResponse> retrieveTicketStatus(@NotEmpty @PathVariable String id) {
 		return retrieveTicketStatusUseCase.retrieveTicketStatus(id);
 	}
 
 	// Actualización de estado de tickets
 	@PatchMapping("/{id}/{status}")
 	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity<TicketStatusResponse> updateTicketStatus(@Valid @PathVariable int id,
-			@Valid @PathVariable String status) throws Exception {
+	public ResponseEntity<TicketStatusResponse> updateTicketStatus(
+			@PathVariable @Min(value = 1, message = Constants.MSG_NOT_EMPTY) int id,
+			@PathVariable @NotEmpty String status) throws Exception {
 		return updateTicketStatusUseCase.updateTicketStatus(id, status);
 	}
 

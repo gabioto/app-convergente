@@ -29,7 +29,7 @@ public enum ErrorCategory {
 																												// server
 																												// error
 	HOST_NOT_FOUND("host-not-found", HttpStatus.INTERNAL_SERVER_ERROR, "SVR1000", "", ""), // 500: Internal server error
-	UNEXPECTED("unexpected", HttpStatus.INTERNAL_SERVER_ERROR, "SVR1000", "", ""), // 500: Internal server error
+	UNEXPECTED("unexpected", HttpStatus.INTERNAL_SERVER_ERROR, "SVR1000", "Generic error exception", "An error occurred"), // 500: Internal server error
 	NOT_IMPLEMENTED("not-implemented", HttpStatus.NOT_IMPLEMENTED, "SVR1000", "", ""), // 501: Not Implemented
 	SERVICE_UNAVAILABLE("service-unavailable", HttpStatus.SERVICE_UNAVAILABLE, "SVR1000", "", ""), // 503: Service
 																									// unavailable

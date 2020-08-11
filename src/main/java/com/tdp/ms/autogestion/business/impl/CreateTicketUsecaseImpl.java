@@ -10,8 +10,6 @@ import org.springframework.stereotype.Service;
 import com.tdp.ms.autogestion.business.CreateTicketUseCase;
 import com.tdp.ms.autogestion.dao.ServiceDao;
 import com.tdp.ms.autogestion.exception.DomainException;
-import com.tdp.ms.autogestion.exception.ErrorCategory;
-import com.tdp.ms.autogestion.exception.ValidRequestException;
 import com.tdp.ms.autogestion.expose.entities.TicketCreateRequest;
 import com.tdp.ms.autogestion.expose.entities.TicketCreateRequest.AdditionalData;
 import com.tdp.ms.autogestion.expose.entities.TicketCreateResponse;
@@ -29,7 +27,7 @@ public class CreateTicketUsecaseImpl implements CreateTicketUseCase {
 
 	@Autowired
 	private TicketRepository ticketRepository;
-	
+
 	@Autowired
 	ServiceDao serviceDao;
 
@@ -39,32 +37,15 @@ public class CreateTicketUsecaseImpl implements CreateTicketUseCase {
 		Ticket ticket;
 
 		try {
-			// Validación de campos
-			// TODO: Migrar a Validator
-			String documentType = validateRequestAdditionalData(request.getAdditionalData(), "nationalIdType");
+			String documentType = getAdditionalData(request.getAdditionalData(), "nationalIdType");
 
-			String documentNumber = validateRequestAdditionalData(request.getAdditionalData(), "nationalId");
+			String documentNumber = getAdditionalData(request.getAdditionalData(), "nationalId");
 
-			String technology = validateRequestAdditionalData(request.getAdditionalData(), "technology");
+			String technology = getAdditionalData(request.getAdditionalData(), "technology");
 
-			String useCaseId = validateRequestAdditionalData(request.getAdditionalData(), "use-case-id");
+			String useCaseId = getAdditionalData(request.getAdditionalData(), "use-case-id");
 
-			String subOperationCode = validateRequestAdditionalData(request.getAdditionalData(), "sub-operation-code");
-
-			boolean validCustomer = documentType.isEmpty() || documentNumber.isEmpty();
-			boolean validParams = technology.isEmpty() || useCaseId.isEmpty() || subOperationCode.isEmpty();
-
-			if (validCustomer || validParams) {
-
-				String emptyFields = documentType.isEmpty() ? "nationalIdType is empty or null" : "";
-				emptyFields = emptyFields.concat(documentNumber.isEmpty() ? ", nationalId is empty or null" : "");
-				emptyFields = emptyFields.concat(technology.isEmpty() ? ", technology is empty or null" : "");
-				emptyFields = emptyFields.concat(useCaseId.isEmpty() ? ", use-case-id is empty or null" : "");
-				emptyFields = emptyFields
-						.concat(subOperationCode.isEmpty() ? ", sub-operation-code is empty or null" : "");
-
-				throw new ValidRequestException(ErrorCategory.MISSING_MANDATORY, emptyFields);
-			}
+			String subOperationCode = getAdditionalData(request.getAdditionalData(), "sub-operation-code");
 
 			ticket = request.fromThis();
 			ticket.setCustomer(new Customer(documentNumber, documentType, request.getRelatedObject().getReference()));
@@ -88,9 +69,9 @@ public class CreateTicketUsecaseImpl implements CreateTicketUseCase {
 		}
 	}
 
-	private String validateRequestAdditionalData(List<AdditionalData> data, String value) {
+	private String getAdditionalData(List<AdditionalData> data, String value) {
 		AdditionalData field = data.stream().filter(item -> value.equals(item.getKey())).findFirst().orElse(null);
-		return (field != null && field.getValue() != null) ? field.getValue() : "";
+		return field.getValue();
 	}
 
 }

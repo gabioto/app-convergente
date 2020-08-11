@@ -2,8 +2,10 @@ package com.tdp.ms.autogestion.expose.entities;
 
 import java.util.List;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import com.tdp.ms.autogestion.model.Ticket;
 import com.tdp.ms.autogestion.util.Constants;
@@ -19,17 +21,29 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = false)
 public class TicketCreateRequest {
 
+//	@NotEmpty(message = Constants.MSG_NOT_EMPTY)
+//	private String description = "averia";
+//
+//	@NotEmpty(message = Constants.MSG_NOT_EMPTY)
+//	private String severity = "minor";
+//
+//	@NotEmpty(message = Constants.MSG_NOT_EMPTY)
+//	private String type = "TroubleTicket";
+//
+//	@NotNull(message = Constants.MSG_NOT_EMPTY)
+//	private int priority = 1;
+	
 	@NotEmpty(message = Constants.MSG_NOT_EMPTY)
-	private String description = "averia";
+	private String description;
 
 	@NotEmpty(message = Constants.MSG_NOT_EMPTY)
-	private String severity = "minor";
+	private String severity;
 
 	@NotEmpty(message = Constants.MSG_NOT_EMPTY)
-	private String type = "TroubleTicket";
+	private String type;
 
-	@NotNull(message = Constants.MSG_NOT_EMPTY)
-	private int priority = 1;
+	@Min(value = 1, message = Constants.MSG_NOT_EMPTY)
+	private int priority;
 
 	@NotNull(message = Constants.MSG_NOT_EMPTY)
 	private Channel channel;
@@ -37,7 +51,8 @@ public class TicketCreateRequest {
 	@NotNull(message = Constants.MSG_NOT_EMPTY)
 	private RelatedObject relatedObject;
 
-	@NotNull(message = Constants.MSG_NOT_EMPTY)
+	@NotNull
+	@AdditionalValid
 	private List<AdditionalData> additionalData;
 
 	@Data

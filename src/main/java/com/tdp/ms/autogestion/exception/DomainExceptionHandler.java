@@ -3,6 +3,9 @@ package com.tdp.ms.autogestion.exception;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolationException;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +29,7 @@ public class DomainExceptionHandler extends ResponseEntityExceptionHandler {
 				category.getExceptionText(), category.getMoreInfo(), category.getHttpStatus(), ex.getMessage()),
 				category.getHttpStatus());
 	}
-	
+
 	@ExceptionHandler(value = { ForbiddenException.class })
 	ResponseEntity<ExceptionResponse> handleForbiddenException(ForbiddenException ex) {
 
@@ -37,22 +40,23 @@ public class DomainExceptionHandler extends ResponseEntityExceptionHandler {
 				category.getHttpStatus());
 	}
 
-//	@ExceptionHandler(value = { ValidRequestException.class })
-//	ResponseEntity<ExceptionResponse> handleValidRequestException(ValidRequestException ex) {
-//
-//		ErrorCategory category = ex.getError();
-//
-//		return new ResponseEntity<>(new ExceptionResponse(category.getExceptionId(), category.getUserMessage(),
-//				category.getExceptionText(), category.getMoreInfo(), category.getHttpStatus(), ex.getMessage()),
-//				category.getHttpStatus());
-//	}
+	@ExceptionHandler(value = { ValidRequestException.class })
+	ResponseEntity<ExceptionResponse> handleValidRequestException(ValidRequestException ex) {
+
+		ErrorCategory category = ex.getError();
+
+		return new ResponseEntity<>(new ExceptionResponse(category.getExceptionId(), category.getUserMessage(),
+				category.getExceptionText(), category.getMoreInfo(), category.getHttpStatus(), ex.getMessage()),
+				category.getHttpStatus());
+	}
 
 	@ExceptionHandler({ Exception.class })
 	public ResponseEntity<Object> handleAll(Exception ex, WebRequest request) {
 
 		ErrorCategory category = ErrorCategory.UNEXPECTED;
 		ExceptionResponse response = new ExceptionResponse(category.getExceptionId(), category.getUserMessage(),
-				"Generic error exception", ex.getLocalizedMessage(), category.getHttpStatus(), "An error occurred");
+				category.getExceptionText(), ex.getLocalizedMessage(), category.getHttpStatus(),
+				category.getMoreInfo());
 		return handleExceptionInternal(ex, response, new HttpHeaders(), response.getStatus(), request);
 	}
 
@@ -68,10 +72,17 @@ public class DomainExceptionHandler extends ResponseEntityExceptionHandler {
 			errors.add(error.getObjectName() + ": " + error.getDefaultMessage());
 		}
 
-		ErrorCategory category = ErrorCategory.INVALID_REQUEST;
+		ErrorCategory category = ErrorCategory.MISSING_MANDATORY;
 		ExceptionResponse response = new ExceptionResponse(category.getExceptionId(), category.getUserMessage(),
-				"Argument Not Valid", ex.getLocalizedMessage(), category.getHttpStatus(), errors);
+				category.getExceptionText(), ex.getLocalizedMessage(), category.getHttpStatus(), errors);
 		return handleExceptionInternal(ex, response, headers, response.getStatus(), request);
+	}
+
+	@ExceptionHandler(ConstraintViolationException.class)
+	public ResponseEntity<ExceptionResponse> constraintViolationException(HttpServletResponse resp) {
+		ErrorCategory category = ErrorCategory.MISSING_MANDATORY;
+		return new ResponseEntity<>(new ExceptionResponse(category.getExceptionId(), category.getUserMessage(),
+				category.getExceptionText(), "", category.getHttpStatus(), ""), category.getHttpStatus());
 	}
 
 }
