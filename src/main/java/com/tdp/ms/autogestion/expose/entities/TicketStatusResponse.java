@@ -72,7 +72,9 @@ public class TicketStatusResponse {
 		response.setType(ticket.getType());
 		response.setStatusChangeDate(ticket.getStatusChangeDate().toString());
 		response.setTicketStatus(ticket.getTicketStatus());
-		response.setModifiedDateTicket(ticket.getModifiedDateTicket().toString());
+		if (ticket.getModifiedDateTicket() != null) {
+			response.setModifiedDateTicket(ticket.getModifiedDateTicket().toString());
+		}
 		response.setAdditionalData(from(addDataList));
 		return response;
 	}
