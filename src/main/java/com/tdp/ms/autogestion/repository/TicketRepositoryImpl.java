@@ -211,7 +211,6 @@ public class TicketRepositoryImpl implements TicketRepository {
 						clientData.setValue(attachAddData.getValue());
 						lstClientData.add(clientData);
 					}
-
 				}
 
 				if (attachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-amdocs")
