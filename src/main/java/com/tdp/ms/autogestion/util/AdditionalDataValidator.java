@@ -5,25 +5,19 @@ import java.util.List;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-
-import com.tdp.ms.autogestion.expose.entities.TicketCreateRequest;
 import com.tdp.ms.autogestion.expose.entities.TicketCreateRequest.AdditionalData;
-
 
 public class AdditionalDataValidator implements ConstraintValidator<AdditionalValid, List<AdditionalData>> {
 
-	List<String> mandatoryfields = Arrays.asList("nationalIdType", "nationalId", "technology", "use-case-id",
-			"sub-operation-code");
+	List<String> mandatoryfields = Arrays.asList("nationalIdType", "nationalId", "use-case-id", "sub-operation-code");
 
 	@Override
 	public boolean isValid(List<AdditionalData> value, ConstraintValidatorContext context) {
-
 		for (String field : mandatoryfields) {
 			if (validateRequestAdditionalData(value, field).isEmpty()) {
 				return false;
 			}
 		}
-
 		return true;
 	}
 

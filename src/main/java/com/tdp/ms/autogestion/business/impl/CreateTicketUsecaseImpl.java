@@ -70,8 +70,17 @@ public class CreateTicketUsecaseImpl implements CreateTicketUseCase {
 	}
 
 	private String getAdditionalData(List<AdditionalData> data, String value) {
-		AdditionalData field = data.stream().filter(item -> value.equals(item.getKey())).findFirst().orElse(null);
-		return field.getValue();
+		if (!value.equals("technology")) {
+			AdditionalData field = data.stream().filter(item -> value.equals(item.getKey())).findFirst().orElse(null);
+			return field.getValue();
+		} else {
+			AdditionalData field = data.stream().filter(item -> value.equals(item.getKey())).findFirst().orElse(null);
+			if (field != null) {
+				return field.getValue();
+			} else {
+				return "";
+			}
+		}
 	}
 
 }
