@@ -24,8 +24,8 @@ public interface TicketRepository {
 
 	Ticket getTicket(int idTicket);
 
-	List<AdditionalData> getDebtAmount(Integer attachmentId);
-
+	List<AdditionalData> getValue(Integer attachmentId, String field);	
+	
 	List<AdditionalData> getAdditionalData(Ticket ticket);
 
 	List<Equivalence> getAttachmentEquivalence(Integer ticketId);

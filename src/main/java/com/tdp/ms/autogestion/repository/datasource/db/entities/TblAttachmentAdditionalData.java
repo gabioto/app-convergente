@@ -78,7 +78,7 @@ public class TblAttachmentAdditionalData implements Serializable {
 	}
 
 	public AdditionalData fromThis() {
-		return new AdditionalData(keyAttachmentAdditional, valueAttachmentAdditional);
+		return new AdditionalData(keyAttachmentAdditional, valueAttachmentAdditional, "");
 	}
 
 	public static List<AdditionalData> listFromThis(List<TblAttachmentAdditionalData> tblAddDataList) {

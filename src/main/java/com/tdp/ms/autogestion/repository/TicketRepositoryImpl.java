@@ -138,14 +138,14 @@ public class TicketRepositoryImpl implements TicketRepository {
 	}
 
 	@Override
-	public List<AdditionalData> getDebtAmount(Integer attachmentId) {
+	public List<AdditionalData> getValue(Integer attachmentId, String field) {
 		Optional<List<TblAttachmentAdditionalData>> optAdditionalData = attachmentAdditionalDataRepository
-				.getMontoDeuda(attachmentId, "monto");
+				.getValue(attachmentId, field);
 
 		return optAdditionalData.isPresent() ? TblAttachmentAdditionalData.listFromThis(optAdditionalData.get())
 				: new ArrayList<>();
 	}
-
+	
 	@Override
 	public List<Equivalence> getAttachmentEquivalence(Integer ticketId) {
 		Optional<List<TblEquivalence>> optEquivalence = jpaEquivalenceRepository.getEquivalence(ticketId);
@@ -196,50 +196,112 @@ public class TicketRepositoryImpl implements TicketRepository {
 		List<Attachment> attachments = ticket.getAttachments();
 
 		if (attachments != null && attachments.size() > 0) {
+			String result = "";
 			for (Attachment attachment : attachments) {
-				// Obtener el monto adeudado por el cliente
+				// Estado Comercial Linea Fija e Internet
+				if (attachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-info-telefono")) {
+					List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(), "estado-linea");
+					for (AdditionalData attachAddData : attachAddDataList) {
+						Boolean check = Boolean.FALSE;
+						if (attachAddData.getValue().equals("active")) {
+							check = Boolean.TRUE;
+						}
+						result += attachment.getNameAttachment().concat(";").concat(check.toString()).concat(",");
+					}
+				}
+				
+				// Sin Deuda Pendiente
 				if (attachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-deuda-amdocs")
 						|| attachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-deuda-cms")
-						|| attachment.getNameAttachment()
-								.equals("ValidacionesInicialesInternet[{}]recupera-deuda-atis")) {
+						|| attachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-deuda-atis")) {
 
-					List<AdditionalData> attachAddDataList = getDebtAmount(attachment.getIdAttachment());
-
+					List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(), "monto");
 					for (AdditionalData attachAddData : attachAddDataList) {
-						clientData = new AdditionalData();
-						clientData.setKey(Constants.LABEL_MONTO);
-						clientData.setValue(attachAddData.getValue());
-						lstClientData.add(clientData);
+						if (!attachAddData.getValue().equals("")) {
+							clientData = new AdditionalData();
+							clientData.setKey(Constants.LABEL_MONTO);
+							clientData.setValue(attachAddData.getValue());
+							lstClientData.add(clientData);
+							
+							result += attachment.getNameAttachment().concat(";").concat(Boolean.FALSE.toString()).concat(",");
+						} else {
+							result += attachment.getNameAttachment().concat(";").concat(Boolean.TRUE.toString()).concat(",");
+						}
 					}
 				}
 
+				// Sin Orden de Reconexión
+				if (attachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-reconexion-pendiente-amdocs")
+						|| attachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-reconexion-pendiente-cms")
+						|| attachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-reconexion-pendiente-atis-hfc")
+						|| attachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-reconexion-pendiente-atis-adsl")) {
+					
+					List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(), "tiene-reconexion-pendiente");
+					for (AdditionalData attachAddData : attachAddDataList) {
+						Boolean check = Boolean.TRUE;
+						if (attachAddData.getValue().equals("SI")) {
+							check = Boolean.FALSE;
+						}
+						result += attachment.getNameAttachment().concat(";").concat(check.toString()).concat(",");
+					}					
+				}
+				
+				// Ninguna Avería Pendiente
 				if (attachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-amdocs")
 						|| attachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-cms")
-						|| attachment.getNameAttachment()
-								.equals("AveriaPendiente[{}]recupera-averia-pendiente-gestel")) {
+						|| attachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-gestel")) {
 
-					List<AdditionalData> attachAddDataList = getDebtAmount(attachment.getIdAttachment());
-
+					List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(), "codigo-averia");
 					for (AdditionalData attachAddData : attachAddDataList) {
-						if (attachAddData.getKey().equals("codigo_averia")) {
+						if (!attachAddData.getValue().equals("")) {
 							clientData = new AdditionalData();
 							clientData.setKey(Constants.LABEL_COD_AVERIA);
 							clientData.setValue(attachAddData.getValue());
 							lstClientData.add(clientData);
+							result += attachment.getNameAttachment().concat(";").concat(Boolean.FALSE.toString()).concat(",");
+						} else {
+							result += attachment.getNameAttachment().concat(";").concat(Boolean.TRUE.toString()).concat(",");
 						}
 					}
 				}
+				
+				// Problemas técnicos
+				if (attachment.getNameAttachment().equals("RecomendacionesDespachoHFC[{}]realiza-sincronizacion-iwy2")
+						|| attachment.getNameAttachment().equals("RecomendacionesDespachoHFC[{}]realiza-sincronizacion-multiconsulta")
+						|| attachment.getNameAttachment().equals("RecomendacionesDespachoHFC[{}]realiza-reset-modem-iwy2")
+						|| attachment.getNameAttachment().equals("RecomendacionesDespachoHFC[{}]realiza-sincronizacion-iwy2-despues-reset-modem")) {
+					
+					List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(), "estado-reset-modem-ok");
+					for (AdditionalData attachAddData : attachAddDataList) {
+						Boolean check = Boolean.TRUE;
+						if (attachAddData.getValue().equals("SI")) {
+							check = Boolean.FALSE;
+						}
+						result += attachment.getNameAttachment().concat(";").concat(check.toString()).concat(",");
+					}					
+				}				
 			}
 
 			// Equivalencias de Attachments
 			List<Equivalence> equivalenceList = getAttachmentEquivalence(ticket.getId());
 			int index = 1;
 
+			String[] list = result.split(",");
+			
 			for (Equivalence equivalence : equivalenceList) {
+				String success = "";
+				for (int indice=0; indice<list.length; indice++) {
+					String[] value = list[indice].split(";"); 					
+					if (value[0].equals(equivalence.getAttachmentName())) {
+						success = value[1]; 
+					}
+				}				
 				clientData = new AdditionalData();
 				clientData.setKey(Constants.LABEL_FRONT_END.concat(String.valueOf(index)));
 				clientData.setValue(equivalence.getNameEquivalence());
+				clientData.setCheck(success);
 				lstClientData.add(clientData);
+				
 				index++;
 			}
 		}
@@ -267,10 +329,10 @@ public class TicketRepositoryImpl implements TicketRepository {
 						clientData.setValue(equivalence.getTitle() != null ? equivalence.getTitle() : "");
 						lstClientData.add(clientData);
 
-						clientData = new AdditionalData();
+						/*clientData = new ClientData();
 						clientData.setKey(Constants.LABEL_TITLE_DESC);
 						clientData.setValue(equivalence.getDescription() != null ? equivalence.getDescription() : "");
-						lstClientData.add(clientData);
+						lstClientData.add(clientData);*/
 
 						clientData = new AdditionalData();
 						clientData.setKey(Constants.LABEL_BODY);

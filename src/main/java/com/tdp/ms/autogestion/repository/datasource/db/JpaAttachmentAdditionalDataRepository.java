@@ -31,10 +31,6 @@ public interface JpaAttachmentAdditionalDataRepository extends JpaRepository<Tbl
 	@Query					  
 	(value = "SELECT add FROM TblAttachmentAdditionalData add "
 			+ "WHERE tblAttachment.idAttachment = ?1 AND add.keyAttachmentAdditional = ?2")
-	Optional<List<TblAttachmentAdditionalData>> getMontoDeuda(int idAttachment, String field);
+	Optional<List<TblAttachmentAdditionalData>> getValue(int idAttachment, String field);
 	
-	@Query					
-	(value = "SELECT add FROM TblAttachmentAdditionalData add "
-			+ "WHERE tblAttachment.idAttachment = ?1")
-	Optional<List<TblAttachmentAdditionalData>> getInfoAveria(int idAttachment);
 }

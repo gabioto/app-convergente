@@ -1,6 +1,5 @@
 package com.tdp.ms.autogestion.expose.entities;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,6 +61,8 @@ public class TicketStatusResponse {
 		private String key;
 
 		private String value;
+		
+		private String check;
 	}
 
 	public static TicketStatusResponse from(Ticket ticket, List<AdditionalData> addDataList) {
@@ -89,6 +90,6 @@ public class TicketStatusResponse {
 	}
 
 	private static ResponseAdditionalData from(AdditionalData additionalData) {
-		return new ResponseAdditionalData(additionalData.getKey(), additionalData.getValue());
+		return new ResponseAdditionalData(additionalData.getKey(), additionalData.getValue(), additionalData.getCheck());
 	}
 }
