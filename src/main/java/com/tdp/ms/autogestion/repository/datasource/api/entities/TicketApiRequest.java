@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.tdp.ms.autogestion.model.Ticket;
+import com.tdp.ms.autogestion.util.Constants;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,7 +36,11 @@ public class TicketApiRequest {
 		priority = pTicket.getPriority();
 		channel = new Channel(pTicket.getChannelId() != null ? pTicket.getChannelId() : "3");
 		additionalData.add(new TicketAdditionalData("use-case-id", pTicket.getUseCaseId()));
-		additionalData.add(new TicketAdditionalData("service-code", pTicket.getCustomer().getServiceCode()));
+		if (pTicket.getProductIdentifier().equals(Constants.SERVICE_CODE)) {
+			additionalData.add(new TicketAdditionalData("service-code", pTicket.getCustomer().getServiceCode()));
+		} else if (pTicket.getProductIdentifier().equals(Constants.PHONE)) {
+			additionalData.add(new TicketAdditionalData("phone", pTicket.getCustomer().getServiceCode()));
+		}
 		additionalData.add(new TicketAdditionalData("sub-operation-code", pTicket.getSubOperationCode()));
 	}
 

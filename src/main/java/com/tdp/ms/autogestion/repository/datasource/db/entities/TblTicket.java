@@ -65,6 +65,8 @@ public class TblTicket implements Serializable {
 	private String involvement;
 
 	private String technology;
+	
+	private String productIdentifier;
 
 	@Convert(converter = LocalDateTimeConverter.class)
 	@Column(name = "status_change_date")
@@ -135,8 +137,16 @@ public class TblTicket implements Serializable {
 		this.involvement = involvement;
 	}
 
+	public void setProductIdentifier(String productIdentifier) {
+		this.productIdentifier = productIdentifier;
+	}
+	
 	public String getTechnology() {
 		return technology;
+	}
+	
+	public String getProductIdentifier() {
+		return productIdentifier;
 	}
 
 	public void setTechnology(String technology) {
@@ -338,12 +348,13 @@ public class TblTicket implements Serializable {
 		tableTicket.setIdUseCase(ticket.getUseCaseId());
 		tableTicket.setTechnology(ticket.getTechnology());
 		tableTicket.setTblCustomer(tableCustomer);
+		tableTicket.setProductIdentifier(ticket.getProductIdentifier());
 		return tableTicket;
 	}
 
 	public Ticket fromThis() {
 		return new Ticket(idTicket, idTicketTriage, "", description, creationDate, severity, ticketType, status,
-				statusChangeDate, statusChangeReason, priority, technology, idUseCase, "", involvement, "", "",
+				statusChangeDate, statusChangeReason, priority, technology, idUseCase, "", productIdentifier, involvement, "", "",
 				tblCustomer.fromThis(), statusTicket, modifiedDateTicket,
 				TblAdditionalData.listFromThis(tblAdditionalData), TblAttachment.listFromThis(tblAttachments));
 	}
