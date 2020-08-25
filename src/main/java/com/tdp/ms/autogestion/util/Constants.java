@@ -17,4 +17,12 @@ public class Constants {
 	public static final String LABEL_ACTION_BUTTON = "ACTION_BUTTON";
 	public static final String LABEL_MONTO = "MONTO";
 	public static final String LABEL_COD_AVERIA = "COD_AVERIA";
+	public static final String USE_CASE = "20000032";
+	public static final String SUB_OPERATION_CODE = "99";
+	public static final String INTERNET = "broadband";
+	public static final String FIJA = "landline";
+	public static final String CABLE = "cableTv";
+	public static final String MOVIL = "mobil";
+	public static final String SERVICE_CODE = "serviceCode";
+	public static final String PHONE = "phone";	
 }

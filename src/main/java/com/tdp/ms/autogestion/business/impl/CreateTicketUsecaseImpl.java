@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.tdp.ms.autogestion.business.CreateTicketUseCase;
 import com.tdp.ms.autogestion.dao.ServiceDao;
 import com.tdp.ms.autogestion.exception.DomainException;
+
 import com.tdp.ms.autogestion.expose.entities.TicketCreateRequest;
 import com.tdp.ms.autogestion.expose.entities.TicketCreateRequest.AdditionalData;
 import com.tdp.ms.autogestion.expose.entities.TicketCreateResponse;
@@ -18,6 +19,7 @@ import com.tdp.ms.autogestion.model.OAuth;
 import com.tdp.ms.autogestion.model.Ticket;
 import com.tdp.ms.autogestion.repository.OAuthRepository;
 import com.tdp.ms.autogestion.repository.TicketRepository;
+import com.tdp.ms.autogestion.util.Constants;
 
 @Service
 public class CreateTicketUsecaseImpl implements CreateTicketUseCase {
@@ -43,18 +45,28 @@ public class CreateTicketUsecaseImpl implements CreateTicketUseCase {
 
 			String technology = getAdditionalData(request.getAdditionalData(), "technology");
 
-			String useCaseId = getAdditionalData(request.getAdditionalData(), "use-case-id");
+			//String useCaseId = getAdditionalData(request.getAdditionalData(), "use-case-id");
 
-			String subOperationCode = getAdditionalData(request.getAdditionalData(), "sub-operation-code");
+			//String subOperationCode = getAdditionalData(request.getAdditionalData(), "sub-operation-code");
 
+			String productIdentifier = getAdditionalData(request.getAdditionalData(), "productIdentifier");
+					
 			ticket = request.fromThis();
 			ticket.setCustomer(new Customer(documentNumber, documentType, request.getRelatedObject().getReference()));
 			ticket.setTechnology(technology);
-			ticket.setUseCaseId(useCaseId);
-			ticket.setSubOperationCode(subOperationCode);
+			if (request.getRelatedObject().getInvolvement().equals(Constants.INTERNET)) {
+				ticket.setUseCaseId(Constants.USE_CASE);
+			} else if (request.getRelatedObject().getInvolvement().equals(Constants.FIJA)) {
+				ticket.setUseCaseId("");
+			} else if (request.getRelatedObject().getInvolvement().equals(Constants.CABLE)) {
+				ticket.setUseCaseId("");
+			} else if (request.getRelatedObject().getInvolvement().equals(Constants.MOVIL)) {
+				ticket.setUseCaseId("");
+			}
+			ticket.setSubOperationCode(Constants.SUB_OPERATION_CODE);
+			ticket.setProductIdentifier(productIdentifier);
 
 			// Invocación a API generación de ticket
-			// oAuth = serviceDao.getOauth(1);
 			oAuth = oAuthRepository.getOAuthValues();
 			ticket = ticketRepository.generateTicket(oAuth, ticket);
 

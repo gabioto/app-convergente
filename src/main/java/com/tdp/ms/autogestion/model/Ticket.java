@@ -59,6 +59,8 @@ public class Ticket {
 	private String useCaseId;
 
 	private String subOperationCode;
+	
+	private String productIdentifier;
 
 	private String involvement;
 

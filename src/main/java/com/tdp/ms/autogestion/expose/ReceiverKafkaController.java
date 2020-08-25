@@ -106,7 +106,7 @@ public class ReceiverKafkaController {
 				tblTicket.setSeverity(ticketKafkaResponse.getEvent().getTroubleTicket().getSeverity());
 				tblTicket.setStatusTicket(TicketStatus.CREATED.toString());
 				tblTicket.setTicketType(ticketKafkaResponse.getEvent().getTroubleTicket().getType());
-
+				
 				AdditionalData ticketAdditionalData = ticketKafkaResponse.getEvent().getTroubleTicket()
 						.getAdditionalData().stream().filter(x -> x.getKey().equals("use-case-id")).findAny()
 						.orElse(null);
@@ -119,6 +119,7 @@ public class ReceiverKafkaController {
 				tblCustomerPK.setServiceCode(listTblTicket.get().get(0).getTblCustomer().getId().getServiceCode());
 				tblTicket.setInvolvement(listTblTicket.get().get(0).getInvolvement());
 				tblTicket.setTechnology(listTblTicket.get().get(0).getTechnology());
+				tblTicket.setProductIdentifier(listTblTicket.get().get(0).getProductIdentifier());
 				tblCustomer.setId(tblCustomerPK);
 				tblTicket.setTblCustomer(tblCustomer);
 
