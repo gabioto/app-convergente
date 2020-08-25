@@ -7,7 +7,6 @@ import javax.validation.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -29,7 +28,7 @@ import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
 import com.tdp.ms.autogestion.util.Constants;
 
 @RestController
-@Validated
+//@Validated
 @CrossOrigin(origins = "*")
 @RequestMapping("/trazabilidad/v1/tickets")
 public class TicketController {
