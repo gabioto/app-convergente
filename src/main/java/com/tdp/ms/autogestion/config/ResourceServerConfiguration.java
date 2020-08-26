@@ -1,6 +1,6 @@
 package com.tdp.ms.autogestion.config;
 
-import java.util.Arrays;
+/*import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,9 +12,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;*/
 
-@Configuration
+/*@Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true)
 public class ResourceServerConfiguration extends GlobalMethodSecurityConfiguration {
@@ -47,4 +47,4 @@ public class ResourceServerConfiguration extends GlobalMethodSecurityConfigurati
 		}
 	}
 
-}
+}*/

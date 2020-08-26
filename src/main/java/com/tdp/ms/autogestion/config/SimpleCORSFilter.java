@@ -1,5 +1,6 @@
 package com.tdp.ms.autogestion.config;
 
+/*
 import java.io.IOException;
 
 import javax.servlet.Filter;
@@ -10,8 +11,9 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+*/
 
-public class SimpleCORSFilter implements Filter{
+/*public class SimpleCORSFilter implements Filter{
 	
 	public SimpleCORSFilter() {
         System.out.println("SimpleCORSFilter init");
@@ -41,4 +43,4 @@ public class SimpleCORSFilter implements Filter{
     public void destroy() {
     }
 
-}
+}*/
