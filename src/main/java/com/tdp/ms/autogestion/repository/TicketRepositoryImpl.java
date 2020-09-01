@@ -192,7 +192,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 	}
 
 	private List<AdditionalData> fillAttachmentsTicket(Ticket ticket, List<AdditionalData> lstClientData) {
-		AdditionalData clientData = null;
+
 		List<Attachment> attachments = ticket.getAttachments();
 
 		if (attachments != null && attachments.size() > 0) {
@@ -203,20 +203,20 @@ public class TicketRepositoryImpl implements TicketRepository {
 				result = getCommercialStatus(attachment, result);
 
 				// Sin Deuda Pendiente
-				result = getNoDebt(attachment, result, lstClientData, clientData);
+				result = getNoDebt(attachment, result, lstClientData);
 
 				// Sin Orden de Reconexión
 				result = getNoOrder(attachment, result);
 
 				// Ninguna Avería Pendiente
-				result = getNoFaults(attachment, result, lstClientData, clientData);
+				result = getNoFaults(attachment, result, lstClientData);
 
 				// Problemas técnicos
 				result = getTechTroubles(attachment, result);
 			}
 
 			// Equivalencias de Attachments
-			attachEquivalence(result, lstClientData, clientData, ticket);
+			attachEquivalence(result, lstClientData, ticket);
 		}
 
 		return lstClientData;
@@ -237,8 +237,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 		return result;
 	}
 
-	private String getNoDebt(Attachment attachment, String result, List<AdditionalData> lstClientData,
-			AdditionalData clientData) {
+	private String getNoDebt(Attachment attachment, String result, List<AdditionalData> lstClientData) {
 		if (attachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-deuda-amdocs")
 				|| attachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-deuda-cms")
 				|| attachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-deuda-atis")) {
@@ -246,7 +245,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 			List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(), "monto");
 			for (AdditionalData attachAddData : attachAddDataList) {
 				if (!attachAddData.getValue().equals("")) {
-					clientData = new AdditionalData();
+					AdditionalData clientData = new AdditionalData();
 					clientData.setKey(Constants.LABEL_MONTO);
 					clientData.setValue(attachAddData.getValue());
 					lstClientData.add(clientData);
@@ -285,8 +284,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 		return result;
 	}
 
-	private String getNoFaults(Attachment attachment, String result, List<AdditionalData> lstClientData,
-			AdditionalData clientData) {
+	private String getNoFaults(Attachment attachment, String result, List<AdditionalData> lstClientData) {
 		if (attachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-amdocs")
 				|| attachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-cms")
 				|| attachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-gestel")) {
@@ -294,7 +292,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 			List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(), "codigo-averia");
 			for (AdditionalData attachAddData : attachAddDataList) {
 				if (!attachAddData.getValue().equals("")) {
-					clientData = new AdditionalData();
+					AdditionalData clientData = new AdditionalData();
 					clientData.setKey(Constants.LABEL_COD_AVERIA);
 					clientData.setValue(attachAddData.getValue());
 					lstClientData.add(clientData);
@@ -329,8 +327,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 		return result;
 	}
 
-	private void attachEquivalence(String result, List<AdditionalData> lstClientData, AdditionalData clientData,
-			Ticket ticket) {
+	private void attachEquivalence(String result, List<AdditionalData> lstClientData, Ticket ticket) {
 		List<Equivalence> equivalenceList = getAttachmentEquivalence(ticket.getId());
 		int index = 1;
 
@@ -344,8 +341,8 @@ public class TicketRepositoryImpl implements TicketRepository {
 					success = value[1];
 				}
 			}
-			
-			clientData = new AdditionalData();
+
+			AdditionalData clientData = new AdditionalData();
 			clientData.setKey(Constants.LABEL_FRONT_END.concat(String.valueOf(index)));
 			clientData.setValue(equivalence.getNameEquivalence());
 			clientData.setCheck(success);
