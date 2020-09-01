@@ -53,6 +53,7 @@ public class TblOauth implements Serializable {
 	private String refreshTokenExpiresIn;
 
 	public TblOauth() {
+		// Constructor without fields
 	}
 
 	public Integer getIdOauth() {

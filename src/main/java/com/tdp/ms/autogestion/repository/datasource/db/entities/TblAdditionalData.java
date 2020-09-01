@@ -44,6 +44,7 @@ public class TblAdditionalData implements Serializable {
 	private TblTicket tblTicket;
 
 	public TblAdditionalData() {
+		// Constructor without fields
 	}
 
 	public String getKeyAdditional() {

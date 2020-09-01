@@ -43,6 +43,7 @@ public class TblAttachmentAdditionalData implements Serializable {
 	private TblAttachment tblAttachment;
 
 	public TblAttachmentAdditionalData() {
+		// Constructor without fields
 	}
 
 	public Integer getIdAttachAdditionalData() {

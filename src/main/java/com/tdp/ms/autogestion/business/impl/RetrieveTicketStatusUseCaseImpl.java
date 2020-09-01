@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import com.tdp.ms.autogestion.business.RetrieveTicketStatusUseCase;
 import com.tdp.ms.autogestion.exception.DomainException;
+import com.tdp.ms.autogestion.exception.ErrorCategory;
+import com.tdp.ms.autogestion.exception.GenericDomainException;
 import com.tdp.ms.autogestion.exception.ResourceNotFoundException;
 import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
 import com.tdp.ms.autogestion.model.Ticket;
@@ -38,7 +40,7 @@ public class RetrieveTicketStatusUseCaseImpl implements RetrieveTicketStatusUseC
 	TicketRepository ticketRepository;
 
 	@Override
-	public ResponseEntity<TicketStatusResponse> retrieveTicketStatus(String idTicket) {
+	public ResponseEntity<TicketStatusResponse> retrieveTicketStatus(String idTicket) throws GenericDomainException {
 
 		try {
 			List<Ticket> tickets = ticketRepository.getTicketStatus(Integer.parseInt(idTicket));
@@ -50,8 +52,8 @@ public class RetrieveTicketStatusUseCaseImpl implements RetrieveTicketStatusUseC
 			throw e;
 		} catch (DomainException e) {
 			throw e;
-		} catch (Exception exception) {
-			throw exception;
+		} catch (Exception e) {
+			throw new GenericDomainException(ErrorCategory.UNEXPECTED, e.getLocalizedMessage());
 		}
 	}
 

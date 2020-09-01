@@ -1,4 +1,4 @@
-package com.tdp.ms.autogestion.config;
+package com.tdp.ms.autogestion.util;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -6,14 +6,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import com.tdp.ms.autogestion.config.DataSourceConfig;
 import com.tdp.ms.autogestion.exception.ErrorCategory;
 import com.tdp.ms.autogestion.exception.GenericDomainException;
 
-public class ConnectionManager {
+public class ConnectionUtil {
 
 	Connection conn;
 
-	public ConnectionManager() throws GenericDomainException {
+	public ConnectionUtil() throws GenericDomainException {
 
 		try {
 
@@ -21,8 +22,9 @@ public class ConnectionManager {
 			conn = dsn.dataSource().getConnection();
 
 		} catch (Exception e) {
-			throw new GenericDomainException(ErrorCategory.UNEXPECTED, e.getLocalizedMessage());
+			throw new GenericDomainException(ErrorCategory.UNEXPECTED, e.getMessage());
 		}
+
 	}
 
 	public Connection getConexion() {
@@ -30,36 +32,36 @@ public class ConnectionManager {
 
 	}
 
-	public void closeConnection() throws Exception {
+	public void closeConnection() throws GenericDomainException {
 		closeResources(conn, null, null, null);
 	}
 
-	public void closeResultSet(ResultSet rs) throws Exception {
+	public void closeResultSet(ResultSet rs) throws GenericDomainException {
 		closeResources(null, rs, null, null);
 	}
 
-	public void closeStatement(Statement stmt) throws Exception {
+	public void closeStatement(Statement stmt) throws GenericDomainException {
 		closeResources(null, null, stmt, null);
 	}
 
-	public void closeCallableStatement(CallableStatement cstmt) throws Exception {
+	public void closeCallableStatement(CallableStatement cstmt) throws GenericDomainException {
 		closeResources(null, null, null, cstmt);
 	}
 
 	public void closeResources(Connection conn, ResultSet rs, Statement stmt, CallableStatement cstmt)
-			throws Exception {
+			throws GenericDomainException {
 		if (conn != null) {
 			try {
 				conn.close();
 			} catch (SQLException ex) {
-				throw new Exception(ex.getMessage());
+				throw new GenericDomainException(ErrorCategory.UNEXPECTED, ex.getMessage());
 			}
 		}
 		if (rs != null) {
 			try {
 				rs.close();
 			} catch (SQLException ex) {
-				throw new Exception(ex.getMessage());
+				throw new GenericDomainException(ErrorCategory.UNEXPECTED, ex.getMessage());
 			}
 		}
 
@@ -67,14 +69,14 @@ public class ConnectionManager {
 			try {
 				stmt.close();
 			} catch (SQLException ex) {
-				throw new Exception(ex.getMessage());
+				throw new GenericDomainException(ErrorCategory.UNEXPECTED, ex.getMessage());
 			}
 		}
 		if (cstmt != null) {
 			try {
 				cstmt.close();
 			} catch (SQLException ex) {
-				throw new Exception(ex.getMessage());
+				throw new GenericDomainException(ErrorCategory.UNEXPECTED, ex.getMessage());
 			}
 		}
 	}

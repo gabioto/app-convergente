@@ -58,6 +58,7 @@ public class TblAttachment implements Serializable {
 	private List<TblAttachmentAdditionalData> tblAttachmentAdditionalData;
 
 	public TblAttachment() {
+		// Constructor without fields
 	}
 
 	public Integer getIdAttachmentKafka() {

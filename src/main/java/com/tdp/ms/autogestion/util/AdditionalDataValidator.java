@@ -23,11 +23,16 @@ public class AdditionalDataValidator implements ConstraintValidator<AdditionalVa
 
 	private String validateRequestAdditionalData(List<AdditionalData> data, String value) {
 		AdditionalData field = data.stream().filter(item -> value.equals(item.getKey())).findFirst().orElse(null);
-		if (field.getKey().equals("productIdentifier")) {
-			if (!field.getValue().equals(Constants.SERVICE_CODE) && !field.getValue().equals(Constants.PHONE)) {
+
+		if (field != null && field.getValue() != null) {
+			if (field.getKey().equals("productIdentifier") && !field.getValue().equals(Constants.SERVICE_CODE)
+					&& !field.getValue().equals(Constants.PHONE)) {
 				return "";
+			} else {
+				return field.getValue();
 			}
+		} else {
+			return "";
 		}
-		return (field != null && field.getValue() != null) ? field.getValue() : "";
 	}
 }

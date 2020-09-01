@@ -10,7 +10,8 @@ import org.springframework.stereotype.Service;
 import com.tdp.ms.autogestion.business.CreateTicketUseCase;
 import com.tdp.ms.autogestion.dao.ServiceDao;
 import com.tdp.ms.autogestion.exception.DomainException;
-
+import com.tdp.ms.autogestion.exception.ErrorCategory;
+import com.tdp.ms.autogestion.exception.GenericDomainException;
 import com.tdp.ms.autogestion.expose.entities.TicketCreateRequest;
 import com.tdp.ms.autogestion.expose.entities.TicketCreateRequest.AdditionalData;
 import com.tdp.ms.autogestion.expose.entities.TicketCreateResponse;
@@ -34,7 +35,8 @@ public class CreateTicketUsecaseImpl implements CreateTicketUseCase {
 	ServiceDao serviceDao;
 
 	@Override
-	public ResponseEntity<TicketCreateResponse> createTicket(TicketCreateRequest request) throws Exception {
+	public ResponseEntity<TicketCreateResponse> createTicket(TicketCreateRequest request)
+			throws GenericDomainException {
 		OAuth oAuth;
 		Ticket ticket;
 
@@ -45,15 +47,12 @@ public class CreateTicketUsecaseImpl implements CreateTicketUseCase {
 
 			String technology = getAdditionalData(request.getAdditionalData(), "technology");
 
-			//String useCaseId = getAdditionalData(request.getAdditionalData(), "use-case-id");
-
-			//String subOperationCode = getAdditionalData(request.getAdditionalData(), "sub-operation-code");
-
 			String productIdentifier = getAdditionalData(request.getAdditionalData(), "productIdentifier");
-					
+
 			ticket = request.fromThis();
 			ticket.setCustomer(new Customer(documentNumber, documentType, request.getRelatedObject().getReference()));
 			ticket.setTechnology(technology);
+
 			if (request.getRelatedObject().getInvolvement().equals(Constants.INTERNET)) {
 				ticket.setUseCaseId(Constants.USE_CASE);
 			} else if (request.getRelatedObject().getInvolvement().equals(Constants.FIJA)) {
@@ -77,7 +76,7 @@ public class CreateTicketUsecaseImpl implements CreateTicketUseCase {
 		} catch (DomainException e) {
 			throw e;
 		} catch (Exception e) {
-			throw e;
+			throw new GenericDomainException(ErrorCategory.UNEXPECTED, e.getLocalizedMessage());
 		}
 	}
 

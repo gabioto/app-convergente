@@ -25,4 +25,13 @@ public class Constants {
 	public static final String MOVIL = "mobil";
 	public static final String SERVICE_CODE = "serviceCode";
 	public static final String PHONE = "phone";	
+	
+	// EXCEPTIONS
+	public static final String SVC0001 = "SVC0001";
+	public static final String SVC1000 = "SVC1000";
+	public static final String SVC1006 = "SVC1006";
+	public static final String SVR1000 = "SVR1000";
+	public static final String SVC1002 = "SVC1002";
+	
+	public static final String ERROR = "ERROR";
 }

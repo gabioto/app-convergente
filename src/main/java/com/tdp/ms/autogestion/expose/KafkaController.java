@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.tdp.ms.autogestion.expose.entities.TicketKafkaResponse;
 import com.tdp.ms.autogestion.expose.entities.TicketKafkaResponse.Event.TroubleTicket.AdditionalData;
 import com.tdp.ms.autogestion.expose.entities.TicketKafkaResponse.Event.TroubleTicket.Attachment;
+import com.tdp.ms.autogestion.model.LogData;
 import com.tdp.ms.autogestion.model.TicketStatus;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaAdditionalDataRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaAttachmentAdditionalDataRepository;
@@ -42,9 +43,9 @@ import com.tdp.ms.autogestion.util.FunctionsUtil;
 
 @EnableAsync
 @Component
-public class ReceiverKafkaController {
+public class KafkaController {
 
-	private static final Logger LOG = LoggerFactory.getLogger(ReceiverKafkaController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(KafkaController.class);
 
 	@Autowired
 	JpaTicketRepository ticketRepository;
@@ -73,15 +74,17 @@ public class ReceiverKafkaController {
 	@Autowired
 	EntityManager entityManager;
 
+	String status = TicketStatus.IN_PROGRESS.name();
+	Boolean indicatorReset = false;
+
 	@Transactional
 	@KafkaListener(topics = "${app.topic.foo}")
 	public void listen(@Payload String message) {
 		LOG.info("Receiver.listen()  ==>  queue-notification-tickets");
-		System.out.print(message);
-		System.out.print("\n\n");
-		// System.out.print("received message='{}'" + message);
+		LOG.info(message);
+
 		TicketKafkaResponse ticketKafkaResponse = new Gson().fromJson(message, TicketKafkaResponse.class);
-		// System.out.println(ticketKafkaResponse.getEventId());
+
 		try {
 			Optional<List<TblTicket>> listTblTicket = ticketRepository
 					.findByIdTicketTriage(Integer.parseInt(ticketKafkaResponse.getEvent().getTroubleTicket().getId()));
@@ -106,7 +109,7 @@ public class ReceiverKafkaController {
 				tblTicket.setSeverity(ticketKafkaResponse.getEvent().getTroubleTicket().getSeverity());
 				tblTicket.setStatusTicket(TicketStatus.CREATED.toString());
 				tblTicket.setTicketType(ticketKafkaResponse.getEvent().getTroubleTicket().getType());
-				
+
 				AdditionalData ticketAdditionalData = ticketKafkaResponse.getEvent().getTroubleTicket()
 						.getAdditionalData().stream().filter(x -> x.getKey().equals("use-case-id")).findAny()
 						.orElse(null);
@@ -124,126 +127,147 @@ public class ReceiverKafkaController {
 				tblTicket.setTblCustomer(tblCustomer);
 
 				tblTicket = ticketRepository.saveAndFlush(tblTicket);
-				System.out.println("tblTicket idTicket:: " + tblTicket.getIdTicket());
-				System.out.println("tblTicket idTicketTriaje:: " + tblTicket.getIdTicketTriage());
+				LOG.info("tblTicket idTicket:: " + tblTicket.getIdTicket());
+				LOG.info("tblTicket idTicketTriaje:: " + tblTicket.getIdTicketTriage());
 
 				List<Attachment> listAttachment = ticketKafkaResponse.getEvent().getTroubleTicket().getAttachment();
-				List<AdditionalData> additionalDataLista = null;
-				TblAttachment tblAttachment = null;
-				TblAttachmentAdditionalData tblAttachmentAdditionalData = null;
 
-				if (listAttachment != null && listAttachment.size() > 0) {
-					for (Attachment attachment : listAttachment) {
-						tblAttachment = new TblAttachment();
-						tblAttachment.setIdAttachmentKafka(Integer.parseInt(attachment.getAttachmentId()));
-						tblAttachment.setNameAttachment(attachment.getName());
-						tblAttachment
-								.setCreationDate(DateUtil.formatStringToLocalDateTime(attachment.getCreationDate()));
-						tblAttachment.setTblTicket(tblTicket);
-						tblAttachment = attachmentRepository.saveAndFlush(tblAttachment);
-						additionalDataLista = attachment.getAdditionalData();
+				// Validación de attachments
+				fillAttachment(tblTicket, listAttachment);
 
-						for (int i = 0; i < additionalDataLista.size(); i++) {
-							if (i > 0 && i % 5 == 0) {
-								entityManager.flush();
-								entityManager.clear();
-							}
-							tblAttachmentAdditionalData = new TblAttachmentAdditionalData();
-							tblAttachmentAdditionalData.setKeyAttachmentAdditional(additionalDataLista.get(i).getKey());
-							tblAttachmentAdditionalData
-									.setValueAttachmentAdditional(additionalDataLista.get(i).getValue());
-							tblAttachmentAdditionalData.setTblAttachment(tblAttachment);
-							// attachmentAdditionalDataRepository.saveAndFlush(tblAttachmentAdditionalData);
-							entityManager.persist(tblAttachmentAdditionalData);
-						}
-
-					}
-				}
-				List<AdditionalData> AdditionalDataList = ticketKafkaResponse.getEvent().getTroubleTicket()
+				// Validación additional data
+				List<AdditionalData> additionalDataList = ticketKafkaResponse.getEvent().getTroubleTicket()
 						.getAdditionalData();
-				TblAdditionalData tblAdditionalData = null;
+				TblAdditionalData tblAdditionalData = fillAdditionalData(tblTicket, additionalDataList);
 
-				if (AdditionalDataList != null && AdditionalDataList.size() > 0) {
-					for (AdditionalData ticketAdditional : AdditionalDataList) {
-						tblAdditionalData = new TblAdditionalData();
-						tblAdditionalData.setKeyAdditional(ticketAdditional.getKey());
-						tblAdditionalData.setValueAdditional(ticketAdditional.getValue());
-						tblAdditionalData.setTblTicket(tblTicket);
-						additionalDataRepository.saveAndFlush(tblAdditionalData);
-					}
-				}
-				// Logica:: Update status_ticket
+				setProgressTicketStatus(tblTicket, listAttachment);
 
-				String status = TicketStatus.IN_PROGRESS.name();
-				Boolean indicadorReset = Boolean.FALSE;
+				setSolvedTicketStatus(tblAdditionalData, additionalDataList);
 
-				Optional<List<TblEquivalence>> tableEquivalence = equivalenceRepository
-						.getEquivalence(tblTicket.getIdTicket());
-
-				if (tableEquivalence.isPresent()) {
-					List<TblEquivalence> lstEquivalence = tableEquivalence.get();
-
-					for (TblEquivalence tblEquivalence : lstEquivalence) {
-						for (Attachment attachment : listAttachment) {
-							// Validar si el attachment existe en la tabla de equivalencias
-							if (attachment.getName().equals(tblEquivalence.getAttachmentName())) {
-								List<AdditionalData> lstAttachmentAdditionalData = attachment.getAdditionalData();
-								for (AdditionalData attachmentAdditionalData : lstAttachmentAdditionalData) {
-									// Validamos si se realizo un reset
-									if (attachmentAdditionalData.getKey().equals("estado-reset-modem-ok")) {
-										status = TicketStatus.RESET.name();
-										indicadorReset = Boolean.TRUE;
-									}
-								}
-							}
-						}
-					}
-				}
-
-				for (AdditionalData additionalData : AdditionalDataList) {
-					if (additionalData.getKey().equals("notification-id")) {
-						Optional<TblEquivalenceNotification> tblEquivalenceNotification = equivalenceNotificationRepository
-								.getEquivalence(tblAdditionalData.getValueAdditional());
-						if (tblEquivalenceNotification.isPresent()) {
-							TblEquivalenceNotification equivalence = tblEquivalenceNotification.get();
-
-							// Validar el estado del notification_id
-							if (equivalence.getAction().equals(TicketStatus.RESET_SOLVED.name()) && indicadorReset) {
-								status = TicketStatus.RESET_SOLVED.toString();
-							} else if (equivalence.getAction().equals(TicketStatus.RESET_SOLVED.name())
-									&& !indicadorReset) {
-								status = TicketStatus.SOLVED.toString();
-							} else if (equivalence.getAction().equals(TicketStatus.FAULT.name())) {
-								status = TicketStatus.FAULT.toString();
-							} else if (equivalence.getAction().equals(TicketStatus.WHATSAPP.name())) {
-								status = TicketStatus.WHATSAPP.toString();
-							} else if (equivalence.getAction().equals(TicketStatus.GENERIC.name())) {
-								status = TicketStatus.GENERIC.toString();
-							} else if (equivalence.getAction().equals(TicketStatus.FAULT_TRAZA.name())) {
-								status = TicketStatus.FAULT_TRAZA.toString();
-							}
-						}
-					}
-				}
-
-				System.out.println("status ticket:: " + status);
+				LOG.info("status ticket:: " + status);
 				LocalDateTime sysDate = LocalDateTime.now(ZoneOffset.of(Constants.ZONE_OFFSET));
 				tblTicket.setStatusTicket(status);
 				tblTicket.setModifiedDateTicket(sysDate);
+
 				ticketRepository.save(tblTicket);
-				functionsUtil.saveLogData(tblTicket.getIdTicketTriage(),
+
+				functionsUtil.saveLogData(new LogData(tblTicket.getIdTicketTriage(),
 						tblTicket.getTblCustomer().getId().getDocumentNumber(),
 						tblTicket.getTblCustomer().getId().getDocumentType(), "Kafka listener", "event", message, "Ok",
-						"Insert Ticket Fcr");
-
+						"Insert Ticket Fcr"));
 			}
 
 		} catch (Exception e) {
-			System.out.println("Error::: " + e.getMessage());
-			functionsUtil.saveLogData(Integer.parseInt(ticketKafkaResponse.getEvent().getTroubleTicket().getId()), "",
-					"", "Kafka listener", "event", message, e.getMessage(), "Insert Ticket Fcr");
+			LOG.info("Error::: " + e.getMessage());
+			functionsUtil.saveLogData(
+					new LogData(Integer.parseInt(ticketKafkaResponse.getEvent().getTroubleTicket().getId()), "", "",
+							"Kafka listener", "event", message, e.getMessage(), "Insert Ticket Fcr"));
 		}
 
+	}
+
+	private void fillAttachment(TblTicket tblTicket, List<Attachment> listAttachment) {
+		if (listAttachment != null) {
+			for (Attachment attachment : listAttachment) {
+				TblAttachment tblAttachment = new TblAttachment();
+				tblAttachment.setIdAttachmentKafka(Integer.parseInt(attachment.getAttachmentId()));
+				tblAttachment.setNameAttachment(attachment.getName());
+				tblAttachment.setCreationDate(DateUtil.formatStringToLocalDateTime(attachment.getCreationDate()));
+				tblAttachment.setTblTicket(tblTicket);
+				tblAttachment = attachmentRepository.saveAndFlush(tblAttachment);
+				List<AdditionalData> additionalDataLista = attachment.getAdditionalData();
+
+				for (int i = 0; i < additionalDataLista.size(); i++) {
+					if (i > 0 && i % 5 == 0) {
+						entityManager.flush();
+						entityManager.clear();
+					}
+					TblAttachmentAdditionalData tblAttachmentAdditionalData = new TblAttachmentAdditionalData();
+					tblAttachmentAdditionalData.setKeyAttachmentAdditional(additionalDataLista.get(i).getKey());
+					tblAttachmentAdditionalData.setValueAttachmentAdditional(additionalDataLista.get(i).getValue());
+					tblAttachmentAdditionalData.setTblAttachment(tblAttachment);
+					entityManager.persist(tblAttachmentAdditionalData);
+				}
+			}
+		}
+	}
+
+	private TblAdditionalData fillAdditionalData(TblTicket tblTicket, List<AdditionalData> additionalDataList) {
+		TblAdditionalData tblAdditionalData = null;
+
+		if (additionalDataList != null) {
+			for (AdditionalData ticketAdditional : additionalDataList) {
+				tblAdditionalData = new TblAdditionalData();
+				tblAdditionalData.setKeyAdditional(ticketAdditional.getKey());
+				tblAdditionalData.setValueAdditional(ticketAdditional.getValue());
+				tblAdditionalData.setTblTicket(tblTicket);
+				additionalDataRepository.saveAndFlush(tblAdditionalData);
+			}
+		}
+
+		return tblAdditionalData;
+	}
+
+	private void setProgressTicketStatus(TblTicket tblTicket, List<Attachment> listAttachment) {
+		Optional<List<TblEquivalence>> tableEquivalence = equivalenceRepository.getEquivalence(tblTicket.getIdTicket());
+
+		if (tableEquivalence.isPresent()) {
+			List<TblEquivalence> lstEquivalence = tableEquivalence.get();
+
+			for (TblEquivalence tblEquivalence : lstEquivalence) {
+				for (Attachment attachment : listAttachment) {
+					validateReset(attachment, tblEquivalence);
+				}
+			}
+		}
+	}
+
+	private void validateReset(Attachment attachment, TblEquivalence tblEquivalence) {
+		// Validar si el attachment existe en la tabla de equivalencias
+		if (attachment.getName().equals(tblEquivalence.getAttachmentName())) {
+			List<AdditionalData> lstAttachmentAdditionalData = attachment.getAdditionalData();
+			for (AdditionalData attachmentAdditionalData : lstAttachmentAdditionalData) {
+				// Validamos si se realizo un reset
+				if (attachmentAdditionalData.getKey().equals("estado-reset-modem-ok")) {
+					status = TicketStatus.RESET.name();
+					indicatorReset = true;
+				}
+			}
+		}
+	}
+
+	private void setSolvedTicketStatus(TblAdditionalData tblAdditionalData, List<AdditionalData> additionalDataList) {
+
+		for (AdditionalData additionalData : additionalDataList) {
+			if (additionalData.getKey().equals("notification-id")) {
+				Optional<TblEquivalenceNotification> tblEquivalenceNotification = equivalenceNotificationRepository
+						.getEquivalence(tblAdditionalData.getValueAdditional());
+
+				if (tblEquivalenceNotification.isPresent()) {
+					TblEquivalenceNotification tblEquivalence = tblEquivalenceNotification.get();
+					status = setStatus(tblEquivalence);
+				}
+			}
+		}
+	}
+
+	private String setStatus(TblEquivalenceNotification equivalence) {
+		// Validar el estado del notification_id
+		if (equivalence.getAction().equals(TicketStatus.RESET_SOLVED.name()) && indicatorReset) {
+			return TicketStatus.RESET_SOLVED.toString();
+		} else if (equivalence.getAction().equals(TicketStatus.RESET_SOLVED.name()) && !indicatorReset) {
+			return TicketStatus.SOLVED.toString();
+		} else if (equivalence.getAction().equals(TicketStatus.FAULT.name())) {
+			return TicketStatus.FAULT.toString();
+		} else if (equivalence.getAction().equals(TicketStatus.WHATSAPP.name())) {
+			return TicketStatus.WHATSAPP.toString();
+		} else if (equivalence.getAction().equals(TicketStatus.GENERIC.name())) {
+			return TicketStatus.GENERIC.toString();
+		} else if (equivalence.getAction().equals(TicketStatus.FAULT_TRAZA.name())) {
+			return TicketStatus.FAULT_TRAZA.toString();
+		}
+
+		return "";
 	}
 
 }

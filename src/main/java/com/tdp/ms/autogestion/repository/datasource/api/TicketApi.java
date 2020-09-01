@@ -18,10 +18,12 @@ import com.google.gson.Gson;
 import com.tdp.ms.autogestion.config.PropertiesConfig;
 import com.tdp.ms.autogestion.exception.ErrorCategory;
 import com.tdp.ms.autogestion.exception.ExternalServerException;
+import com.tdp.ms.autogestion.model.LogData;
 import com.tdp.ms.autogestion.model.OAuth;
 import com.tdp.ms.autogestion.model.Ticket;
 import com.tdp.ms.autogestion.repository.datasource.api.entities.TicketApiRequest;
 import com.tdp.ms.autogestion.repository.datasource.api.entities.TicketApiResponse;
+import com.tdp.ms.autogestion.util.Constants;
 import com.tdp.ms.autogestion.util.FunctionsUtil;
 import com.tdp.ms.autogestion.util.SSLClientFactory;
 import com.tdp.ms.autogestion.util.SSLClientFactory.HttpClientType;
@@ -31,6 +33,7 @@ public class TicketApi {
 
 	private static final Log log = LogFactory.getLog(TicketApi.class);
 	private static final String TAG = TicketApi.class.getCanonicalName();
+	private static final String METHOD_NAME = "generateTicket";
 
 	@Autowired
 	private PropertiesConfig config;
@@ -44,7 +47,7 @@ public class TicketApi {
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
 		String requestUrl = config.getCreateTicket();
-		System.out.println("requestUrl::::: " + requestUrl);
+		log.info(TAG + " requestUrl::::: " + requestUrl);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -67,20 +70,20 @@ public class TicketApi {
 			if (ticketResponse != null && ticketResponse.getId() != null) {
 				return ticketResponse.fromThis(pTicket);
 			} else {
-				functionsUtil.saveLogData(0, pTicket.getCustomer().getNationalId(),
-						pTicket.getCustomer().getNationalType(), pTicket.getChannelId(), "ERROR", new Gson().toJson(entity),
-						"TicketResponse inválido", "generateTicekt");
+				functionsUtil.saveLogData(new LogData(0, pTicket.getCustomer().getNationalId(),
+						pTicket.getCustomer().getNationalType(), pTicket.getChannelId(), Constants.ERROR,
+						new Gson().toJson(entity), "TicketResponse inválido", METHOD_NAME));
 				throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		} catch (HttpClientErrorException e) {
-			functionsUtil.saveLogData(0, pTicket.getCustomer().getNationalId(),
-					pTicket.getCustomer().getNationalType(), pTicket.getChannelId(), "ERROR", new Gson().toJson(entity),
-					e.getLocalizedMessage(), "generateTicekt");
+			functionsUtil.saveLogData(new LogData(0, pTicket.getCustomer().getNationalId(),
+					pTicket.getCustomer().getNationalType(), pTicket.getChannelId(), Constants.ERROR,
+					new Gson().toJson(entity), e.getLocalizedMessage(), METHOD_NAME));
 			throw new ExternalServerException(ErrorCategory.EXTERNAL_ERROR, e.getLocalizedMessage());
 		} catch (Exception e) {
-			functionsUtil.saveLogData(0, pTicket.getCustomer().getNationalId(),
-					pTicket.getCustomer().getNationalType(), pTicket.getChannelId(), "ERROR", new Gson().toJson(entity),
-					e.getLocalizedMessage(), "generateTicekt");
+			functionsUtil.saveLogData(new LogData(0, pTicket.getCustomer().getNationalId(),
+					pTicket.getCustomer().getNationalType(), pTicket.getChannelId(), Constants.ERROR,
+					new Gson().toJson(entity), e.getLocalizedMessage(), METHOD_NAME));
 			throw e;
 		}
 	}

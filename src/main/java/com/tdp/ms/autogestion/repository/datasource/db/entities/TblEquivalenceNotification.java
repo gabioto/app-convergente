@@ -50,6 +50,7 @@ public class TblEquivalenceNotification implements Serializable {
 	private String actionbutton;
 
 	public TblEquivalenceNotification() {
+		// Constructor without fields
 	}
 
 	public Integer getIdEquivalenceNotification() {

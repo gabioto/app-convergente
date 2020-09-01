@@ -111,6 +111,7 @@ public class TblTicket implements Serializable {
 	private TblCustomer tblCustomer;
 
 	public TblTicket() {
+		// Constructor without fields
 	}
 
 	public LocalDateTime getEventTimeKafka() {
