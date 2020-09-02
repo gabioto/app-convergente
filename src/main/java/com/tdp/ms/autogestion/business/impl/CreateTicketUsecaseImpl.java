@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.tdp.ms.autogestion.business.CreateTicketUseCase;
-import com.tdp.ms.autogestion.dao.ServiceDao;
 import com.tdp.ms.autogestion.exception.DomainException;
 import com.tdp.ms.autogestion.exception.ErrorCategory;
 import com.tdp.ms.autogestion.exception.GenericDomainException;
@@ -30,9 +29,6 @@ public class CreateTicketUsecaseImpl implements CreateTicketUseCase {
 
 	@Autowired
 	private TicketRepository ticketRepository;
-
-	@Autowired
-	ServiceDao serviceDao;
 
 	@Override
 	public ResponseEntity<TicketCreateResponse> createTicket(TicketCreateRequest request)
