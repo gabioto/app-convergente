@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import com.tdp.ms.autogestion.business.CreateTicketUseCase;
 import com.tdp.ms.autogestion.business.RetrieveTicketStatusUseCase;
@@ -29,6 +30,7 @@ import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
 import com.tdp.ms.autogestion.util.Constants;
 
 @RestController
+@EnableWebMvc
 @Validated
 @CrossOrigin(origins = "*")
 @RequestMapping("/trazabilidad/v1/tickets")
