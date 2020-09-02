@@ -6,6 +6,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.tdp.ms.autogestion.exception.ErrorCategory;
+import com.tdp.ms.autogestion.exception.GenericDomainException;
 import com.tdp.ms.autogestion.model.OAuth;
 import com.tdp.ms.autogestion.repository.datasource.api.OAuthApi;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaOAuthRepository;
@@ -37,10 +39,10 @@ public class OAuthRepositoryImpl implements OAuthRepository {
 				}
 
 			} else {
-				throw new Exception();
+				throw new GenericDomainException(ErrorCategory.UNEXPECTED, "OAuth couldn't be null");
 			}
 		} catch (Exception e) {
-			throw e;
+			throw new GenericDomainException(ErrorCategory.UNEXPECTED, e.getLocalizedMessage());
 		}
 
 		return oAuth;
