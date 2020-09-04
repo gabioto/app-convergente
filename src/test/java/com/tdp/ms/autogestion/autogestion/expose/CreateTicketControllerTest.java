@@ -31,12 +31,11 @@ import com.tdp.ms.autogestion.expose.entities.TicketCreateRequest;
 import com.tdp.ms.autogestion.expose.entities.TicketCreateRequest.AdditionalData;
 import com.tdp.ms.autogestion.expose.entities.TicketCreateRequest.Channel;
 import com.tdp.ms.autogestion.expose.entities.TicketCreateRequest.RelatedObject;
-import com.tdp.ms.autogestion.expose.entities.TicketCreateResponse;
 
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = { TicketController.class })
 @SpringBootTest
-public class CreateTicketTestController {
+public class CreateTicketControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -55,7 +54,6 @@ public class CreateTicketTestController {
 
 	private static Gson gson = new Gson();
 
-	private static Map<String, TicketCreateResponse> ticketResponseMap = new HashMap<>();
 	private static Map<String, String> ticketRequestMap = new HashMap<>();
 
 	private static AdditionalData nationalTypeAdditional = new AdditionalData("nationalIdType", "DNI");
@@ -71,14 +69,11 @@ public class CreateTicketTestController {
 		additionalRequest.add(nationalIdAdditional);
 		additionalRequest.add(productIdAdditional);
 
-		// RESPONSE POST
-		ticketResponseMap.put("post", new TicketCreateResponse());
-
 		// REQUEST POST
-		ticketRequestMap.put("POST_COMPLETE", gson.toJson(new TicketCreateRequest("averia", "minor", "TroubleTicket", 1,
+		ticketRequestMap.put("post_complete", gson.toJson(new TicketCreateRequest("averia", "minor", "TroubleTicket", 1,
 				new Channel("AppConvergente", "3"), new RelatedObject("broadband", "10368606"), additionalRequest)));
 
-		ticketRequestMap.put("POST_EMPTY",
+		ticketRequestMap.put("post_empty",
 				gson.toJson(new TicketCreateRequest("averia", "minor", "TroubleTicket", 1,
 						new Channel("AppConvergente", "3"), new RelatedObject("broadband", "10368606"),
 						emptyAdditionalRequest)));
@@ -86,12 +81,12 @@ public class CreateTicketTestController {
 
 	@Test
 	public void createTicket_completeFields() throws Exception {
-		testController("POST_COMPLETE", status().isCreated());
+		testController("post_complete", status().isCreated());
 	}
 
 	@Test
 	public void createTicket_emptyAdditionalFields() throws Exception {
-		testController("POST_EMPTY", status().isBadRequest());
+		testController("post_empty", status().isBadRequest());
 	}
 
 	private MvcResult testController(String requestName, ResultMatcher resultMatcher) throws Exception {

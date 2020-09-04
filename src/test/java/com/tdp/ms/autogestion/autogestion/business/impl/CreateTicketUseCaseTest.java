@@ -44,24 +44,22 @@ import com.tdp.ms.autogestion.repository.TicketRepository;
 public class CreateTicketUseCaseTest {
 
 	@InjectMocks
-	CreateTicketUsecaseImpl createTicketUseCase;
+	private CreateTicketUsecaseImpl createTicketUseCase;
 
 	@Mock
 	private OAuthRepository oAuthRepository;
-//	private OAuthRepository oAuthRepository = mock(OAuthRepository.class);
 
 	@Mock
 	private TicketRepository ticketRepository;
 
 	private static Map<String, TicketCreateRequest> ticketRequestMap = new HashMap<>();
-	private static OAuth oAuthResponseMap;
+	private static OAuth oAuthResponseMap = new OAuth();
 
 	private static AdditionalData nationalTypeAdditional = new AdditionalData("nationalIdType", "DNI");
 	private static AdditionalData nationalIdAdditional = new AdditionalData("nationalId", "70981983");
 	private static AdditionalData productIdAdditional = new AdditionalData("productIdentifier", "serviceCode");
 
 	private static List<AdditionalData> additionalRequest = new ArrayList<>();
-	private static List<AdditionalData> emptyAdditionalRequest = new ArrayList<>();
 
 	@BeforeAll
 	public static void setup() throws JsonProcessingException {
@@ -70,18 +68,8 @@ public class CreateTicketUseCaseTest {
 		additionalRequest.add(productIdAdditional);
 
 		// TICKET REQUEST
-		ticketRequestMap.put("POST_COMPLETE", new TicketCreateRequest("averia", "minor", "TroubleTicket", 1,
+		ticketRequestMap.put("post_complete", new TicketCreateRequest("averia", "minor", "TroubleTicket", 1,
 				new Channel("AppConvergente", "3"), new RelatedObject("broadband", "10368606"), additionalRequest));
-
-		ticketRequestMap.put("POST_EMPTY",
-				new TicketCreateRequest("averia", "minor", "TroubleTicket", 1, new Channel("AppConvergente", "3"),
-						new RelatedObject("broadband", "10368606"), emptyAdditionalRequest));
-
-		oAuthResponseMap = new OAuth("PARAM_KEY_OAUTH_TOKEN", "Bearer",
-				"AAIkZjhmZmU1YjUtNzVlYy00ZDY1LWIwZDYtODY5Y2Y2NDJiNjQyrDDAdK2T5ncDoyvUAUPnnWEkdwMjDc29b02RHIHbm76DDFCMLxGFMT5oBaolkQ5fyqsWOAxg6R1J6N-8pHz1NmGdlNX2ZA5OCiNAEdR5fZg",
-				"3600", "1599053571", "scope1",
-				"AAKstYVcRgMA8xwn90jhSB008ds-uUkIamtsIfP6UV7WZAD5qJpepT8MGhF70H9qtOryvdwKl-Tnth3P8p3jJtyEDVQD48TQGrUA4jKJG6C89A",
-				"2682000");
 	}
 
 	@Test
@@ -101,7 +89,7 @@ public class CreateTicketUseCaseTest {
 		doNothing().when(ticketRepository).saveGeneratedTicket(any(Ticket.class));
 
 		ResponseEntity<TicketCreateResponse> ticketResponse = createTicketUseCase
-				.createTicket(ticketRequestMap.get("POST_COMPLETE"));
+				.createTicket(ticketRequestMap.get("post_complete"));
 
 		assertNotNull(ticketResponse);
 		assertEquals(ticketResponse.getStatusCode(), HttpStatus.OK);
@@ -115,7 +103,7 @@ public class CreateTicketUseCaseTest {
 				.thenThrow(HttpClientErrorException.class);
 
 		DomainException exception = assertThrows(DomainException.class, () -> {
-			createTicketUseCase.createTicket(ticketRequestMap.get("POST_COMPLETE"));
+			createTicketUseCase.createTicket(ticketRequestMap.get("post_complete"));
 		});
 
 		assertEquals(GenericDomainException.class, exception.getClass());
