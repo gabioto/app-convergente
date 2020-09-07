@@ -3,12 +3,15 @@ package com.tdp.ms.autogestion.autogestion.repository;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -23,6 +26,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.tdp.ms.autogestion.model.AdditionalData;
 import com.tdp.ms.autogestion.model.Equivalence;
 import com.tdp.ms.autogestion.model.EquivalenceNotification;
+import com.tdp.ms.autogestion.model.Customer;
+import com.tdp.ms.autogestion.model.OAuth;
 import com.tdp.ms.autogestion.model.Ticket;
 import com.tdp.ms.autogestion.repository.TicketRepositoryImpl;
 import com.tdp.ms.autogestion.repository.datasource.api.TicketApi;
@@ -31,8 +36,6 @@ import com.tdp.ms.autogestion.repository.datasource.db.JpaCustomerRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaEquivalenceNotificationRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaEquivalenceRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaTicketRepository;
-import com.tdp.ms.autogestion.repository.datasource.db.entities.TblAdditionalData;
-import com.tdp.ms.autogestion.repository.datasource.db.entities.TblAttachment;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblCustomer;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblCustomerPK;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblEquivalence;
@@ -44,8 +47,8 @@ import com.tdp.ms.autogestion.repository.datasource.db.entities.TblTicket;
 public class TicketRepositoryTest {
 
 	@InjectMocks
-	TicketRepositoryImpl ticketRepository;
-	
+	private TicketRepositoryImpl ticketRepository;
+
 	@Mock
 	private TicketApi ticketApi;
 
@@ -63,12 +66,18 @@ public class TicketRepositoryTest {
 
 	@Mock
 	private JpaAttachmentAdditionalDataRepository attachmentAdditionalDataRepository;
+
 	
 	private static Optional<List<TblTicket>> optLstTicket;
 	
 	private static Optional<List<TblEquivalence>> optLstEquivalence;
 	
 	private static Optional<TblEquivalenceNotification> equivalenceNotification;
+	
+	private static Map<String, Ticket> ticketResponseMap = new HashMap<>();
+	private static Map<String, Ticket> ticketRequestMap = new HashMap<>();
+	private static OAuth oAuthResponseMap;
+	private static Ticket ticketComplete, ticketInitial;
 	
 	@BeforeAll
 	public static void setup() throws JsonProcessingException {
@@ -97,8 +106,8 @@ public class TicketRepositoryTest {
 		tblCustomer.setId(tblCustomerPK);		
 		ticket.setTblCustomer(tblCustomer);
 		ticket.setStatusTicket("");
-		ticket.setTblAdditionalData(new ArrayList<TblAdditionalData>());
-		ticket.setTblAttachments(new ArrayList<TblAttachment>());
+		//ticket.setTblAdditionalData(new ArrayList<TblAdditionalData>());
+		//ticket.setTblAttachments(new ArrayList<TblAttachment>());
 		
 		List<TblTicket> lstTicket = new ArrayList<TblTicket>();
 		lstTicket.add(ticket);
@@ -151,13 +160,62 @@ public class TicketRepositoryTest {
 		tblEquivalenceNotification.setActionbutton("https://api.whatsapp.com/send?phone=51999955555&text=%C2%A1Hola!%20Me%20derivaron%20de%20la%20app%20para%20que%20me%20ayuden%20a%20resolver%20la%20avería%20de%20internet%20en%20mi%20hogar.%20Mi%20código%20de%20atención%20es%20FCR101");
 		equivalenceNotification = Optional.of(tblEquivalenceNotification);
 		
+		LocalDateTime actualDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
+		ticketComplete = new Ticket(0, 19406743, "/ticket/v2/tickets/19406743", "averia", actualDate, "minor",
+				"TroubleTicket", "acknowledged", actualDate, "Ticket generado", 1, "", "20000032", "99", "serviceCode",
+				"broadband", "3", null, new Customer("70981983", "DNI", "10368606"), null, actualDate,
+				new ArrayList<>(), new ArrayList<>());
+
+		ticketInitial = new Ticket(0, 0, null, "averia", null, "minor", "TroubleTicket", null, null, null, 1, "",
+				"20000032", "99", "serviceCode", "broadband", "3", null, new Customer("70981983", "DNI", "10368606"),
+				null, null, new ArrayList<>(), new ArrayList<>());
+
+		oAuthResponseMap = new OAuth();
+
+		// TICKET RESPONSE
+		ticketResponseMap.put("generated_ticket", ticketComplete);
+
+		// TICKET REQUEST
+		ticketRequestMap.put("ticket_to_generate", ticketInitial);
+		ticketRequestMap.put("generated_ticket", ticketComplete);
 	}
-	
+
+	@Test
+	void createTicket_generateTicket() {
+		when(ticketApi.generate(any(OAuth.class), any(Ticket.class)))
+				.thenReturn(ticketResponseMap.get("generated_ticket"));
+
+		Ticket ticket = ticketRepository.generateTicket(oAuthResponseMap, ticketRequestMap.get("ticket_to_generate"));
+
+		assertNotNull(ticket);
+	}
+
+	@Test
+	void createTicket_saveGeneratedTicketWithCustomer() {
+		when(jpaCustomerRepository.findById(any(TblCustomerPK.class))).thenReturn(Optional.of(new TblCustomer()));
+
+		saveGeneratedTicket();
+	}
+
 	@Test
 	void ticketRepository_getTicket() throws Exception {
 		when(ticketRepository.getTicket(anyInt())).thenReturn(optLstTicket.get().get(0).fromThis());
 		Ticket ticket = ticketRepository.getTicket(19406791);
 		assertNotNull(ticket);		
+	}
+	
+	void createTicket_saveGeneratedTicketWithoutCustomer() {
+		when(jpaCustomerRepository.findById(any(TblCustomerPK.class))).thenReturn(Optional.empty());
+
+		when(jpaCustomerRepository.save(any())).thenReturn(new TblCustomer());
+
+		saveGeneratedTicket();
+	}
+
+	private void saveGeneratedTicket() {
+		when(jpaTicketRepository.save(any())).thenReturn(new TblTicket());
+
+		ticketRepository.saveGeneratedTicket(ticketRequestMap.get("generated_ticket"));
 	}
 	
 	@Test

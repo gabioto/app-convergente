@@ -40,6 +40,9 @@ public class TicketApi {
 
 	@Autowired
 	private FunctionsUtil functionsUtil;
+	
+//	@Autowired
+//	private RestTemplate restTemplate;
 
 	public Ticket generate(OAuth pOAuth, Ticket pTicket) {
 		RestTemplate restTemplate = new RestTemplate(
