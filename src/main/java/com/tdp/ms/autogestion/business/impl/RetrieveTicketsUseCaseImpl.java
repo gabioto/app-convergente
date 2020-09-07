@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 
 import com.tdp.ms.autogestion.business.RetrieveTicketsUseCase;
 import com.tdp.ms.autogestion.exception.DomainException;
+import com.tdp.ms.autogestion.exception.ErrorCategory;
 import com.tdp.ms.autogestion.exception.ForbiddenException;
+import com.tdp.ms.autogestion.exception.GenericDomainException;
 import com.tdp.ms.autogestion.exception.ResourceNotFoundException;
 import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
 import com.tdp.ms.autogestion.model.Ticket;
@@ -49,7 +51,7 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 
 	@Override
 	public ResponseEntity<TicketStatusResponse> pendingTicket(String type, String involvement, String reference,
-			String nationalIdType, String nationalId) {
+			String nationalIdType, String nationalId) throws GenericDomainException{
 
 		LocalDate today = LocalDate.now(ZoneOffset.of(Constants.ZONE_OFFSET));
 
@@ -81,7 +83,7 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 		} catch (DomainException e) {
 			throw e;
 		} catch (Exception e) {
-			throw e;
+			throw new GenericDomainException(ErrorCategory.UNEXPECTED, e.getLocalizedMessage());
 		}
 	}
 
@@ -91,37 +93,32 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 		if (tickets != null && tickets.size() > 0) {
 			String idTicketTriage = "";
 			int count = 0;
+
 			for (Ticket ticket : tickets) {
 				if (idTicketTriage.isEmpty()) {
 					idTicketTriage = ticket.getIdTriage().toString();
 					listIds.add(0, ticket.getId());
-
 					log.info("1 - Id Ticket Triaje (Dia Actual): " + idTicketTriage);
-				} else {
-					if (!idTicketTriage.equals(ticket.getIdTriage().toString())) {
-						idTicketTriage = ticket.getIdTriage().toString();
-						listIds.add(1, ticket.getId());
-						count = 2;
 
-						log.info("2 - Id Ticket Triaje (Dia Actual): " + idTicketTriage);
-					} else {
-						if (count == 0) {
-							idTicketTriage = ticket.getIdTriage().toString();
-							listIds.remove(0);
-							listIds.add(0, ticket.getId());
-							count++;
+				} else if (!idTicketTriage.equals(ticket.getIdTriage().toString())) {
+					idTicketTriage = ticket.getIdTriage().toString();
+					listIds.add(1, ticket.getId());
+					count = 2;
+					log.info("2 - Id Ticket Triaje (Dia Actual): " + idTicketTriage);
 
-							log.info("1 - Id Ticket Triaje Actualizado (Dia Actual): " + idTicketTriage);
-						}
-						if (isToday && count == 2) {
-							idTicketTriage = ticket.getIdTriage().toString();
-							listIds.remove(1);
-							listIds.add(1, ticket.getId());
-							count++;
-
-							log.info("2 - Id Ticket Triaje Actualizado (Dia Actual): " + idTicketTriage);
-						}
-					}
+				} else if (count == 0) {
+					idTicketTriage = ticket.getIdTriage().toString();
+					listIds.remove(0);
+					listIds.add(0, ticket.getId());
+					count++;
+					log.info("1 - Id Ticket Triaje Actualizado (Dia Actual): " + idTicketTriage);
+					
+				} else if (isToday && count == 2) {
+					idTicketTriage = ticket.getIdTriage().toString();
+					listIds.remove(1);
+					listIds.add(1, ticket.getId());
+					count++;
+					log.info("2 - Id Ticket Triaje Actualizado (Dia Actual): " + idTicketTriage);
 				}
 			}
 		}
@@ -137,7 +134,6 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 					HttpStatus.OK);
 		} else {
 			// Si tiene un ticket puede crear otro, en caso contrario no
-			// TODO: Validar si devuelve una excepción
 			if (listIds.size() == 1) {
 				return new ResponseEntity<>(new TicketStatusResponse(), HttpStatus.OK);
 			} else {

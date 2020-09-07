@@ -43,6 +43,7 @@ public class TblAttachmentAdditionalData implements Serializable {
 	private TblAttachment tblAttachment;
 
 	public TblAttachmentAdditionalData() {
+		// Constructor without fields
 	}
 
 	public Integer getIdAttachAdditionalData() {
@@ -78,7 +79,7 @@ public class TblAttachmentAdditionalData implements Serializable {
 	}
 
 	public AdditionalData fromThis() {
-		return new AdditionalData(keyAttachmentAdditional, keyAttachmentAdditional);
+		return new AdditionalData(keyAttachmentAdditional, valueAttachmentAdditional, "");
 	}
 
 	public static List<AdditionalData> listFromThis(List<TblAttachmentAdditionalData> tblAddDataList) {

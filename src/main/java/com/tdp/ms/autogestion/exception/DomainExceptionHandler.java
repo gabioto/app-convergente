@@ -50,7 +50,8 @@ public class DomainExceptionHandler extends ResponseEntityExceptionHandler {
 				category.getHttpStatus());
 	}
 
-	@ExceptionHandler({ Exception.class })
+//	@ExceptionHandler({ Exception.class })
+	@ExceptionHandler({ GenericDomainException.class })
 	public ResponseEntity<Object> handleAll(Exception ex, WebRequest request) {
 
 		ErrorCategory category = ErrorCategory.UNEXPECTED;

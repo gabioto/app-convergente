@@ -36,6 +36,7 @@ public class TblEquivalence implements Serializable {
 	private String nameEquivalence;
 
 	public TblEquivalence() {
+		// Constructor without fields
 	}
 
 	public Integer getIdEquivalence() {

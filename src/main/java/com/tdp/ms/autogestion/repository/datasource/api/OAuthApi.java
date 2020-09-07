@@ -25,7 +25,6 @@ import com.tdp.ms.autogestion.repository.datasource.api.entities.OAuthApiRespons
 import com.tdp.ms.autogestion.util.SSLClientFactory;
 import com.tdp.ms.autogestion.util.SSLClientFactory.HttpClientType;
 
-
 @Component
 public class OAuthApi {
 
@@ -72,13 +71,12 @@ public class OAuthApi {
 				throw new Exception("Error when get OAuth response");
 			}
 		} catch (HttpClientErrorException e) {
-			System.out.println(TAG + " Exception: " + e.getMessage());
-			log.info(TAG + " Exception: " + e.getMessage());
-			log.info(TAG + " Exception: " + e.getResponseBodyAsString());
+			log.info(TAG + e.getMessage());
+			log.info(TAG + e.getResponseBodyAsString());
 			throw e;
 		} catch (Exception e) {
-			System.out.println(TAG + " Exception: " + e.getMessage());
-			log.info(TAG + " Exception: " + e.getMessage());
+			System.out.println(TAG + e.getMessage());
+			log.info(TAG + e.getMessage());
 			throw e;
 		}
 	}

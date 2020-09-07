@@ -3,43 +3,51 @@ package com.tdp.ms.autogestion.dao;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Repository;
 
 import com.tdp.ms.autogestion.model.OAuth;
-import com.tdp.ms.autogestion.util.Conexion;
+import com.tdp.ms.autogestion.util.ConnectionUtil;
 
 @Repository
 public class ServiceDao implements ServiceDaoInterface {
 
-	
+	private static final Log log = LogFactory.getLog(ServiceDao.class);
+
 	@Override
-	public OAuth getOauth(int id) {
-		OAuth oAuth= new OAuth();
+	public OAuth getOauth(int id) throws Exception {
+		OAuth oAuth = new OAuth();
 		PreparedStatement pstm = null;
-		Conexion con = null;
-		ResultSet rs =  null;
+		ConnectionUtil conn = null;
+		ResultSet rs = null;
 		String SQL = "select * from tbl_oauth";
 		try {
-			con = new Conexion();
-			con.getConexion().setAutoCommit(false);
-			pstm = con.getConexion().prepareStatement(SQL);			
+			conn = new ConnectionUtil();
+			conn.getConexion().setAutoCommit(false);
+			pstm = conn.getConexion().prepareStatement(SQL);
 			rs = pstm.executeQuery();
-			while (rs.next()) {	    
+			while (rs.next()) {
 				oAuth.setTokenKey(rs.getString(2));
-				System.out.println(rs.getString(2));
-                System.out.println(rs.getInt(1));
-                System.out.println(": ");
-                System.out.println(rs.getString(2));
-            }		
-			con.getConexion().commit();
+				log.info(rs.getString(2));
+				log.info(rs.getInt(1));
+				log.info(": ");
+				log.info(rs.getString(2));
+			}
+			conn.getConexion().commit();
 			return oAuth;
-			
+
 		} catch (Exception e) {
-			// TODO: handle exception
+			throw e;
+		} finally {
+			if (conn != null) {
+				conn.closeConnection();
+			}
+
+			if (rs != null) {
+				rs.close();
+			}
 		}
-		
-		return null;
 	}
-	
 
 }

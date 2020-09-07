@@ -44,6 +44,7 @@ public class TblAdditionalData implements Serializable {
 	private TblTicket tblTicket;
 
 	public TblAdditionalData() {
+		// Constructor without fields
 	}
 
 	public String getKeyAdditional() {
@@ -79,7 +80,7 @@ public class TblAdditionalData implements Serializable {
 	}
 	
 	public AdditionalData fromThis() {
-		return new AdditionalData(keyAdditional, valueAdditional);
+		return new AdditionalData(keyAdditional, valueAdditional, "");
 	}
 	
 	public static List<AdditionalData> listFromThis(List<TblAdditionalData> tblAddDataList){

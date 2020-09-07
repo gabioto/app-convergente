@@ -27,6 +27,7 @@ public class TblCustomerPK implements Serializable {
 	private String serviceCode;
 
 	public TblCustomerPK() {
+		// Constructor without fields
 	}
 
 	public String getDocumentType() {

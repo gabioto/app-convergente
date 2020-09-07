@@ -21,18 +21,6 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = false)
 public class TicketCreateRequest {
 
-//	@NotEmpty(message = Constants.MSG_NOT_EMPTY)
-//	private String description = "averia";
-//
-//	@NotEmpty(message = Constants.MSG_NOT_EMPTY)
-//	private String severity = "minor";
-//
-//	@NotEmpty(message = Constants.MSG_NOT_EMPTY)
-//	private String type = "TroubleTicket";
-//
-//	@NotNull(message = Constants.MSG_NOT_EMPTY)
-//	private int priority = 1;
-	
 	@NotEmpty(message = Constants.MSG_NOT_EMPTY)
 	private String description;
 

@@ -14,4 +14,6 @@ public class AdditionalData {
 	private String key;
 
 	private String value;
+	
+	private String check;
 }
