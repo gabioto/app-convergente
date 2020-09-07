@@ -98,9 +98,7 @@ public class TicketRepositoryTest {
 	void createTicket_saveGeneratedTicketWithCustomer() {
 		when(jpaCustomerRepository.findById(any(TblCustomerPK.class))).thenReturn(Optional.of(new TblCustomer()));
 
-		when(jpaTicketRepository.save(any())).thenReturn(new TblTicket());
-
-		ticketRepository.saveGeneratedTicket(ticketRequestMap.get("generated_ticket"));
+		saveGeneratedTicket();
 	}
 
 	@Test
@@ -109,6 +107,10 @@ public class TicketRepositoryTest {
 
 		when(jpaCustomerRepository.save(any())).thenReturn(new TblCustomer());
 
+		saveGeneratedTicket();
+	}
+
+	private void saveGeneratedTicket() {
 		when(jpaTicketRepository.save(any())).thenReturn(new TblTicket());
 
 		ticketRepository.saveGeneratedTicket(ticketRequestMap.get("generated_ticket"));
