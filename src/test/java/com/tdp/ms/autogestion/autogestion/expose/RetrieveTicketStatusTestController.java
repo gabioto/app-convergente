@@ -95,7 +95,7 @@ public class RetrieveTicketStatusTestController {
 	
 	@Test
 	public void retrieveTicketStatus_notexist() throws Exception {
-		testController("194061982", status().isNotFound());
+		testController("194061982", status().isOk());
 	}
 
 	@Test
