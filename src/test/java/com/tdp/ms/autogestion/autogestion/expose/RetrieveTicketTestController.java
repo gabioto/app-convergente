@@ -1,8 +1,5 @@
 package com.tdp.ms.autogestion.autogestion.expose;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.HashMap;
@@ -49,7 +46,6 @@ public class RetrieveTicketTestController {
 	private UpdateTicketStatusUseCase updateTicketStatusUseCase;
 	
 	private static Map<String, String> retrieveTicketRequestMap = new HashMap<>();
-	private static Map<String, String> retrieveTicketRequestMapEmpty = new HashMap<>();
 	
 	@BeforeAll
 	public static void setup() throws JsonProcessingException {
@@ -80,8 +76,7 @@ public class RetrieveTicketTestController {
 				.param("nationalId", requestName.get("nationalId"))
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON)
-				.characterEncoding("utf-8")
-				)
+				.characterEncoding("utf-8"))
 			    .andExpect(resultMatcher)
 				.andReturn();
 				
@@ -93,8 +88,7 @@ public class RetrieveTicketTestController {
 				.perform(MockMvcRequestBuilders.get("/trazabilidad/v1/tickets/retrieveTickets")
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON)
-				.characterEncoding("utf-8")
-				)
+				.characterEncoding("utf-8"))
 			    .andExpect(resultMatcher)
 				.andReturn();
 				
