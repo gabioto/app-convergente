@@ -40,10 +40,9 @@ public class RetrieveTicketStatusUseCaseImpl implements RetrieveTicketStatusUseC
 	TicketRepository ticketRepository;
 
 	@Override
-	public ResponseEntity<TicketStatusResponse> retrieveTicketStatus(String idTicket) throws GenericDomainException {
-
+	public ResponseEntity<TicketStatusResponse> retrieveTicketStatus(int idTicket) throws GenericDomainException {
 		try {
-			List<Ticket> tickets = ticketRepository.getTicketStatus(Integer.parseInt(idTicket));
+			List<Ticket> tickets = ticketRepository.getTicketStatus(idTicket);
 			Ticket ticket = tickets.get(tickets.size() == 1 ? 0 : 1);
 
 			return new ResponseEntity<>(TicketStatusResponse.from(ticket, ticketRepository.getAdditionalData(ticket)),

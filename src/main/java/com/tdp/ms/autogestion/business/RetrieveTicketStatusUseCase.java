@@ -24,6 +24,6 @@ import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
  */
 public interface RetrieveTicketStatusUseCase {
 
-	ResponseEntity<TicketStatusResponse> retrieveTicketStatus(String idTicket) throws GenericDomainException;
+	ResponseEntity<TicketStatusResponse> retrieveTicketStatus(int idTicket) throws GenericDomainException;
 
 }

@@ -68,7 +68,7 @@ public class TicketController {
 	// Datos del ticket
 	@GetMapping("/{id}/status")
 	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity<TicketStatusResponse> retrieveTicketStatus(@NotEmpty @PathVariable String id) {
+	public ResponseEntity<TicketStatusResponse> retrieveTicketStatus(@PathVariable @Min(value = 1, message = Constants.MSG_NOT_EMPTY) int id) {
 		return retrieveTicketStatusUseCase.retrieveTicketStatus(id);
 	}
 
