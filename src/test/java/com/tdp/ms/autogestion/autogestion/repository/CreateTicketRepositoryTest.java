@@ -64,7 +64,7 @@ public class CreateTicketRepositoryTest {
 	@BeforeAll
 	public static void setup() {
 		LocalDateTime actualDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
-		
+
 		ticketComplete = new Ticket(0, 19406743, "/ticket/v2/tickets/19406743", "averia", actualDate, "minor",
 				"TroubleTicket", "acknowledged", actualDate, "Ticket generado", 1, "", "20000032", "99", "serviceCode",
 				"broadband", "3", null, new Customer("70981983", "DNI", "10368606"), null, actualDate,
@@ -101,10 +101,8 @@ public class CreateTicketRepositoryTest {
 		saveGeneratedTicket();
 	}
 
-	@Test
 	void createTicket_saveGeneratedTicketWithoutCustomer() {
 		when(jpaCustomerRepository.findById(any(TblCustomerPK.class))).thenReturn(Optional.empty());
-
 		when(jpaCustomerRepository.save(any())).thenReturn(new TblCustomer());
 
 		saveGeneratedTicket();
@@ -115,4 +113,5 @@ public class CreateTicketRepositoryTest {
 
 		ticketRepository.saveGeneratedTicket(ticketRequestMap.get("generated_ticket"));
 	}
+
 }

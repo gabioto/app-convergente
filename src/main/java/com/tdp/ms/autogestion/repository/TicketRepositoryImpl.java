@@ -191,7 +191,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 		}
 	}
 
-	private List<AdditionalData> fillAttachmentsTicket(Ticket ticket, List<AdditionalData> lstClientData) {
+	public List<AdditionalData> fillAttachmentsTicket(Ticket ticket, List<AdditionalData> lstClientData) {
 
 		List<Attachment> attachments = ticket.getAttachments();
 

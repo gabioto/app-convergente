@@ -72,8 +72,7 @@ public class RetrieveTicketTestController {
 				.param("nationalId", requestName.get("nationalId"))
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON)
-				.characterEncoding("utf-8")
-				)
+				.characterEncoding("utf-8"))
 			    .andExpect(resultMatcher)
 				.andReturn();
 				
@@ -85,8 +84,7 @@ public class RetrieveTicketTestController {
 				.perform(MockMvcRequestBuilders.get("/trazabilidad/v1/tickets/retrieveTickets")
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON)
-				.characterEncoding("utf-8")
-				)
+				.characterEncoding("utf-8"))
 			    .andExpect(resultMatcher)
 				.andReturn();
 				
