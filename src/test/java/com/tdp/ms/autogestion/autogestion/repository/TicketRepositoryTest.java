@@ -1,9 +1,11 @@
 package com.tdp.ms.autogestion.autogestion.repository;
 
+import static org.assertj.core.api.Assertions.anyOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
@@ -19,11 +21,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.tdp.ms.autogestion.model.AdditionalData;
+import com.tdp.ms.autogestion.model.Attachment;
 import com.tdp.ms.autogestion.model.Equivalence;
 import com.tdp.ms.autogestion.model.EquivalenceNotification;
 import com.tdp.ms.autogestion.model.Customer;
@@ -41,6 +45,7 @@ import com.tdp.ms.autogestion.repository.datasource.db.entities.TblCustomerPK;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblEquivalence;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblEquivalenceNotification;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblTicket;
+import com.tdp.ms.autogestion.util.Constants;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -78,6 +83,9 @@ public class TicketRepositoryTest {
 	private static Map<String, Ticket> ticketRequestMap = new HashMap<>();
 	private static OAuth oAuthResponseMap;
 	private static Ticket ticketComplete, ticketInitial;
+	
+	private static Optional<List<AdditionalData>> lstClientData ;
+	private static Optional<Ticket> ticket;
 	
 	@BeforeAll
 	public static void setup() throws JsonProcessingException {
@@ -178,6 +186,42 @@ public class TicketRepositoryTest {
 		// TICKET REQUEST
 		ticketRequestMap.put("ticket_to_generate", ticketInitial);
 		ticketRequestMap.put("generated_ticket", ticketComplete);
+		
+		List<AdditionalData> listClientData = new ArrayList<AdditionalData>();
+		AdditionalData clientData = new AdditionalData();
+		clientData.setKey(Constants.LABEL_STATUS);
+		clientData.setValue(ticket.getStatus());
+		clientData.setCheck("True");
+		listClientData.add(clientData);
+		List<Attachment> attachments=new ArrayList<Attachment>();
+		Attachment attachment=new Attachment();
+		attachment.setIdAttachment(665);
+		attachment.setIdAttachmentKafka(529102);
+		attachment.setCreationDate(LocalDateTime.now());
+		attachment.setNameAttachment("ValidacionesInicialesInternet[{}]recupera-estado-telefono");
+		attachments.add(attachment);
+		
+		attachment=new Attachment();
+		attachment.setIdAttachment(666);
+		attachment.setIdAttachmentKafka(529103);
+		attachment.setCreationDate(LocalDateTime.now());
+		attachment.setNameAttachment("ValidacionesInicialesInternet[{}]recupera-identificacion-cliente-atis");
+		attachments.add(attachment);
+		
+		attachment=new Attachment();
+		attachment.setIdAttachment(667);
+		attachment.setIdAttachmentKafka(529104);
+		attachment.setCreationDate(LocalDateTime.now());
+		attachment.setNameAttachment("ValidacionesInicialesInternet[{}]recupera-info-telefono");
+		attachments.add(attachment);
+		ticketComplete.setAttachments(attachments);
+		ticketComplete.setAdditionalData(listClientData);
+		lstClientData = Optional.of(listClientData);
+		//List<AdditionalData> lstAdditionalData=new ArrayList<>();
+//		AdditionalData additionalData=new AdditionalData();
+//		additionalData.setCheck("");
+//
+//		lstAdditionalData.add(additionalData);
 	}
 
 	@Test
@@ -197,16 +241,15 @@ public class TicketRepositoryTest {
 		saveGeneratedTicket();
 	}
 
-	@Test
-	void ticketRepository_getTicket() throws Exception {
-		when(ticketRepository.getTicket(anyInt())).thenReturn(optLstTicket.get().get(0).fromThis());
-		Ticket ticket = ticketRepository.getTicket(19406791);
-		assertNotNull(ticket);		
-	}
+//	@Test
+//	void ticketRepository_getTicket() throws Exception {
+//		when(ticketRepository.getTicket(anyInt())).thenReturn(optLstTicket.get().get(0).fromThis());
+//		Ticket ticket = ticketRepository.getTicket(19406791);
+//		assertNotNull(ticket);		
+//	}
 	
 	void createTicket_saveGeneratedTicketWithoutCustomer() {
 		when(jpaCustomerRepository.findById(any(TblCustomerPK.class))).thenReturn(Optional.empty());
-
 		when(jpaCustomerRepository.save(any())).thenReturn(new TblCustomer());
 
 		saveGeneratedTicket();
@@ -232,5 +275,24 @@ public class TicketRepositoryTest {
 		assertNotNull(equivalenceNotification);
 	}
 	
+	@Test
+	void ticketRepository_getAdditionalData() {
+//		when(ticketRepository.fillAttachmentsTicket(ticketRequestMap.get("ticketComplete"), lstClientData.get()))
+//				.thenReturn(lstClientData.get());
+//		
+//		List<AdditionalData> lstAdditionalData=ticketRepository.fillAttachmentsTicket(ticketRequestMap.get("ticketComplete"),
+//				lstClientData.get());
+//		assertNotNull(lstAdditionalData);
+	}
+	
+	@Test
+	void ticketRepository_fillAttachmentsTicket() throws Exception {
+		
+	}
+	
+	@Test
+	void ticketRepository_getCommercialStatus() throws Exception {
+		
+	}
 	
 }
