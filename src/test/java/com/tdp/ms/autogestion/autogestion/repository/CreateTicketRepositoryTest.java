@@ -18,7 +18,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.tdp.ms.autogestion.model.Customer;
 import com.tdp.ms.autogestion.model.OAuth;
 import com.tdp.ms.autogestion.model.Ticket;
@@ -34,7 +33,7 @@ import com.tdp.ms.autogestion.repository.datasource.db.entities.TblCustomerPK;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblTicket;
 
 @ExtendWith(MockitoExtension.class)
-public class TicketRepositoryTest {
+public class CreateTicketRepositoryTest {
 
 	@InjectMocks
 	private TicketRepositoryImpl ticketRepository;
@@ -63,8 +62,9 @@ public class TicketRepositoryTest {
 	private static Ticket ticketComplete, ticketInitial;
 
 	@BeforeAll
-	public static void setup() throws JsonProcessingException {
+	public static void setup() {
 		LocalDateTime actualDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
+		
 		ticketComplete = new Ticket(0, 19406743, "/ticket/v2/tickets/19406743", "averia", actualDate, "minor",
 				"TroubleTicket", "acknowledged", actualDate, "Ticket generado", 1, "", "20000032", "99", "serviceCode",
 				"broadband", "3", null, new Customer("70981983", "DNI", "10368606"), null, actualDate,

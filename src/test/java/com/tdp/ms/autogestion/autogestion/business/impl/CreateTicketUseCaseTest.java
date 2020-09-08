@@ -29,7 +29,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.tdp.ms.autogestion.business.impl.CreateTicketUsecaseImpl;
 import com.tdp.ms.autogestion.exception.DomainException;
-import com.tdp.ms.autogestion.exception.GenericDomainException;
 import com.tdp.ms.autogestion.expose.entities.TicketCreateRequest;
 import com.tdp.ms.autogestion.expose.entities.TicketCreateRequest.AdditionalData;
 import com.tdp.ms.autogestion.expose.entities.TicketCreateRequest.Channel;
@@ -102,10 +101,8 @@ public class CreateTicketUseCaseTest {
 		when(ticketRepository.generateTicket(any(OAuth.class), any(Ticket.class)))
 				.thenThrow(HttpClientErrorException.class);
 
-		DomainException exception = assertThrows(DomainException.class, () -> {
+		assertThrows(DomainException.class, () -> {
 			createTicketUseCase.createTicket(ticketRequestMap.get("post_complete"));
 		});
-
-		assertEquals(GenericDomainException.class, exception.getClass());
 	}
 }

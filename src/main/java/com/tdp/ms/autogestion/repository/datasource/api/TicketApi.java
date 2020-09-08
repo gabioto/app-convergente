@@ -9,6 +9,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -25,8 +26,6 @@ import com.tdp.ms.autogestion.repository.datasource.api.entities.TicketApiReques
 import com.tdp.ms.autogestion.repository.datasource.api.entities.TicketApiResponse;
 import com.tdp.ms.autogestion.util.Constants;
 import com.tdp.ms.autogestion.util.FunctionsUtil;
-import com.tdp.ms.autogestion.util.SSLClientFactory;
-import com.tdp.ms.autogestion.util.SSLClientFactory.HttpClientType;
 
 @Component
 public class TicketApi {
@@ -40,17 +39,18 @@ public class TicketApi {
 
 	@Autowired
 	private FunctionsUtil functionsUtil;
-	
-//	@Autowired
-//	private RestTemplate restTemplate;
+
+	@Autowired
+	private HttpComponentsClientHttpRequestFactory initClientRestTemplate;
+
+	@Autowired
+	private RestTemplate restTemplate;
 
 	public Ticket generate(OAuth pOAuth, Ticket pTicket) {
-		RestTemplate restTemplate = new RestTemplate(
-				SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
+		restTemplate.setRequestFactory(initClientRestTemplate);
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
 		String requestUrl = config.getCreateTicket();
-		log.info(TAG + " requestUrl::::: " + requestUrl);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -73,10 +73,7 @@ public class TicketApi {
 			if (ticketResponse != null && ticketResponse.getId() != null) {
 				return ticketResponse.fromThis(pTicket);
 			} else {
-				functionsUtil.saveLogData(new LogData(0, pTicket.getCustomer().getNationalId(),
-						pTicket.getCustomer().getNationalType(), pTicket.getChannelId(), Constants.ERROR,
-						new Gson().toJson(entity), "TicketResponse inválido", METHOD_NAME));
-				throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
+				throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "invalid ticketResponse");
 			}
 		} catch (HttpClientErrorException e) {
 			functionsUtil.saveLogData(new LogData(0, pTicket.getCustomer().getNationalId(),

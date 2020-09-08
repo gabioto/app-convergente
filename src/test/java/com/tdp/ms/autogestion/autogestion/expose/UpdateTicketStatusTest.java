@@ -19,7 +19,8 @@ import com.tdp.ms.autogestion.business.UpdateTicketStatusUseCase;
 import com.tdp.ms.autogestion.expose.TicketController;
 
 @WebMvcTest(TicketController.class)
-public class RetrieveTicketStatusTestController {
+public class UpdateTicketStatusTest {
+
 	@Autowired
 	private MockMvc mockMvc;
 
@@ -36,32 +37,18 @@ public class RetrieveTicketStatusTestController {
 	private UpdateTicketStatusUseCase updateTicketStatusUseCase;
 
 	@Test
-	public void retrieveTicketStatus_complete() throws Exception {
-		testController("19406198", status().isOk());
+	void updateTicketStatus_complete() throws Exception {
+		testController("194022", "WA_SOLVED", status().isOk());
 	}
 
 	@Test
-	public void retrieveTicketStatus_empty() throws Exception {
-		testController("", status().isNotFound());
-	}
-	
-	@Test
-	public void retrieveTicketStatus_notexist() throws Exception {
-		testController("194061982", status().isOk());
+	void updateTicketStatus_invalid() throws Exception {
+		testController("1940DDDD", "WA_SOLVED", status().isBadRequest());
 	}
 
-	@Test
-	public void retrieveTicketStatus_invalid() throws Exception {
-		testController("1940DDDD", status().isBadRequest());
-	}
-	
-	private MvcResult testController(String id, ResultMatcher resultMatcher) throws Exception {
-		return mockMvc
-				.perform(MockMvcRequestBuilders.get("/trazabilidad/v1/tickets/{id}/status", id)				
-				.contentType(MediaType.APPLICATION_JSON)
-				.accept(MediaType.APPLICATION_JSON)
-				.characterEncoding("utf-8"))
-				.andExpect(resultMatcher)
-				.andReturn();
+	private MvcResult testController(String id, String status, ResultMatcher resultMatcher) throws Exception {
+		return mockMvc.perform(MockMvcRequestBuilders.patch("/trazabilidad/v1/tickets/{id}/{status}", id, status)
+				.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).characterEncoding("utf-8"))
+				.andExpect(resultMatcher).andReturn();
 	}
 }
