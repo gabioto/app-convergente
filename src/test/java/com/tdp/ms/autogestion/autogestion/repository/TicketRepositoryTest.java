@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -275,11 +277,19 @@ public class TicketRepositoryTest {
 		assertNotNull(equivalenceNotification);
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Test
 	void ticketRepository_getAdditionalData() {
-		when(ticketRepository.fillAttachmentsTicket(ticketRequestMap.get("ticketComplete"), lstClientData.get()))
+		//lstClientData.get()
+		// any(List.class)
+		//anyList()
+		when(ticketRepository.fillAttachmentsTicket(any(Ticket.class), Matchers.anyList() ))
 				.thenReturn(lstClientData.get());
-		
+	
+	    //when(mock.get(anyInt())).thenReturn(null);
+//	    doThrow(new RuntimeException()).when(mock).someVoidMethod(anyObject());
+//	    verify(mock).someMethod(contains("foo"))
+
 		List<AdditionalData> lstAdditionalData=ticketRepository.fillAttachmentsTicket(ticketRequestMap.get("ticketComplete"),
 				lstClientData.get());
 		assertNotNull(lstAdditionalData);

@@ -230,7 +230,7 @@ public class GetTicketRepositoryTest {
 		List<AdditionalData> lstAdditionalData = ticketRepository
 				.fillAttachmentsTicket(ticketRequestMap.get("generated_ticket"), lstClientData.get());
 		assertNotNull(lstAdditionalData);
-	}
+	}    
 
 	@Test
 	void ticketRepository_fillAttachmentsTicket() throws Exception {
