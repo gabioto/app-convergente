@@ -77,6 +77,7 @@ public class TicketApiTest {
 		// TICKET RESPONSE
 		ticketApiResponseMap.put("generated_ticket", ticketComplete);
 		ticketApiResponseMap.put("generated_null", null);
+		ticketApiResponseMap.put("generated_empty", new TicketApiResponse());
 
 		// TICKET REQUEST
 		ticketRequestMap.put("ticket_to_generate", ticketInitial);
@@ -100,14 +101,22 @@ public class TicketApiTest {
 
 	@Test
 	void generateTicket_responseNull() {
+		generateTicketException(ticketApiResponseMap.get("generated_null"));
+	}
+
+	@Test
+	void generateTicket_responseEmpty() {
+		generateTicketException(ticketApiResponseMap.get("generated_empty"));
+	}
+
+	private void generateTicketException(TicketApiResponse response) {
 		when(config.getCreateTicket()).thenReturn(fakeUrl);
 
 		when(config.getClientTicket()).thenReturn("252525");
 
 		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(),
 				ArgumentMatchers.<Class<TicketApiResponse>>any()))
-						.thenReturn(new ResponseEntity<TicketApiResponse>(ticketApiResponseMap.get("generated_null"),
-								HttpStatus.OK));
+						.thenReturn(new ResponseEntity<TicketApiResponse>(response, HttpStatus.OK));
 
 		doNothing().when(functionsUtil).saveLogData(any(LogData.class));
 

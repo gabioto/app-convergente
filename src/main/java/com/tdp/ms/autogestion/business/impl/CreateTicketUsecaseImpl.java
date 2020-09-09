@@ -49,15 +49,20 @@ public class CreateTicketUsecaseImpl implements CreateTicketUseCase {
 			ticket.setCustomer(new Customer(documentNumber, documentType, request.getRelatedObject().getReference()));
 			ticket.setTechnology(technology);
 
-			if (request.getRelatedObject().getInvolvement().equals(Constants.INTERNET)) {
+			switch (request.getRelatedObject().getInvolvement()) {
+			case Constants.INTERNET:
 				ticket.setUseCaseId(Constants.USE_CASE);
-			} else if (request.getRelatedObject().getInvolvement().equals(Constants.FIJA)) {
+				break;
+			case Constants.FIJA:
+			case Constants.CABLE:
+			case Constants.MOVIL:
 				ticket.setUseCaseId("");
-			} else if (request.getRelatedObject().getInvolvement().equals(Constants.CABLE)) {
+				break;
+			default:
 				ticket.setUseCaseId("");
-			} else if (request.getRelatedObject().getInvolvement().equals(Constants.MOVIL)) {
-				ticket.setUseCaseId("");
+				break;
 			}
+
 			ticket.setSubOperationCode(Constants.SUB_OPERATION_CODE);
 			ticket.setProductIdentifier(productIdentifier);
 
@@ -81,8 +86,8 @@ public class CreateTicketUsecaseImpl implements CreateTicketUseCase {
 //			AdditionalData field = data.stream().filter(item -> value.equals(item.getKey())).findFirst().orElse(null);
 //			return field.getValue();
 //		} else {
-			AdditionalData field = data.stream().filter(item -> value.equals(item.getKey())).findFirst().orElse(null);
-			return (field != null) ? field.getValue() : "";
+		AdditionalData field = data.stream().filter(item -> value.equals(item.getKey())).findFirst().orElse(null);
+		return (field != null) ? field.getValue() : "";
 //			}
 //		}
 	}

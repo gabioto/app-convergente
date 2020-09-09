@@ -64,7 +64,7 @@ public class OAuthApiTest {
 	}
 
 	@Test
-	void generateTicket_responseOk() throws HttpClientErrorException, Exception {
+	void generateOAuth_responseOk() throws HttpClientErrorException, Exception {
 		when(config.getOAuthUrl()).thenReturn(fakeUrl);
 
 		when(config.getOAuthClient()).thenReturn("252525");
@@ -79,14 +79,23 @@ public class OAuthApiTest {
 	}
 
 	@Test
-	void generateTicket_responseNull() {
+	void generateOAuth_responseNull() {
+		generateOAuthException(oAuthApiResponseMap.get("empty_oauth"), HttpStatus.OK);
+	}
+
+	@Test
+	void generateOAuth_responseError() {
+		generateOAuthException(oAuthApiResponseMap.get("empty_oauth"), HttpStatus.BAD_REQUEST);
+	}
+
+	private void generateOAuthException(OAuthApiResponse response, HttpStatus status) {
 		when(config.getOAuthUrl()).thenReturn(fakeUrl);
 
 		when(config.getOAuthClient()).thenReturn("252525");
 
 		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(),
-				ArgumentMatchers.<Class<OAuthApiResponse>>any())).thenReturn(
-						new ResponseEntity<OAuthApiResponse>(oAuthApiResponseMap.get("empty_oauth"), HttpStatus.OK));
+				ArgumentMatchers.<Class<OAuthApiResponse>>any()))
+						.thenReturn(new ResponseEntity<OAuthApiResponse>(response, status));
 
 		ExternalServerException exception = assertThrows(ExternalServerException.class, () -> {
 			oAuthApi.generate(oAuthRequestMap.get("last_oauth"));
@@ -94,5 +103,4 @@ public class OAuthApiTest {
 
 		assertEquals(exception.getMessage(), "500 Error when get OAuth response");
 	}
-
 }

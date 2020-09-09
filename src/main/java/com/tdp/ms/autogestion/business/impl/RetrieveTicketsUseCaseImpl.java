@@ -51,7 +51,7 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 
 	@Override
 	public ResponseEntity<TicketStatusResponse> pendingTicket(String type, String involvement, String reference,
-			String nationalIdType, String nationalId) throws GenericDomainException{
+			String nationalIdType, String nationalId) throws GenericDomainException {
 
 		LocalDate today = LocalDate.now(ZoneOffset.of(Constants.ZONE_OFFSET));
 
@@ -90,7 +90,7 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 	private List<Integer> getListIds(List<Ticket> tickets, boolean isToday) {
 		List<Integer> listIds = new ArrayList<Integer>();
 
-		if (tickets != null && tickets.size() > 0) {
+		if (tickets != null) {
 			String idTicketTriage = "";
 			int count = 0;
 
@@ -112,7 +112,7 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 					listIds.add(0, ticket.getId());
 					count++;
 					log.info("1 - Id Ticket Triaje Actualizado (Dia Actual): " + idTicketTriage);
-					
+
 				} else if (isToday && count == 2) {
 					idTicketTriage = ticket.getIdTriage().toString();
 					listIds.remove(1);

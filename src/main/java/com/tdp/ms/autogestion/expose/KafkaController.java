@@ -23,11 +23,9 @@ import com.tdp.ms.autogestion.expose.entities.TicketKafkaResponse.Event.TroubleT
 import com.tdp.ms.autogestion.model.LogData;
 import com.tdp.ms.autogestion.model.TicketStatus;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaAdditionalDataRepository;
-import com.tdp.ms.autogestion.repository.datasource.db.JpaAttachmentAdditionalDataRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaAttachmentRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaEquivalenceNotificationRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaEquivalenceRepository;
-import com.tdp.ms.autogestion.repository.datasource.db.JpaStatusHistoryRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaTicketRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblAdditionalData;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblAttachment;
@@ -48,34 +46,28 @@ public class KafkaController {
 	private static final Logger LOG = LoggerFactory.getLogger(KafkaController.class);
 
 	@Autowired
-	JpaTicketRepository ticketRepository;
+	private JpaTicketRepository ticketRepository;
 
 	@Autowired
-	JpaStatusHistoryRepository statusHistoryRepository;
+	private JpaAdditionalDataRepository additionalDataRepository;
 
 	@Autowired
-	JpaAdditionalDataRepository additionalDataRepository;
+	private JpaAttachmentRepository attachmentRepository;
 
 	@Autowired
-	JpaAttachmentRepository attachmentRepository;
+	private JpaEquivalenceRepository equivalenceRepository;
 
 	@Autowired
-	JpaAttachmentAdditionalDataRepository attachmentAdditionalDataRepository;
+	private JpaEquivalenceNotificationRepository equivalenceNotificationRepository;
 
 	@Autowired
-	JpaEquivalenceRepository equivalenceRepository;
+	private FunctionsUtil functionsUtil;
 
 	@Autowired
-	JpaEquivalenceNotificationRepository equivalenceNotificationRepository;
+	private EntityManager entityManager;
 
-	@Autowired
-	FunctionsUtil functionsUtil;
-
-	@Autowired
-	EntityManager entityManager;
-
-	String status = TicketStatus.IN_PROGRESS.name();
-	Boolean indicatorReset = false;
+	private String status = TicketStatus.IN_PROGRESS.name();
+	private Boolean indicatorReset = false;
 
 	@Transactional
 	@KafkaListener(topics = "${app.topic.foo}")

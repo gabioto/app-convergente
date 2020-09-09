@@ -101,6 +101,7 @@ public class CreateTicketRepositoryTest {
 		saveGeneratedTicket();
 	}
 
+	@Test
 	void createTicket_saveGeneratedTicketWithoutCustomer() {
 		when(jpaCustomerRepository.findById(any(TblCustomerPK.class))).thenReturn(Optional.empty());
 		when(jpaCustomerRepository.save(any())).thenReturn(new TblCustomer());

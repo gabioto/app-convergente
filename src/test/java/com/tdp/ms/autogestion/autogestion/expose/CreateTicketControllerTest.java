@@ -76,7 +76,7 @@ public class CreateTicketControllerTest {
 	}
 
 	@Test
-	public void createTicket_completeFields() throws Exception {
+	public void createTicket_completeInternetFields() throws Exception {
 		testController("post_complete", status().isCreated());
 	}
 
@@ -88,11 +88,8 @@ public class CreateTicketControllerTest {
 	private MvcResult testController(String requestName, ResultMatcher resultMatcher) throws Exception {
 		return mockMvc
 				.perform(MockMvcRequestBuilders.post("/trazabilidad/v1/tickets")
-				.content(ticketRequestMap.get(requestName))
-				.contentType(MediaType.APPLICATION_JSON)
-				.accept(MediaType.APPLICATION_JSON)
-				.characterEncoding("utf-8"))
-				.andExpect(resultMatcher)
-				.andReturn();
+						.content(ticketRequestMap.get(requestName)).contentType(MediaType.APPLICATION_JSON)
+						.accept(MediaType.APPLICATION_JSON).characterEncoding("utf-8"))
+				.andExpect(resultMatcher).andReturn();
 	}
 }
