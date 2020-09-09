@@ -29,7 +29,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.tdp.ms.autogestion.business.impl.CreateTicketUsecaseImpl;
 import com.tdp.ms.autogestion.exception.DomainException;
-import com.tdp.ms.autogestion.exception.GenericDomainException;
 import com.tdp.ms.autogestion.expose.entities.TicketCreateRequest;
 import com.tdp.ms.autogestion.expose.entities.TicketCreateRequest.AdditionalData;
 import com.tdp.ms.autogestion.expose.entities.TicketCreateRequest.Channel;
@@ -68,12 +67,48 @@ public class CreateTicketUseCaseTest {
 		additionalRequest.add(productIdAdditional);
 
 		// TICKET REQUEST
-		ticketRequestMap.put("post_complete", new TicketCreateRequest("averia", "minor", "TroubleTicket", 1,
+		ticketRequestMap.put("post_internet_complete", new TicketCreateRequest("averia", "minor", "TroubleTicket", 1,
 				new Channel("AppConvergente", "3"), new RelatedObject("broadband", "10368606"), additionalRequest));
+
+		ticketRequestMap.put("post_landline_complete", new TicketCreateRequest("averia", "minor", "TroubleTicket", 1,
+				new Channel("AppConvergente", "3"), new RelatedObject("landline", "10368606"), additionalRequest));
+
+		ticketRequestMap.put("post_cable_complete", new TicketCreateRequest("averia", "minor", "TroubleTicket", 1,
+				new Channel("AppConvergente", "3"), new RelatedObject("cableTv", "10368606"), additionalRequest));
+
+		ticketRequestMap.put("post_mobile_complete", new TicketCreateRequest("averia", "minor", "TroubleTicket", 1,
+				new Channel("AppConvergente", "3"), new RelatedObject("mobil", "10368606"), additionalRequest));
+		
+		ticketRequestMap.put("post_other_complete", new TicketCreateRequest("averia", "minor", "TroubleTicket", 1,
+				new Channel("AppConvergente", "3"), new RelatedObject("mobillllll", "10368606"), additionalRequest));
 	}
 
 	@Test
-	void createTicket_completeParams() throws Exception {
+	void createTicket_completeInternetParams() throws Exception {
+		createTicket(ticketRequestMap.get("post_internet_complete"));
+	}
+
+	@Test
+	void createTicket_completeLandlineParams() throws Exception {
+		createTicket(ticketRequestMap.get("post_landline_complete"));
+	}
+
+	@Test
+	void createTicket_completeCableParams() throws Exception {
+		createTicket(ticketRequestMap.get("post_cable_complete"));
+	}
+
+	@Test
+	void createTicket_completeMobileParams() throws Exception {
+		createTicket(ticketRequestMap.get("post_mobile_complete"));
+	}
+	
+	@Test
+	void createTicket_completeOtherServiceParams() throws Exception {
+		createTicket(ticketRequestMap.get("post_other_complete"));
+	}
+
+	private void createTicket(TicketCreateRequest request) throws Exception {
 		when(oAuthRepository.getOAuthValues()).thenReturn(oAuthResponseMap);
 
 		when(ticketRepository.generateTicket(any(OAuth.class), any(Ticket.class))).thenAnswer(new Answer<Ticket>() {
@@ -88,8 +123,7 @@ public class CreateTicketUseCaseTest {
 
 		doNothing().when(ticketRepository).saveGeneratedTicket(any(Ticket.class));
 
-		ResponseEntity<TicketCreateResponse> ticketResponse = createTicketUseCase
-				.createTicket(ticketRequestMap.get("post_complete"));
+		ResponseEntity<TicketCreateResponse> ticketResponse = createTicketUseCase.createTicket(request);
 
 		assertNotNull(ticketResponse);
 		assertEquals(ticketResponse.getStatusCode(), HttpStatus.OK);
@@ -102,10 +136,8 @@ public class CreateTicketUseCaseTest {
 		when(ticketRepository.generateTicket(any(OAuth.class), any(Ticket.class)))
 				.thenThrow(HttpClientErrorException.class);
 
-		DomainException exception = assertThrows(DomainException.class, () -> {
-			createTicketUseCase.createTicket(ticketRequestMap.get("post_complete"));
+		assertThrows(DomainException.class, () -> {
+			createTicketUseCase.createTicket(ticketRequestMap.get("post_internet_complete"));
 		});
-
-		assertEquals(GenericDomainException.class, exception.getClass());
 	}
 }

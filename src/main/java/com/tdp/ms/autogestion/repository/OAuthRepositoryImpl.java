@@ -3,6 +3,8 @@ package com.tdp.ms.autogestion.repository;
 import java.util.Date;
 import java.util.Optional;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -16,6 +18,9 @@ import com.tdp.ms.autogestion.repository.datasource.db.entities.TblOauth;
 @Repository
 public class OAuthRepositoryImpl implements OAuthRepository {
 
+	private static final Log log = LogFactory.getLog(OAuthRepositoryImpl.class);
+	private static final String TAG = OAuthRepositoryImpl.class.getCanonicalName();
+
 	@Autowired
 	private OAuthApi oAuthApi;
 
@@ -23,7 +28,6 @@ public class OAuthRepositoryImpl implements OAuthRepository {
 	private JpaOAuthRepository jpaOAuthRepository;
 
 	@Override
-
 	public OAuth getOAuthValues() throws Exception {
 		OAuth oAuth = null;
 
@@ -53,7 +57,7 @@ public class OAuthRepositoryImpl implements OAuthRepository {
 
 		if (lOAuthResponse != null) {
 			TblOauth tableOauth = jpaOAuthRepository.save(TblOauth.from(lOAuthResponse));
-			System.out.println("update tableOauth:: " + tableOauth.getIdOauth());
+			log.info(TAG + " update tableOauth:: " + tableOauth.getIdOauth());
 		}
 
 		return lOAuthResponse;
