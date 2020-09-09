@@ -277,12 +277,12 @@ public class TicketRepositoryTest {
 	
 	@Test
 	void ticketRepository_getAdditionalData() {
-//		when(ticketRepository.fillAttachmentsTicket(ticketRequestMap.get("ticketComplete"), lstClientData.get()))
-//				.thenReturn(lstClientData.get());
-//		
-//		List<AdditionalData> lstAdditionalData=ticketRepository.fillAttachmentsTicket(ticketRequestMap.get("ticketComplete"),
-//				lstClientData.get());
-//		assertNotNull(lstAdditionalData);
+		when(ticketRepository.fillAttachmentsTicket(ticketRequestMap.get("ticketComplete"), lstClientData.get()))
+				.thenReturn(lstClientData.get());
+		
+		List<AdditionalData> lstAdditionalData=ticketRepository.fillAttachmentsTicket(ticketRequestMap.get("ticketComplete"),
+				lstClientData.get());
+		assertNotNull(lstAdditionalData);
 	}
 	
 	@Test
