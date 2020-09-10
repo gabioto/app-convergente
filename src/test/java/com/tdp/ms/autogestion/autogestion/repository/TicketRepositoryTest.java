@@ -277,33 +277,24 @@ public class TicketRepositoryTest {
 		assertNotNull(equivalenceNotification);
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Test
 	void ticketRepository_getAdditionalData() {
-		//lstClientData.get()
-		// any(List.class)
-		//anyList()
-		when(ticketRepository.fillAttachmentsTicket(any(Ticket.class), Matchers.anyList() ))
-				.thenReturn(lstClientData.get());
-	
-	    //when(mock.get(anyInt())).thenReturn(null);
-//	    doThrow(new RuntimeException()).when(mock).someVoidMethod(anyObject());
-//	    verify(mock).someMethod(contains("foo"))
 
-		List<AdditionalData> lstAdditionalData=ticketRepository.fillAttachmentsTicket(ticketRequestMap.get("ticketComplete"),
-				lstClientData.get());
+		//when(ticketRepository.fillAttachmentsTicket(any(Ticket.class), Matchers.anyList() ))
+		//		.thenReturn(lstClientData.get());
+
+		List<AdditionalData> lstAdditionalData = ticketRepository.getAdditionalData(ticketRequestMap.get("generated_ticket"));
 		assertNotNull(lstAdditionalData);
 	}
 	
-	
-	@Test
-	void ticketRepository_fillAttachmentsTicket() throws Exception {
-		
-	}
-	
-	@Test
-	void ticketRepository_getCommercialStatus() throws Exception {
-		
-	}
+//	@Test
+//	void ticketRepository_fillAttachmentsTicket() throws Exception {
+//		
+//	}
+//	
+//	@Test
+//	void ticketRepository_getCommercialStatus() throws Exception {
+//		
+//	}
 	
 }
