@@ -1,6 +1,8 @@
 package com.tdp.ms.autogestion.autogestion.repository;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -21,6 +23,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.tdp.ms.autogestion.exception.ResourceNotFoundException;
 import com.tdp.ms.autogestion.model.AdditionalData;
 import com.tdp.ms.autogestion.model.Attachment;
 import com.tdp.ms.autogestion.model.Customer;
@@ -69,7 +72,6 @@ public class GetTicketRepositoryTest {
 	private static Optional<List<TblTicket>> optLstTicket;
 	private static Optional<List<TblEquivalence>> optLstEquivalence;
 	private static Optional<TblEquivalenceNotification> equivalenceNotification;
-	private static Optional<List<AdditionalData>> lstClientData;
 	private static Ticket ticketComplete;
 
 	@BeforeAll
@@ -193,40 +195,55 @@ public class GetTicketRepositoryTest {
 
 		ticketComplete.setAttachments(attachments);
 		ticketComplete.setAdditionalData(listClientData);
-		lstClientData = Optional.of(listClientData);
-		// List<AdditionalData> lstAdditionalData=new ArrayList<>();
-//				AdditionalData additionalData=new AdditionalData();
-//				additionalData.setCheck("");
-		//
-//				lstAdditionalData.add(additionalData);
 	}
 
 	@Test
 	void ticketRepository_getTicket() throws Exception {
 		when(jpaTicketRepository.getTicket(anyInt())).thenReturn(optLstTicket);
+
 		Ticket ticket = ticketRepository.getTicket(19406791);
+
 		assertNotNull(ticket);
 	}
 
 	@Test
 	void ticketRepository_getAttachmentEquivalence() throws Exception {
 		when(jpaEquivalenceRepository.getEquivalence(anyInt())).thenReturn(optLstEquivalence);
+
 		List<Equivalence> listEquivalence = ticketRepository.getAttachmentEquivalence(19406791);
+
 		assertNotNull(listEquivalence);
+		assertEquals(5, listEquivalence.size());
 	}
 
 	@Test
 	void ticketRepository_getNotificationEquivalence() throws Exception {
 		when(jpaEquivalenceNotificationRepository.getEquivalence(anyString())).thenReturn(equivalenceNotification);
+
 		EquivalenceNotification equivalenceNotification = ticketRepository.getNotificationEquivalence("20000032-001");
+
 		assertNotNull(equivalenceNotification);
+		assertEquals("WHATSAPP", equivalenceNotification.getAction());
 	}
 
 	@Test
 	void ticketRepository_getAdditionalData() {
 		List<AdditionalData> lstAdditionalData = ticketRepository
 				.getAdditionalData(ticketRequestMap.get("generated_ticket"));
+
 		assertNotNull(lstAdditionalData);
+		assertEquals(1, lstAdditionalData.size());
 	}
 
+	@Test
+	void ticketRepository_resourceException() {
+
+		when(jpaTicketRepository.getTicket(anyInt())).thenReturn(Optional.empty());
+
+		ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () -> {
+			ticketRepository.getTicket(19406791);
+		});
+
+		assertEquals("Resource 19406791 does not exist. Resource Identifier", ex.getMessage());
+	}
 }

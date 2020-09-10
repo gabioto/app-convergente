@@ -1,28 +1,22 @@
 package com.tdp.ms.autogestion.autogestion.repository;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.stubbing.Answer;
 
-import com.tdp.ms.autogestion.exception.ResourceNotFoundException;
 import com.tdp.ms.autogestion.model.Ticket;
 import com.tdp.ms.autogestion.repository.TicketRepositoryImpl;
 import com.tdp.ms.autogestion.repository.datasource.api.TicketApi;
@@ -36,7 +30,7 @@ import com.tdp.ms.autogestion.repository.datasource.db.entities.TblCustomerPK;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblTicket;
 
 @ExtendWith(MockitoExtension.class)
-public class UpdateTicketRepositoryTest {
+public class RetrieveTicketsRepositoryTest {
 
 	@InjectMocks
 	private TicketRepositoryImpl ticketRepository;
@@ -59,8 +53,25 @@ public class UpdateTicketRepositoryTest {
 	@Mock
 	private JpaAttachmentAdditionalDataRepository attachmentAdditionalDataRepository;
 
-	private static List<TblTicket> listTickets = new ArrayList<TblTicket>();
-	private static TblTicket tblTicket;
+//	@Override
+//	public List<Ticket> findByCustomerAndUseCase(String docType, String docNumber, String reference, String involvement,
+//			LocalDateTime creationDate, LocalDateTime endDate) {
+//		List<TblTicket> tblTickets = jpaTicketRepository.findByCustomerAndUseCase(docType, docNumber, reference,
+//				involvement, creationDate, endDate);
+//
+//		return TblTicket.listFromThis(tblTickets);
+//	}
+//
+//	@Override
+//	public List<Ticket> findByCustomerAndUseCasePast(String docType, String docNumber, String reference,
+//			String involvement) {
+//		List<TblTicket> tblTickets = jpaTicketRepository.findByCustomerAndUseCasePast(docType, docNumber, reference,
+//				involvement);
+//
+//		return TblTicket.listFromThis(tblTickets);
+//	}
+
+	private static List<TblTicket> lstTblTicket = new ArrayList<TblTicket>();
 
 	@BeforeAll
 	public static void setup() {
@@ -70,11 +81,11 @@ public class UpdateTicketRepositoryTest {
 		customerPk.setDocumentNumber("70981983");
 		customerPk.setDocumentType("DNI");
 		customerPk.setServiceCode("");
-		
+
 		TblCustomer tblCustomer = new TblCustomer();
 		tblCustomer.setId(customerPk);
-		
-		tblTicket = new TblTicket();
+
+		TblTicket tblTicket = new TblTicket();
 		tblTicket.setCreationDate(actualDate);
 		tblTicket.setCreationDateTicket(actualDate);
 		tblTicket.setDescription("Ticket generado");
@@ -92,47 +103,32 @@ public class UpdateTicketRepositoryTest {
 		tblTicket.setStatusChangeReason("");
 		tblTicket.setStatusTicket("WA_SOLVED");
 		tblTicket.setTblCustomer(tblCustomer);
-		
-		listTickets.add(tblTicket);
+
+		lstTblTicket.add(tblTicket);
 	}
 
 	@Test
-	void updateTicket_success() {
-		
-		updateTicketSuccess();
-	}
-	
-	@Test
-	void updateTicket_twoTickets() {
-		
-		listTickets.add(tblTicket);
-		updateTicketSuccess();
-	}
-	
-	private void updateTicketSuccess() {
-		
-		when(jpaTicketRepository.getTicketStatus(anyInt())).thenReturn(Optional.of(listTickets));
+	void findCustomerAndUseCase() {
 
-		when(jpaTicketRepository.save(any(TblTicket.class))).thenAnswer(new Answer<TblTicket>() {
-			@Override
-			public TblTicket answer(InvocationOnMock invocation) throws Throwable {
-				return (TblTicket) invocation.getArguments()[0];
-			}
-		});
+		when(jpaTicketRepository.findByCustomerAndUseCase(anyString(), anyString(), anyString(), anyString(),
+				any(LocalDateTime.class), any(LocalDateTime.class))).thenReturn(lstTblTicket);
 
-		Ticket ticket = ticketRepository.updateTicketStatus(1, "WA_SOLVED");
+		List<Ticket> listTickets = ticketRepository.findByCustomerAndUseCase("DNI", "70707070", "", "",
+				LocalDateTime.now(), LocalDateTime.now());
 
-		assertNotNull(ticket);
+		assertEquals(1, listTickets.size());
+		assertEquals(19406743, listTickets.get(0).getIdTriage());
 	}
 
 	@Test
-	void updateTicket_resourceException() {
-		when(jpaTicketRepository.getTicketStatus(anyInt())).thenReturn(Optional.empty());
+	void findByCustomerAndUseCasePast() {
 
-		ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () -> {
-			ticketRepository.updateTicketStatus(1, "WA_SOLVED");
-		});
+		when(jpaTicketRepository.findByCustomerAndUseCasePast(anyString(), anyString(), anyString(), anyString()))
+				.thenReturn(lstTblTicket);
 
-		assertEquals(ex.getMessage(), "Resource 1 does not exist. Resource Identifier");
+		List<Ticket> listTickets = ticketRepository.findByCustomerAndUseCasePast("DNI", "70707070", "", "");
+
+		assertEquals(1, listTickets.size());
+		assertEquals(19406743, listTickets.get(0).getIdTriage());
 	}
 }
