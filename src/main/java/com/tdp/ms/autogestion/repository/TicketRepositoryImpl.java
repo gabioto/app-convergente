@@ -289,6 +289,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 				|| attachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-cms")
 				|| attachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-gestel")) {
 
+			Boolean indicador = Boolean.FALSE;
 			List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(), "codigo-averia");
 			for (AdditionalData attachAddData : attachAddDataList) {
 				if (!attachAddData.getValue().equals("")) {
@@ -296,10 +297,14 @@ public class TicketRepositoryImpl implements TicketRepository {
 					clientData.setKey(Constants.LABEL_COD_AVERIA);
 					clientData.setValue(attachAddData.getValue());
 					lstClientData.add(clientData);
-					result += attachment.getNameAttachment().concat(";").concat(Boolean.FALSE.toString()).concat(",");
+					result += attachment.getNameAttachment().concat(";").concat(Boolean.FALSE.toString()).concat(",");					
 				} else {
 					result += attachment.getNameAttachment().concat(";").concat(Boolean.TRUE.toString()).concat(",");
 				}
+				indicador = Boolean.TRUE;
+			}
+			if (!indicador) {
+				result += attachment.getNameAttachment().concat(";").concat(Boolean.TRUE.toString()).concat(",");
 			}
 		}
 
