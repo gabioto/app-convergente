@@ -1,5 +1,6 @@
 package com.tdp.ms.autogestion.autogestion.repository;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -226,10 +227,15 @@ public class GetTicketRepositoryTest {
 	void ticketRepository_getAdditionalData() {
 //		when(ticketRepository.fillAttachmentsTicket(ticketRequestMap.get("generated_ticket"), lstClientData.get()))
 //				.thenReturn(lstClientData.get());
+		
+//		when(methodCall)
 
-		List<AdditionalData> lstAdditionalData = ticketRepository
-				.fillAttachmentsTicket(ticketRequestMap.get("generated_ticket"), lstClientData.get());
+		List<AdditionalData> lstAdditionalData = ticketRepository.getAdditionalData(new Ticket());
+		
+//		List<AdditionalData> lstAdditionalData = ticketRepository
+//				.fillAttachmentsTicket(ticketRequestMap.get("generated_ticket"), lstClientData.get());
 		assertNotNull(lstAdditionalData);
+		assertEquals(2, lstAdditionalData.size());
 	}
 
 	@Test
