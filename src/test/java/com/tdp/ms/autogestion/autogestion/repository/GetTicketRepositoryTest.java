@@ -224,19 +224,8 @@ public class GetTicketRepositoryTest {
 
 	@Test
 	void ticketRepository_getAdditionalData() {
-//		when(ticketRepository.fillAttachmentsTicket(ticketRequestMap.get("generated_ticket"), lstClientData.get()))
-//				.thenReturn(lstClientData.get());
 		List<AdditionalData> lstAdditionalData = ticketRepository.getAdditionalData(ticketRequestMap.get("generated_ticket"));
 		assertNotNull(lstAdditionalData);
 	}    
 
-//	@Test
-//	void ticketRepository_fillAttachmentsTicket() throws Exception {
-//
-//	}
-//
-//	@Test
-//	void ticketRepository_getCommercialStatus() throws Exception {
-//
-//	}
 }
