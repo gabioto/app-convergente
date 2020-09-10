@@ -1,8 +1,12 @@
 package com.tdp.ms.autogestion.autogestion.repository;
 
+import static org.assertj.core.api.Assertions.anyOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
@@ -17,15 +21,19 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.tdp.ms.autogestion.model.AdditionalData;
 import com.tdp.ms.autogestion.model.Attachment;
-import com.tdp.ms.autogestion.model.Customer;
 import com.tdp.ms.autogestion.model.Equivalence;
 import com.tdp.ms.autogestion.model.EquivalenceNotification;
+import com.tdp.ms.autogestion.model.Customer;
+import com.tdp.ms.autogestion.model.OAuth;
 import com.tdp.ms.autogestion.model.Ticket;
 import com.tdp.ms.autogestion.repository.TicketRepositoryImpl;
 import com.tdp.ms.autogestion.repository.datasource.api.TicketApi;
@@ -41,8 +49,9 @@ import com.tdp.ms.autogestion.repository.datasource.db.entities.TblEquivalenceNo
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblTicket;
 import com.tdp.ms.autogestion.util.Constants;
 
+
 @ExtendWith(MockitoExtension.class)
-public class GetTicketRepositoryTest {
+public class TicketRepositoryTest {
 
 	@InjectMocks
 	private TicketRepositoryImpl ticketRepository;
@@ -65,32 +74,31 @@ public class GetTicketRepositoryTest {
 	@Mock
 	private JpaAttachmentAdditionalDataRepository attachmentAdditionalDataRepository;
 
-	private static Map<String, Ticket> ticketRequestMap = new HashMap<>();
+	
 	private static Optional<List<TblTicket>> optLstTicket;
+	
 	private static Optional<List<TblEquivalence>> optLstEquivalence;
+	
 	private static Optional<TblEquivalenceNotification> equivalenceNotification;
-	private static Optional<List<AdditionalData>> lstClientData;
-	private static Ticket ticketComplete;
-
+	
+	private static Map<String, Ticket> ticketResponseMap = new HashMap<>();
+	private static Map<String, Ticket> ticketRequestMap = new HashMap<>();
+	private static OAuth oAuthResponseMap;
+	private static Ticket ticketComplete, ticketInitial;
+	
+	private static Optional<List<AdditionalData>> lstClientData ;
+	private static Optional<Ticket> ticket;
+	
 	@BeforeAll
 	public static void setup() throws JsonProcessingException {
-		LocalDateTime actualDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
-
-		ticketComplete = new Ticket(0, 19406743, "/ticket/v2/tickets/19406743", "averia", actualDate, "minor",
-				"TroubleTicket", "acknowledged", actualDate, "Ticket generado", 1, "", "20000032", "99", "serviceCode",
-				"broadband", "3", null, new Customer("70981983", "DNI", "10368606"), null, actualDate,
-				new ArrayList<>(), new ArrayList<>());
-
-		ticketRequestMap.put("generated_ticket", ticketComplete);
-
 		TblTicket ticket = new TblTicket();
 		ticket.setIdTicket(1);
 		ticket.setIdTicketTriage(19406791);
 		ticket.setDescription("averia");
-		ticket.setCreationDate(actualDate);
-		ticket.setStatusChangeDate(actualDate);
+		ticket.setCreationDate(LocalDateTime.now(ZoneOffset.of("-05:00")));		
+		ticket.setStatusChangeDate(LocalDateTime.now(ZoneOffset.of("-05:00")));
 		ticket.setStatus("WHATSAPP");
-		ticket.setModifiedDateTicket(actualDate);
+		ticket.setModifiedDateTicket(LocalDateTime.now(ZoneOffset.of("-05:00")));
 		ticket.setSeverity("");
 		ticket.setTicketType("");
 		ticket.setStatusChangeReason("");
@@ -99,56 +107,56 @@ public class GetTicketRepositoryTest {
 		ticket.setIdUseCase("");
 		ticket.setProductIdentifier("");
 		ticket.setInvolvement("");
-
+		
 		TblCustomer tblCustomer = new TblCustomer();
 		TblCustomerPK tblCustomerPK = new TblCustomerPK();
 		tblCustomerPK.setDocumentNumber("40504339");
 		tblCustomerPK.setDocumentType("DNI");
 		tblCustomerPK.setServiceCode("10000");
-		tblCustomer.setId(tblCustomerPK);
+		tblCustomer.setId(tblCustomerPK);		
 		ticket.setTblCustomer(tblCustomer);
 		ticket.setStatusTicket("");
-		// ticket.setTblAdditionalData(new ArrayList<TblAdditionalData>());
-		// ticket.setTblAttachments(new ArrayList<TblAttachment>());
-
+		//ticket.setTblAdditionalData(new ArrayList<TblAdditionalData>());
+		//ticket.setTblAttachments(new ArrayList<TblAttachment>());
+		
 		List<TblTicket> lstTicket = new ArrayList<TblTicket>();
 		lstTicket.add(ticket);
-
+		
 		optLstTicket = Optional.of(lstTicket);
-
+		
 		List<TblEquivalence> lstTblEquivalence = new ArrayList<>();
-		TblEquivalence tblEquivalence = new TblEquivalence();
+		TblEquivalence tblEquivalence = new TblEquivalence();	
 		tblEquivalence.setIdEquivalence(1);
 		tblEquivalence.setNameEquivalence("Servicio Activo");
 		tblEquivalence.setAttachmentName("ValidacionesInicialesInternet[{}]recupera-info-telefono");
 		lstTblEquivalence.add(tblEquivalence);
-		// Primer Objeto
+		//Primer Objeto
 		tblEquivalence = new TblEquivalence();
 		tblEquivalence.setIdEquivalence(2);
 		tblEquivalence.setNameEquivalence("Sin Deuda Pendiente");
 		tblEquivalence.setAttachmentName("ValidacionesInicialesInternet[{}]recupera-deuda-amdocs");
 		lstTblEquivalence.add(tblEquivalence);
-		// Tercer Objeto
-		tblEquivalence = new TblEquivalence();
+		//Tercer Objeto
+		tblEquivalence = new TblEquivalence();		
 		tblEquivalence.setIdEquivalence(3);
 		tblEquivalence.setNameEquivalence("Sin Deuda Pendiente");
 		tblEquivalence.setAttachmentName("ValidacionesInicialesInternet[{}]recupera-deuda-cms");
 		lstTblEquivalence.add(tblEquivalence);
-		// Cuarto Objeto
+		//Cuarto Objeto
 		tblEquivalence = new TblEquivalence();
 		tblEquivalence.setIdEquivalence(4);
 		tblEquivalence.setNameEquivalence("Sin Deuda Pendiente");
 		tblEquivalence.setAttachmentName("ValidacionesInicialesInternet[{}]recupera-deuda-atis");
 		lstTblEquivalence.add(tblEquivalence);
-		// Quinto Objeto
+		//Quinto Objeto
 		tblEquivalence = new TblEquivalence();
 		tblEquivalence.setIdEquivalence(5);
 		tblEquivalence.setNameEquivalence("Sin Orden de Reconexión");
 		tblEquivalence.setAttachmentName("ValidacionesInicialesInternet[{}]recupera-reconexion-pendiente-amdocs");
 		lstTblEquivalence.add(tblEquivalence);
 		optLstEquivalence = Optional.of(lstTblEquivalence);
-
-		TblEquivalenceNotification tblEquivalenceNotification = new TblEquivalenceNotification();
+		
+		TblEquivalenceNotification tblEquivalenceNotification= new TblEquivalenceNotification();
 		tblEquivalenceNotification.setIdEquivalenceNotification(1);
 		tblEquivalenceNotification.setCode("20000032-001");
 		tblEquivalenceNotification.setDescription("No se pudo consultar al cliente");
@@ -159,74 +167,122 @@ public class GetTicketRepositoryTest {
 		tblEquivalenceNotification.setAction("WHATSAPP");
 		tblEquivalenceNotification.setButton("Ir a whastapp");
 		tblEquivalenceNotification.setImage("whastapp");
-		tblEquivalenceNotification.setActionbutton(
-				"https://api.whatsapp.com/send?phone=51999955555&text=%C2%A1Hola!%20Me%20derivaron%20de%20la%20app%20para%20que%20me%20ayuden%20a%20resolver%20la%20avería%20de%20internet%20en%20mi%20hogar.%20Mi%20código%20de%20atención%20es%20FCR101");
+		tblEquivalenceNotification.setActionbutton("https://api.whatsapp.com/send?phone=51999955555&text=%C2%A1Hola!%20Me%20derivaron%20de%20la%20app%20para%20que%20me%20ayuden%20a%20resolver%20la%20avería%20de%20internet%20en%20mi%20hogar.%20Mi%20código%20de%20atención%20es%20FCR101");
 		equivalenceNotification = Optional.of(tblEquivalenceNotification);
+		
+		LocalDateTime actualDate = LocalDateTime.now(ZoneOffset.of("-05:00"));
+		ticketComplete = new Ticket(0, 19406743, "/ticket/v2/tickets/19406743", "averia", actualDate, "minor",
+				"TroubleTicket", "acknowledged", actualDate, "Ticket generado", 1, "", "20000032", "99", "serviceCode",
+				"broadband", "3", null, new Customer("70981983", "DNI", "10368606"), null, actualDate,
+				new ArrayList<>(), new ArrayList<>());
 
+		ticketInitial = new Ticket(0, 0, null, "averia", null, "minor", "TroubleTicket", null, null, null, 1, "",
+				"20000032", "99", "serviceCode", "broadband", "3", null, new Customer("70981983", "DNI", "10368606"),
+				null, null, new ArrayList<>(), new ArrayList<>());
+
+		oAuthResponseMap = new OAuth();
+
+		// TICKET RESPONSE
+		ticketResponseMap.put("generated_ticket", ticketComplete);
+
+		// TICKET REQUEST
+		ticketRequestMap.put("ticket_to_generate", ticketInitial);
+		ticketRequestMap.put("generated_ticket", ticketComplete);
+		
 		List<AdditionalData> listClientData = new ArrayList<AdditionalData>();
 		AdditionalData clientData = new AdditionalData();
 		clientData.setKey(Constants.LABEL_STATUS);
 		clientData.setValue(ticket.getStatus());
 		clientData.setCheck("True");
 		listClientData.add(clientData);
-		List<Attachment> attachments = new ArrayList<Attachment>();
-		Attachment attachment = new Attachment();
+		List<Attachment> attachments=new ArrayList<Attachment>();
+		Attachment attachment=new Attachment();
 		attachment.setIdAttachment(665);
 		attachment.setIdAttachmentKafka(529102);
 		attachment.setCreationDate(LocalDateTime.now());
 		attachment.setNameAttachment("ValidacionesInicialesInternet[{}]recupera-estado-telefono");
 		attachments.add(attachment);
-
-		attachment = new Attachment();
+		
+		attachment=new Attachment();
 		attachment.setIdAttachment(666);
 		attachment.setIdAttachmentKafka(529103);
 		attachment.setCreationDate(LocalDateTime.now());
 		attachment.setNameAttachment("ValidacionesInicialesInternet[{}]recupera-identificacion-cliente-atis");
 		attachments.add(attachment);
-
-		attachment = new Attachment();
+		
+		attachment=new Attachment();
 		attachment.setIdAttachment(667);
 		attachment.setIdAttachmentKafka(529104);
 		attachment.setCreationDate(LocalDateTime.now());
 		attachment.setNameAttachment("ValidacionesInicialesInternet[{}]recupera-info-telefono");
 		attachments.add(attachment);
-
 		ticketComplete.setAttachments(attachments);
 		ticketComplete.setAdditionalData(listClientData);
 		lstClientData = Optional.of(listClientData);
-		// List<AdditionalData> lstAdditionalData=new ArrayList<>();
-//				AdditionalData additionalData=new AdditionalData();
-//				additionalData.setCheck("");
-		//
-//				lstAdditionalData.add(additionalData);
+		//List<AdditionalData> lstAdditionalData=new ArrayList<>();
+//		AdditionalData additionalData=new AdditionalData();
+//		additionalData.setCheck("");
+//
+//		lstAdditionalData.add(additionalData);
 	}
 
 	@Test
-	void ticketRepository_getTicket() throws Exception {
-		when(jpaTicketRepository.getTicket(anyInt())).thenReturn(optLstTicket);
-		Ticket ticket = ticketRepository.getTicket(19406791);
+	void createTicket_generateTicket() {
+		when(ticketApi.generate(any(OAuth.class), any(Ticket.class)))
+				.thenReturn(ticketResponseMap.get("generated_ticket"));
+
+		Ticket ticket = ticketRepository.generateTicket(oAuthResponseMap, ticketRequestMap.get("ticket_to_generate"));
+
 		assertNotNull(ticket);
 	}
 
 	@Test
+	void createTicket_saveGeneratedTicketWithCustomer() {
+		when(jpaCustomerRepository.findById(any(TblCustomerPK.class))).thenReturn(Optional.of(new TblCustomer()));
+
+		saveGeneratedTicket();
+	}
+
+//	@Test
+//	void ticketRepository_getTicket() throws Exception {
+//		when(ticketRepository.getTicket(anyInt())).thenReturn(optLstTicket.get().get(0).fromThis());
+//		Ticket ticket = ticketRepository.getTicket(19406791);
+//		assertNotNull(ticket);		
+//	}
+	
+	void createTicket_saveGeneratedTicketWithoutCustomer() {
+		when(jpaCustomerRepository.findById(any(TblCustomerPK.class))).thenReturn(Optional.empty());
+		when(jpaCustomerRepository.save(any())).thenReturn(new TblCustomer());
+
+		saveGeneratedTicket();
+	}
+
+	private void saveGeneratedTicket() {
+		when(jpaTicketRepository.save(any())).thenReturn(new TblTicket());
+
+		ticketRepository.saveGeneratedTicket(ticketRequestMap.get("generated_ticket"));
+	}
+	
+	@Test
 	void ticketRepository_getAttachmentEquivalence() throws Exception {
 		when(jpaEquivalenceRepository.getEquivalence(anyInt())).thenReturn(optLstEquivalence);
 		List<Equivalence> listEquivalence = ticketRepository.getAttachmentEquivalence(19406791);
-		assertNotNull(listEquivalence);
+		assertNotNull(listEquivalence);	
 	}
-
+	
 	@Test
 	void ticketRepository_getNotificationEquivalence() throws Exception {
 		when(jpaEquivalenceNotificationRepository.getEquivalence(anyString())).thenReturn(equivalenceNotification);
 		EquivalenceNotification equivalenceNotification = ticketRepository.getNotificationEquivalence("20000032-001");
 		assertNotNull(equivalenceNotification);
 	}
-
+	
 	@Test
 	void ticketRepository_getAdditionalData() {
-		List<AdditionalData> lstAdditionalData = ticketRepository
-				.getAdditionalData(ticketRequestMap.get("generated_ticket"));
+
+		List<AdditionalData> lstAdditionalData = ticketRepository.getAdditionalData(ticketRequestMap.get("generated_ticket"));
 		assertNotNull(lstAdditionalData);
 	}
-
+	
+	
 }
