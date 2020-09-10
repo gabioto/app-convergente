@@ -1,6 +1,8 @@
 package com.tdp.ms.autogestion.autogestion.repository;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -22,6 +24,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.tdp.ms.autogestion.exception.ResourceNotFoundException;
 import com.tdp.ms.autogestion.model.AdditionalData;
 import com.tdp.ms.autogestion.model.Attachment;
 import com.tdp.ms.autogestion.model.Customer;
@@ -617,4 +620,14 @@ public class TicketRepositoryTest {
 		assertNotNull(listTicket);
 	}
 
+	@Test
+	void ticketRepository_getTicketStatusResourceException() {
+		when(jpaTicketRepository.getTicketStatus(anyInt())).thenReturn(Optional.empty());
+
+		ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () -> {
+			ticketRepository.getTicketStatus(1116);
+		});
+
+		assertEquals("Resource 1116 does not exist. Resource Identifier", ex.getMessage());
+	}
 }

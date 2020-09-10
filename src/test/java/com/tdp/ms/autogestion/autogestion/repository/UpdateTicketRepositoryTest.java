@@ -106,6 +106,7 @@ public class UpdateTicketRepositoryTest {
 	void updateTicket_twoTickets() {
 		
 		listTickets.add(tblTicket);
+	
 		updateTicketSuccess();
 	}
 	

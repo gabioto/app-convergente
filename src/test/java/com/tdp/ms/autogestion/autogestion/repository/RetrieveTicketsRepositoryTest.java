@@ -53,24 +53,6 @@ public class RetrieveTicketsRepositoryTest {
 	@Mock
 	private JpaAttachmentAdditionalDataRepository attachmentAdditionalDataRepository;
 
-//	@Override
-//	public List<Ticket> findByCustomerAndUseCase(String docType, String docNumber, String reference, String involvement,
-//			LocalDateTime creationDate, LocalDateTime endDate) {
-//		List<TblTicket> tblTickets = jpaTicketRepository.findByCustomerAndUseCase(docType, docNumber, reference,
-//				involvement, creationDate, endDate);
-//
-//		return TblTicket.listFromThis(tblTickets);
-//	}
-//
-//	@Override
-//	public List<Ticket> findByCustomerAndUseCasePast(String docType, String docNumber, String reference,
-//			String involvement) {
-//		List<TblTicket> tblTickets = jpaTicketRepository.findByCustomerAndUseCasePast(docType, docNumber, reference,
-//				involvement);
-//
-//		return TblTicket.listFromThis(tblTickets);
-//	}
-
 	private static List<TblTicket> lstTblTicket = new ArrayList<TblTicket>();
 
 	@BeforeAll
