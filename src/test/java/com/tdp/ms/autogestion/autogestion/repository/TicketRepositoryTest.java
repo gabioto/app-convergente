@@ -603,45 +603,30 @@ public class TicketRepositoryTest {
 	@Test
 	void ticketRepository_getAdditionalData() {
 		when(jpaEquivalenceNotificationRepository.getEquivalence(anyString())).thenReturn(equivalenceNotification);
-		//JpaAttachmentAdditionalDataRepository
-		//attachmentAdditionalDataRepository
 		when(jpaEquivalenceRepository.getEquivalence(anyInt())).thenReturn(optLstEquivalence);
 		when(attachmentAdditionalDataRepository.getValue(anyInt(), anyString())).thenReturn(lstTblAttachmentAdditionalData);
-		 //jpaEquivalenceRepository.getEquivalence(ticketId)
-//		TblTicket tblTicket= jpaTicketRepository.findById(1095).get();
-//		Ticket ticket=tblTicket.fromThis();
-		//ticketRequestMap.get("generated_ticket")
 		List<AdditionalData> lstAdditionalData = ticketRepository.getAdditionalData(ticketRequestMap.get("generated_ticket"));
 		assertNotNull(lstAdditionalData);
 	}
 	
 	@Test
-	void ticketRepository_findByCustomerAndUseCase() {
-		
+	void ticketRepository_findByCustomerAndUseCase() {		
 		when(jpaTicketRepository.findByCustomerAndUseCase(anyString(),anyString(),anyString(),anyString(), any(LocalDateTime.class), any(LocalDateTime.class))).thenReturn(optLstTicket.get());
-		//new Customer("70981983", "DNI", "10368606")
 		List<Ticket> listTicket= ticketRepository.findByCustomerAndUseCase("DNI", "70981983", "10368606", "broadband", LocalDateTime.now(ZoneOffset.of("-05:00")), LocalDateTime.now(ZoneOffset.of("-05:00")));
-		//List<AdditionalData> lstAdditionalData = ticketRepository.getAdditionalData(ticketRequestMap.get("generated_ticket"));
 		assertNotNull(listTicket);
 	}
 	
 	@Test
-	void ticketRepository_findByCustomerAndUseCasePast() {
-		
+	void ticketRepository_findByCustomerAndUseCasePast() {		
 		when(jpaTicketRepository.findByCustomerAndUseCasePast(anyString(),anyString(),anyString(),anyString())).thenReturn(optLstTicket.get());
-		//new Customer("70981983", "DNI", "10368606")
 		List<Ticket> listTicket= ticketRepository.findByCustomerAndUseCasePast("DNI", "70981983", "10368606", "broadband");
-		//List<AdditionalData> lstAdditionalData = ticketRepository.getAdditionalData(ticketRequestMap.get("generated_ticket"));
 		assertNotNull(listTicket);
 	}
 	
 	@Test
-	void ticketRepository_getTicketStatus() {
-		
+	void ticketRepository_getTicketStatus() {		
 		when(jpaTicketRepository.getTicketStatus(anyInt())).thenReturn(optLstTicket);
-		//new Customer("70981983", "DNI", "10368606")
 		List<Ticket> listTicket= ticketRepository.getTicketStatus(1116);
-		//List<AdditionalData> lstAdditionalData = ticketRepository.getAdditionalData(ticketRequestMap.get("generated_ticket"));
 		assertNotNull(listTicket);
 	}
 	
