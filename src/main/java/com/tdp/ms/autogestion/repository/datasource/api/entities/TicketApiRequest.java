@@ -8,13 +8,10 @@ import com.tdp.ms.autogestion.util.Constants;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
 public class TicketApiRequest {
 
 	private String description;
@@ -45,17 +42,13 @@ public class TicketApiRequest {
 	}
 
 	@Data
-	@NoArgsConstructor
 	@AllArgsConstructor
-	@EqualsAndHashCode(callSuper = false)
 	private static class Channel {
 		private String id;
 	}
 
 	@Data
-	@NoArgsConstructor
 	@AllArgsConstructor
-	@EqualsAndHashCode(callSuper = false)
 	public class TicketAdditionalData {
 
 		private String key;

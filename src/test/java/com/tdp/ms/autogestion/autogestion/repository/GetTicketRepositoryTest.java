@@ -226,14 +226,11 @@ public class GetTicketRepositoryTest {
 		assertEquals("WHATSAPP", equivalenceNotification.getAction());
 	}
 
-	@Test
-	void ticketRepository_getAdditionalData() {
-		List<AdditionalData> lstAdditionalData = ticketRepository
-				.getAdditionalData(ticketRequestMap.get("generated_ticket"));
-
-		assertNotNull(lstAdditionalData);
-		assertEquals(1, lstAdditionalData.size());
-	}
+//	@Test
+//	void ticketRepository_getAdditionalData() {
+//		List<AdditionalData> lstAdditionalData = ticketRepository.getAdditionalData(ticketRequestMap.get("generated_ticket"));
+//		assertNotNull(lstAdditionalData);
+//	}    
 
 	@Test
 	void ticketRepository_resourceException() {
