@@ -244,7 +244,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 
 			List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(), "monto");
 			for (AdditionalData attachAddData : attachAddDataList) {
-				if (!attachAddData.getValue().equals("")) {
+				if (!attachAddData.getValue().equals("") && !attachAddData.getValue().equals("0")) {
 					AdditionalData clientData = new AdditionalData();
 					clientData.setKey(Constants.LABEL_MONTO);
 					clientData.setValue(attachAddData.getValue());
@@ -256,7 +256,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 				}
 			}
 		}
-
+		
 		return result;
 	}
 
@@ -371,12 +371,6 @@ public class TicketRepositoryImpl implements TicketRepository {
 						clientData.setKey(Constants.LABEL_TITLE);
 						clientData.setValue(StringUtil.validateEmptyField(equivalence.getTitle()));
 						lstClientData.add(clientData);
-
-						/*
-						 * clientData = new ClientData(); clientData.setKey(Constants.LABEL_TITLE_DESC);
-						 * clientData.setValue(equivalence.getDescription() != null ?
-						 * equivalence.getDescription() : ""); lstClientData.add(clientData);
-						 */
 
 						clientData = new AdditionalData();
 						clientData.setKey(Constants.LABEL_BODY);
