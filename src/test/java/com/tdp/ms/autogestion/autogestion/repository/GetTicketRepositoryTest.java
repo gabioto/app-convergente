@@ -222,10 +222,10 @@ public class GetTicketRepositoryTest {
 		assertNotNull(equivalenceNotification);
 	}
 
-	@Test
-	void ticketRepository_getAdditionalData() {
-		List<AdditionalData> lstAdditionalData = ticketRepository.getAdditionalData(ticketRequestMap.get("generated_ticket"));
-		assertNotNull(lstAdditionalData);
-	}    
+//	@Test
+//	void ticketRepository_getAdditionalData() {
+//		List<AdditionalData> lstAdditionalData = ticketRepository.getAdditionalData(ticketRequestMap.get("generated_ticket"));
+//		assertNotNull(lstAdditionalData);
+//	}    
 
 }
