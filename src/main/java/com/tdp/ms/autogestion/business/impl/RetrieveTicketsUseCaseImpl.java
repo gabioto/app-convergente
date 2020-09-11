@@ -130,7 +130,7 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 	}
 
 	private ResponseEntity<TicketStatusResponse> evaluateTicketStatus(List<Integer> listIds) {
-		Ticket ticket = ticketRepository.getTicket(listIds.get(listIds.size() == 1 ? 0 : 0));
+		Ticket ticket = ticketRepository.getTicket(listIds.get(listIds.size() == 1 ? 0 : 1));
 
 		if (validateStatus(ticket)) {
 			return new ResponseEntity<>(TicketStatusResponse.from(ticket, ticketRepository.getAdditionalData(ticket)),
