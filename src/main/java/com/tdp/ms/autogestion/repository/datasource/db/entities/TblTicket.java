@@ -334,7 +334,7 @@ public class TblTicket implements Serializable {
 
 	public static TblTicket from(Ticket ticket, TblCustomer tableCustomer, String status) {
 		TblTicket tableTicket = new TblTicket();
-		tableTicket.setIdTicketTriage(Integer.valueOf(ticket.getId()));
+		tableTicket.setIdTicketTriage(ticket.getId());
 		tableTicket.setDescription(ticket.getDescription());
 		tableTicket.setCreationDate(ticket.getCreationDate());
 		tableTicket.setCreationDateTicket(LocalDateTime.now(ZoneOffset.of(Constants.ZONE_OFFSET)));
