@@ -141,7 +141,8 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 			if (listIds.size() == 1) {
 				return new ResponseEntity<>(new TicketStatusResponse(), HttpStatus.OK);
 			} else {
-				throw new ForbiddenException("User can´t create more tickets");
+				return new ResponseEntity<>(new TicketStatusResponse(), HttpStatus.OK);
+				//throw new ForbiddenException("User can´t create more tickets");
 			}
 		}
 	}

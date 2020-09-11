@@ -217,7 +217,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 
 					List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(), "monto");
 					for (AdditionalData attachAddData : attachAddDataList) {
-						if (!attachAddData.getValue().equals("")) {
+						if (!attachAddData.getValue().equals("") && !attachAddData.getValue().equals("0")) {
 							clientData = new AdditionalData();
 							clientData.setKey(Constants.LABEL_MONTO);
 							clientData.setValue(attachAddData.getValue());
@@ -251,6 +251,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 						|| attachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-cms")
 						|| attachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-gestel")) {
 
+					Boolean existe = Boolean.FALSE;
 					List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(), "codigo-averia");
 					for (AdditionalData attachAddData : attachAddDataList) {
 						if (!attachAddData.getValue().equals("")) {
@@ -262,6 +263,10 @@ public class TicketRepositoryImpl implements TicketRepository {
 						} else {
 							result += attachment.getNameAttachment().concat(";").concat(Boolean.TRUE.toString()).concat(",");
 						}
+						existe = Boolean.TRUE;
+					}
+					if (!existe) {
+						result += attachment.getNameAttachment().concat(";").concat(Boolean.TRUE.toString()).concat(",");
 					}
 				}
 				
