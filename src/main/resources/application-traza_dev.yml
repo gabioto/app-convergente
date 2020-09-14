@@ -13,8 +13,9 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQL9Dialect
   datasource:
     hikari:
-      connectionTimeout: 20000
-      maximumPoolSize: 5
+      connectionTimeout: 30000
+      maximumPoolSize: 100
+      minimum-idle: 10
     url: jdbc:postgresql://sl-us-south-1-portal.54.dblayer.com:23239/compose
     username: admin
     password: GNTVLIQEAIPDVGTT
