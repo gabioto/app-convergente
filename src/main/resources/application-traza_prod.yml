@@ -13,8 +13,9 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   datasource:
     hikari:
-      connectionTimeout: 20000
-      maximumPoolSize: 5
+      connectionTimeout: 30000
+      maximumPoolSize: 100
+      minimum-idle: 10
     url: jdbc:postgresql://6de706f1-ed6b-41c3-9714-d84afa6c2726.974550db55eb4ec0983f023940bf637f.databases.appdomain.cloud:31164/ibmclouddb
     username: user_averia
     password: SyDe2VrKZH
