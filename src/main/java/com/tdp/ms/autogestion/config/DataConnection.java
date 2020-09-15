@@ -19,15 +19,15 @@ public class DataConnection {
 //		this.username="admin";
 //		this.password="GNTVLIQEAIPDVGTT";
 		//Cert
-//		this.url="jdbc:postgresql://a1f396ab-707f-4fcc-8225-fee7f1d7647a.br37s45d0p54n73ffbr0.databases.appdomain.cloud:30865/ibmclouddb";
-//		this.driverclassname ="org.postgresql.Driver";
-//		this.username="user_averia";
-//		this.password="SyDe2VrKZH";
-		//Prod
-		this.url="jdbc:postgresql://6de706f1-ed6b-41c3-9714-d84afa6c2726.974550db55eb4ec0983f023940bf637f.databases.appdomain.cloud:31164/ibmclouddb";
+		this.url="jdbc:postgresql://a1f396ab-707f-4fcc-8225-fee7f1d7647a.br37s45d0p54n73ffbr0.databases.appdomain.cloud:30865/ibmclouddb";
 		this.driverclassname ="org.postgresql.Driver";
 		this.username="user_averia";
 		this.password="SyDe2VrKZH";
+		//Prod
+//		this.url="jdbc:postgresql://6de706f1-ed6b-41c3-9714-d84afa6c2726.974550db55eb4ec0983f023940bf637f.databases.appdomain.cloud:31164/ibmclouddb";
+//		this.driverclassname ="org.postgresql.Driver";
+//		this.username="user_averia";
+//		this.password="SyDe2VrKZH";
 
 	}
 	
