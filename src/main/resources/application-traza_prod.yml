@@ -13,8 +13,9 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   datasource:
     hikari:
-      connectionTimeout: 20000
-      maximumPoolSize: 5
+      connectionTimeout: 30000
+      maximumPoolSize: 100
+      minimum-idle: 10
     url: jdbc:postgresql://6de706f1-ed6b-41c3-9714-d84afa6c2726.974550db55eb4ec0983f023940bf637f.databases.appdomain.cloud:31164/ibmclouddb
     username: user_averia
     password: SyDe2VrKZH
@@ -27,11 +28,12 @@ app:
     foo: queue-notification-tickets
   oauth:
     url: https://apis.telefonica.com.pe/vp-tecnologia/bss/public/oauth2/token
-    client: afc1075e-69a4-40dc-809a-11e498cea9af
+    client: b3e34511-5e5b-4fb2-b5ce-2e0bbd0fcb0b
   ticket:
     create: https://apis.telefonica.com.pe/vp-tecnologia/bss/triagefcr/createticket/tickets
     retrieve: https://apis.telefonica.com.pe/vp-tecnologia/bss/triagefcr/retrieveticket/tickets/
-    client: afc1075e-69a4-40dc-809a-11e498cea9af
+    client: b3e34511-5e5b-4fb2-b5ce-2e0bbd0fcb0b
+
 logging:
   level:
     com.tdp.ms.autogestion: DEBUG
