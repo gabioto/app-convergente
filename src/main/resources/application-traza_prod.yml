@@ -28,11 +28,11 @@ app:
     foo: queue-notification-tickets
   oauth:
     url: https://api.us-east.apiconnect.ibmcloud.com/telefonica-del-peru-development/ter/public/oauth2/token
-    client: afc1075e-69a4-40dc-809a-11e498cea9af
+    client: b3e34511-5e5b-4fb2-b5ce-2e0bbd0fcb0b
   ticket:
     create: https://api.us-east.apiconnect.ibmcloud.com/telefonica-del-peru-development/ter/triagefcr/createticket/tickets
     retrieve: https://api.us-east.apiconnect.ibmcloud.com/telefonica-del-peru-development/ter/triagefcr/retrieveticket/tickets/
-    client: afc1075e-69a4-40dc-809a-11e498cea9af
+    client: b3e34511-5e5b-4fb2-b5ce-2e0bbd0fcb0b
 logging:
   level:
     com.tdp.ms.autogestion: DEBUG
