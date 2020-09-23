@@ -6,7 +6,7 @@ spring:
     properties:
       hibernate:
         temp:
-          use_jdbc_metadata_defaults : false
+          use_jdbc_metadata_defaults: false
         jdbc:
           batch_size: 5
         default_schema: public
