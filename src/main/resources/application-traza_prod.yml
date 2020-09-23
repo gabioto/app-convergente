@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: trazabilidad-autogestion
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        temp:
+          use_jdbc_metadata_defaults : false
+        jdbc:
+          batch_size: 5
+        default_schema: public
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    hikari:
+      connectionTimeout: 20000
+      maximumPoolSize: 5
+    url: jdbc:postgresql://6de706f1-ed6b-41c3-9714-d84afa6c2726.974550db55eb4ec0983f023940bf637f.databases.appdomain.cloud:31164/ibmclouddb
+    username: user_averia
+    password: SyDe2VrKZH
+    driverClassName: org.postgresql.Driver
+  kafka:
+    bootstrap-servers: cap-sg-prd-5.securegateway.appdomain.cloud:18987
+
+app:
+  topic:
+    foo: queue-notification-tickets
+  oauth:
+    url: https://api.us-east.apiconnect.ibmcloud.com/telefonica-del-peru-development/ter/public/oauth2/token
+    client: afc1075e-69a4-40dc-809a-11e498cea9af
+  ticket:
+    create: https://api.us-east.apiconnect.ibmcloud.com/telefonica-del-peru-development/ter/triagefcr/createticket/tickets
+    retrieve: https://api.us-east.apiconnect.ibmcloud.com/telefonica-del-peru-development/ter/triagefcr/retrieveticket/tickets/
+    client: afc1075e-69a4-40dc-809a-11e498cea9af
+logging:
+  level:
+    com.tdp.ms.autogestion: DEBUG
