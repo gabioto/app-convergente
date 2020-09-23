@@ -21,6 +21,7 @@ import com.tdp.ms.autogestion.model.Ticket;
 import com.tdp.ms.autogestion.model.TicketStatus;
 import com.tdp.ms.autogestion.repository.TicketRepository;
 import com.tdp.ms.autogestion.util.Constants;
+import com.tdp.ms.autogestion.util.FunctionsUtil;
 
 /**
  * Class: TrazabilidadpruebaServiceImpl. <br/>
@@ -47,6 +48,9 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 	@Autowired
 	private TicketRepository ticketRepository;
 
+	@Autowired
+	FunctionsUtil functionsUtil;
+	
 	@Override
 	public ResponseEntity<TicketStatusResponse> pendingTicket(String type, String involvement, String reference,
 			String nationalIdType, String nationalId) {
@@ -72,8 +76,15 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 			if (listIds.size() > 0) {
 				return evaluatePastTicketStatus(listIds);
 			}
+			
+			ResponseEntity<TicketStatusResponse> ticketStatusResponse = new ResponseEntity<>(
+					new TicketStatusResponse(), HttpStatus.OK);
 
-			return new ResponseEntity<>(new TicketStatusResponse(), HttpStatus.OK);
+			functionsUtil.saveLogData(0, nationalIdType,
+					nationalIdType, "Retrieve Ticket", "retrieveTicket",
+					"", ticketStatusResponse.toString(), "Retrieve Ticket");
+			
+			return ticketStatusResponse;
 		} catch (ResourceNotFoundException e) {
 			throw e;
 		} catch (ForbiddenException e) {
@@ -130,19 +141,35 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 	}
 
 	private ResponseEntity<TicketStatusResponse> evaluateTicketStatus(List<Integer> listIds) {
-		Ticket ticket = ticketRepository.getTicket(listIds.get(listIds.size() == 1 ? 0 : 1));
+		Ticket ticket = ticketRepository.getTicket(listIds.get(0));
 
 		if (validateStatus(ticket)) {
-			return new ResponseEntity<>(TicketStatusResponse.from(ticket, ticketRepository.getAdditionalData(ticket)),
-					HttpStatus.OK);
+			ResponseEntity<TicketStatusResponse> ticketStatusResponse = new ResponseEntity<>(
+					TicketStatusResponse.from(ticket, ticketRepository.getAdditionalData(ticket)), HttpStatus.OK);
+
+			functionsUtil.saveLogData(ticket.getIdTriage(), ticket.getCustomer().getNationalId(),
+					ticket.getCustomer().getNationalType(), "Retrieve Ticket", "retrieveTicket",
+					ticket.getIdTriage().toString(), ticketStatusResponse.toString(), "Retrieve Ticket");
+
+			return ticketStatusResponse;
 		} else {
 			// Si tiene un ticket puede crear otro, en caso contrario no
 			// TODO: Validar si devuelve una excepción
 			if (listIds.size() == 1) {
-				return new ResponseEntity<>(new TicketStatusResponse(), HttpStatus.OK);
+				ResponseEntity<TicketStatusResponse> ticketStatusResponse = new ResponseEntity<>(
+						new TicketStatusResponse(), HttpStatus.OK);
+
+				functionsUtil.saveLogData(ticket.getIdTriage(), ticket.getCustomer().getNationalId(),
+						ticket.getCustomer().getNationalType(), "Retrieve Ticket", "retrieveTicket",
+						ticket.getIdTriage().toString(), ticketStatusResponse.toString(), "Retrieve Ticket");
+
+				return ticketStatusResponse;
 			} else {
-				return new ResponseEntity<>(new TicketStatusResponse(), HttpStatus.OK);
-				//throw new ForbiddenException("User can´t create more tickets");
+				functionsUtil.saveLogData(ticket.getIdTriage(), ticket.getCustomer().getNationalId(),
+						ticket.getCustomer().getNationalType(), "Retrieve Ticket", "retrieveTicket",
+						ticket.getIdTriage().toString(), "User can´t create more tickets", "Retrieve Ticket");
+
+				throw new ForbiddenException("User can´t create more tickets");
 			}
 		}
 	}

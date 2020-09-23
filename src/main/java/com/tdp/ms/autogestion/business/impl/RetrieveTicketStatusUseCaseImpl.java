@@ -13,6 +13,7 @@ import com.tdp.ms.autogestion.exception.ResourceNotFoundException;
 import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
 import com.tdp.ms.autogestion.model.Ticket;
 import com.tdp.ms.autogestion.repository.TicketRepository;
+import com.tdp.ms.autogestion.util.FunctionsUtil;
 
 /**
  * Class: TrazabilidadpruebaServiceImpl. <br/>
@@ -37,6 +38,9 @@ public class RetrieveTicketStatusUseCaseImpl implements RetrieveTicketStatusUseC
 	@Autowired
 	TicketRepository ticketRepository;
 
+	@Autowired
+	FunctionsUtil functionsUtil;
+	
 	@Override
 	public ResponseEntity<TicketStatusResponse> retrieveTicketStatus(String idTicket) {
 
@@ -44,8 +48,15 @@ public class RetrieveTicketStatusUseCaseImpl implements RetrieveTicketStatusUseC
 			List<Ticket> tickets = ticketRepository.getTicketStatus(Integer.parseInt(idTicket));
 			Ticket ticket = tickets.get(tickets.size() == 1 ? 0 : 1);
 
-			return new ResponseEntity<>(TicketStatusResponse.from(ticket, ticketRepository.getAdditionalData(ticket)),
-					HttpStatus.OK);
+			ResponseEntity<TicketStatusResponse> ticketStatusResponse = new ResponseEntity<>(
+					TicketStatusResponse.from(ticket, ticketRepository.getAdditionalData(ticket)), HttpStatus.OK);
+
+			functionsUtil.saveLogData(Integer.parseInt(idTicket),
+					ticket.getCustomer().getNationalId(),
+					ticket.getCustomer().getNationalType(), "Retrieve Ticket Status", "retrieveTicketStatus", idTicket, ticketStatusResponse.toString(),
+					"Retrieve Ticket Status");
+			
+			return ticketStatusResponse;
 		} catch (ResourceNotFoundException e) {
 			throw e;
 		} catch (DomainException e) {
