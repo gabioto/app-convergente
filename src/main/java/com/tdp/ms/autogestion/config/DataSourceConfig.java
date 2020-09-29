@@ -25,11 +25,14 @@ public class DataSourceConfig {
     public DataSource getDataSource() {
 		
 		DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
-		//dataSourceBuilder.driverClassName(System.getenv("TDP_DriverClassName"));
-        dataSourceBuilder.driverClassName("org.postgresql.Driver");
-        dataSourceBuilder.url("jdbc:postgresql://a1f396ab-707f-4fcc-8225-fee7f1d7647a.br37s45d0p54n73ffbr0.databases.appdomain.cloud:30865/ibmclouddb");
-        dataSourceBuilder.username("user_averia");
-        dataSourceBuilder.password("SyDe2VrKZH");
+		dataSourceBuilder.driverClassName(System.getenv("TDP_DRIVERCLASSNAME"));
+		dataSourceBuilder.url(System.getenv("TDP_URL"));
+		dataSourceBuilder.username(System.getenv("TDP_USERNAME"));
+		dataSourceBuilder.password(System.getenv("TDP_PASSWORD"));
+        //dataSourceBuilder.driverClassName("org.postgresql.Driver");
+        //dataSourceBuilder.url("jdbc:postgresql://a1f396ab-707f-4fcc-8225-fee7f1d7647a.br37s45d0p54n73ffbr0.databases.appdomain.cloud:30865/ibmclouddb");
+        //dataSourceBuilder.username("user_averia");
+        //dataSourceBuilder.password("SyDe2VrKZH");
         return dataSourceBuilder.build();
     }
 	

@@ -15,10 +15,10 @@ spring:
     hikari:
       connectionTimeout: 20000
       maximumPoolSize: 5
-    url: jdbc:postgresql://6de706f1-ed6b-41c3-9714-d84afa6c2726.974550db55eb4ec0983f023940bf637f.databases.appdomain.cloud:31164/ibmclouddb
-    username: user_averia
-    password: SyDe2VrKZH
-    driverClassName: org.postgresql.Driver
+#    url: jdbc:postgresql://6de706f1-ed6b-41c3-9714-d84afa6c2726.974550db55eb4ec0983f023940bf637f.databases.appdomain.cloud:31164/ibmclouddb
+#    username: user_averia
+#    password: SyDe2VrKZH
+#    driverClassName: org.postgresql.Driver
   kafka:
     bootstrap-servers: cap-sg-prd-5.securegateway.appdomain.cloud:18987
 

@@ -8,4 +8,7 @@ applications:
     disk_quota: 2GB
     instances: 1
     env:
-      TDP_DriverClassName: org.postgresql.Driver
+      TDP_DRIVERCLASSNAME: org.postgresql.Driver
+      TDP_URL: jdbc:postgresql://a1f396ab-707f-4fcc-8225-fee7f1d7647a.br37s45d0p54n73ffbr0.databases.appdomain.cloud:30865/ibmclouddb
+      TDP_USERNAME: user_averia
+      TDP_PASSWORD: SyDe2VrKZH

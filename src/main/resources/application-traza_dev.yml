@@ -15,10 +15,10 @@ spring:
     hikari:
       connectionTimeout: 20000
       maximumPoolSize: 5
-    url: jdbc:postgresql://sl-us-south-1-portal.54.dblayer.com:23239/compose
-    username: admin
-    password: GNTVLIQEAIPDVGTT
-    driverClassName: org.postgresql.Driver
+#    url: jdbc:postgresql://sl-us-south-1-portal.54.dblayer.com:23239/compose
+#    username: admin
+#    password: GNTVLIQEAIPDVGTT
+#    driverClassName: org.postgresql.Driver
   kafka:
     bootstrap-servers: cap-sg-prd-1.securegateway.appdomain.cloud:18007 
 app:
