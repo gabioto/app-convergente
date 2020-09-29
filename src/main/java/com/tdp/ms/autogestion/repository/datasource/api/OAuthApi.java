@@ -38,11 +38,13 @@ public class OAuthApi {
 	@Autowired
 	private HttpComponentsClientHttpRequestFactory initClientRestTemplate;
 
-	@Autowired
-	private RestTemplate restTemplate;
+	//@Autowired
+	//private RestTemplate restTemplate;
 
 	public OAuth generate(OAuth pOAuth) throws Exception, HttpClientErrorException {
-		restTemplate.setRequestFactory(initClientRestTemplate);
+		//restTemplate.setRequestFactory(initClientRestTemplate);
+		
+		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
 		String requestUrl = config.getOAuthUrl();

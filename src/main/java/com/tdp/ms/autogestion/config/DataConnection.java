@@ -26,10 +26,10 @@ public class DataConnection {
 //		this.username = "user_averia";
 //		this.password = SecurityUtil.decrypt("LJ93AUKHW6P9uYaupkaZEw==");
 		// Prod
-		this.url = "jdbc:postgresql://6de706f1-ed6b-41c3-9714-d84afa6c2726.974550db55eb4ec0983f023940bf637f.databases.appdomain.cloud:31164/ibmclouddb";
-		this.driverclassname = "org.postgresql.Driver";
-		this.username = "user_averia";
-		this.password = SecurityUtil.decrypt("LJ93AUKHW6P9uYaupkaZEw==");
+//		this.url = "jdbc:postgresql://6de706f1-ed6b-41c3-9714-d84afa6c2726.974550db55eb4ec0983f023940bf637f.databases.appdomain.cloud:31164/ibmclouddb";
+//		this.driverclassname = "org.postgresql.Driver";
+//		this.username = "user_averia";
+//		this.password = SecurityUtil.decrypt("LJ93AUKHW6P9uYaupkaZEw==");
 	}
 
 	public DataConnection(String driverclassname, String url, String username, String password) {

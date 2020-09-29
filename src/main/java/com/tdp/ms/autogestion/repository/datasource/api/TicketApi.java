@@ -40,14 +40,15 @@ public class TicketApi {
 	@Autowired
 	private FunctionsUtil functionsUtil;
 
-	@Autowired
-	private HttpComponentsClientHttpRequestFactory initClientRestTemplate;
+	//@Autowired
+	//private HttpComponentsClientHttpRequestFactory initClientRestTemplate;
 
-	@Autowired
-	private RestTemplate restTemplate;
+	//@Autowired
+	//private RestTemplate restTemplate;
 
 	public Ticket generate(OAuth pOAuth, Ticket pTicket) {
-		restTemplate.setRequestFactory(initClientRestTemplate);
+		//restTemplate.setRequestFactory(initClientRestTemplate);
+		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
 		String requestUrl = config.getCreateTicket();
