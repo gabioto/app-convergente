@@ -144,9 +144,7 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 			ResponseEntity<TicketStatusResponse> ticketStatusResponse = new ResponseEntity<>(
 					TicketStatusResponse.from(ticket, ticketRepository.getAdditionalData(ticket)), HttpStatus.OK);
 
-			functionsUtil.saveLogData(new LogData(ticket.getIdTriage(), ticket.getCustomer().getNationalId(),
-					ticket.getCustomer().getNationalType(), "Retrieve Ticket", "retrieveTicket",
-					ticket.getIdTriage().toString(), ticketStatusResponse.toString(), "Retrieve Ticket"));
+			saveLog(ticket, ticketStatusResponse.toString());
 
 			return ticketStatusResponse;
 		} else {
@@ -155,15 +153,11 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 				ResponseEntity<TicketStatusResponse> ticketStatusResponse = new ResponseEntity<>(
 						new TicketStatusResponse(), HttpStatus.OK);
 
-				functionsUtil.saveLogData(new LogData(ticket.getIdTriage(), ticket.getCustomer().getNationalId(),
-						ticket.getCustomer().getNationalType(), "Retrieve Ticket", "retrieveTicket",
-						ticket.getIdTriage().toString(), ticketStatusResponse.toString(), "Retrieve Ticket"));
+				saveLog(ticket, ticketStatusResponse.toString());
 
 				return ticketStatusResponse;
 			} else {
-				functionsUtil.saveLogData(new LogData(ticket.getIdTriage(), ticket.getCustomer().getNationalId(),
-						ticket.getCustomer().getNationalType(), "Retrieve Ticket", "retrieveTicket",
-						ticket.getIdTriage().toString(), "User can´t create more tickets", "Retrieve Ticket"));
+				saveLog(ticket, "User can´t create more tickets");
 
 				throw new ForbiddenException("User can´t create more tickets");
 			}
@@ -193,5 +187,11 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 				&& !ticket.getTicketStatus().equalsIgnoreCase(TicketStatus.WA_SOLVED.name())
 				&& !ticket.getTicketStatus().equalsIgnoreCase(TicketStatus.FAULT_SOLVED.name())
 				&& !ticket.getTicketStatus().equalsIgnoreCase(TicketStatus.GENERIC_SOLVED.name());
+	}
+
+	private void saveLog(Ticket ticket, String message) {
+		functionsUtil.saveLogData(new LogData(ticket.getIdTriage(), ticket.getCustomer().getNationalId(),
+				ticket.getCustomer().getNationalType(), "Retrieve Ticket", "retrieveTicket",
+				ticket.getIdTriage().toString(), message, "Retrieve Ticket"));
 	}
 }

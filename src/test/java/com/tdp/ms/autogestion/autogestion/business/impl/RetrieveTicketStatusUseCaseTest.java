@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
@@ -27,8 +28,11 @@ import com.tdp.ms.autogestion.business.impl.RetrieveTicketStatusUseCaseImpl;
 import com.tdp.ms.autogestion.exception.ResourceNotFoundException;
 import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
 import com.tdp.ms.autogestion.model.AdditionalData;
+import com.tdp.ms.autogestion.model.Customer;
+import com.tdp.ms.autogestion.model.LogData;
 import com.tdp.ms.autogestion.model.Ticket;
 import com.tdp.ms.autogestion.repository.TicketRepository;
+import com.tdp.ms.autogestion.util.FunctionsUtil;
 
 @ExtendWith(MockitoExtension.class)
 public class RetrieveTicketStatusUseCaseTest {
@@ -38,6 +42,9 @@ public class RetrieveTicketStatusUseCaseTest {
 
 	@Mock
 	private TicketRepository ticketRepository;
+
+	@Mock
+	private FunctionsUtil functionsUtil;
 
 	private static Map<String, TicketStatusResponse> ticketResponseMap = new HashMap<>();
 	private static List<AdditionalData> lstAdditionalData = new ArrayList<AdditionalData>();
@@ -59,6 +66,7 @@ public class RetrieveTicketStatusUseCaseTest {
 		ticket.setStatusChangeDate(actualDate);
 		ticket.setStatus("WHATSAPP");
 		ticket.setModifiedDateTicket(actualDate);
+		ticket.setCustomer(new Customer("DNI", "10101010", "545454"));
 
 		AdditionalData additionalData = new AdditionalData();
 		additionalData.setKey("STATUS");
@@ -68,7 +76,7 @@ public class RetrieveTicketStatusUseCaseTest {
 		ticket.setAdditionalData(lstAdditionalData);
 
 		lstTicket.add(ticket);
-		
+
 		lstTwoTickets.add(ticket);
 		lstTwoTickets.add(ticket);
 	}
@@ -77,17 +85,19 @@ public class RetrieveTicketStatusUseCaseTest {
 	void retrieveTicketStatus_complete() throws Exception {
 		retrieveTicketStatusComplete();
 	}
-	
+
 	@Test
 	void retrieveTicketStatus_completeMoreTickets() throws Exception {
 		lstTicket.add(ticket);
 		retrieveTicketStatusComplete();
 	}
-	
+
 	private void retrieveTicketStatusComplete() {
 		when(ticketRepository.getTicketStatus(anyInt())).thenReturn(lstTicket);
 
 		when(ticketRepository.getAdditionalData(any(Ticket.class))).thenReturn(lstAdditionalData);
+
+		doNothing().when(functionsUtil).saveLogData(any(LogData.class));
 
 		ResponseEntity<TicketStatusResponse> ticketResponse = retrieveTicketStatusUseCase
 				.retrieveTicketStatus(19406198);

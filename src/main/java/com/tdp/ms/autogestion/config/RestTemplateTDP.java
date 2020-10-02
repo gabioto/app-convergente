@@ -1,4 +1,4 @@
-package com.tdp.ms.autogestion.util;
+package com.tdp.ms.autogestion.config;
 
 import java.io.File;
 import java.io.FileInputStream;

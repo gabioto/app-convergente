@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
@@ -27,14 +28,19 @@ import com.tdp.ms.autogestion.business.impl.RetrieveTicketsUseCaseImpl;
 import com.tdp.ms.autogestion.exception.ForbiddenException;
 import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
 import com.tdp.ms.autogestion.model.Customer;
+import com.tdp.ms.autogestion.model.LogData;
 import com.tdp.ms.autogestion.model.Ticket;
 import com.tdp.ms.autogestion.repository.TicketRepository;
+import com.tdp.ms.autogestion.util.FunctionsUtil;
 
 @ExtendWith(MockitoExtension.class)
 public class RetrieveTicketsUseCaseTest {
 
 	@InjectMocks
 	private RetrieveTicketsUseCaseImpl retrieveTicketsUseCase;
+
+	@Mock
+	private FunctionsUtil functionsUtil;
 
 	@Mock
 	private TicketRepository ticketRepository;
@@ -44,7 +50,7 @@ public class RetrieveTicketsUseCaseTest {
 	private static List<Ticket> solvedTwoTickets = new ArrayList<>();
 	private static List<Ticket> completeTrackTickets = new ArrayList<>();
 	private static List<Ticket> completeTrackTwoTickets = new ArrayList<>();
-	
+
 	private static Ticket pendingTicket, anotherPendingTicket, solvedTicket, waSolvedTicket;
 
 	@BeforeAll
@@ -80,7 +86,7 @@ public class RetrieveTicketsUseCaseTest {
 
 		solvedTwoTickets.add(solvedTicket);
 		solvedTwoTickets.add(waSolvedTicket);
-		
+
 		completeTrackTwoTickets.add(pendingTicket);
 		completeTrackTwoTickets.add(solvedTicket);
 		completeTrackTwoTickets.add(anotherPendingTicket);
@@ -95,6 +101,8 @@ public class RetrieveTicketsUseCaseTest {
 
 		when(ticketRepository.findByCustomerAndUseCasePast(anyString(), anyString(), anyString(), anyString()))
 				.thenReturn(new ArrayList<>());
+
+		doNothing().when(functionsUtil).saveLogData(any(LogData.class));
 
 		ResponseEntity<TicketStatusResponse> response = retrieveTicketsUseCase.pendingTicket("CMS", "broadband",
 				"10400884", "DNI", "70981983");
@@ -112,6 +120,8 @@ public class RetrieveTicketsUseCaseTest {
 
 		when(ticketRepository.getAdditionalData(any(Ticket.class))).thenReturn(new ArrayList<>());
 
+		doNothing().when(functionsUtil).saveLogData(any(LogData.class));
+
 		ResponseEntity<TicketStatusResponse> response = retrieveTicketsUseCase.pendingTicket("CMS", "broadband",
 				"10400884", "DNI", "70981983");
 
@@ -128,6 +138,8 @@ public class RetrieveTicketsUseCaseTest {
 
 		when(ticketRepository.getTicket(anyInt())).thenReturn(solvedTicket);
 
+		doNothing().when(functionsUtil).saveLogData(any(LogData.class));
+
 		ResponseEntity<TicketStatusResponse> response = retrieveTicketsUseCase.pendingTicket("CMS", "broadband",
 				"10400884", "DNI", "70981983");
 
@@ -142,6 +154,8 @@ public class RetrieveTicketsUseCaseTest {
 				any(LocalDateTime.class), any(LocalDateTime.class))).thenReturn(solvedTwoTickets);
 
 		when(ticketRepository.getTicket(anyInt())).thenReturn(waSolvedTicket);
+
+		doNothing().when(functionsUtil).saveLogData(any(LogData.class));
 
 		ForbiddenException ex = assertThrows(ForbiddenException.class, () -> {
 			retrieveTicketsUseCase.pendingTicket("CMS", "broadband", "10400884", "DNI", "70981983");
@@ -158,13 +172,15 @@ public class RetrieveTicketsUseCaseTest {
 
 		when(ticketRepository.getTicket(anyInt())).thenReturn(solvedTicket);
 
+		doNothing().when(functionsUtil).saveLogData(any(LogData.class));
+
 		ResponseEntity<TicketStatusResponse> response = retrieveTicketsUseCase.pendingTicket("CMS", "broadband",
 				"10400884", "DNI", "70981983");
 
 		assertEquals(response.getStatusCode(), HttpStatus.OK);
 		assertNull(response.getBody().getTicketId());
 	}
-	
+
 	@Test
 	void getPendingTicket_completeTrackTwoTickets() {
 
@@ -172,6 +188,8 @@ public class RetrieveTicketsUseCaseTest {
 				any(LocalDateTime.class), any(LocalDateTime.class))).thenReturn(completeTrackTwoTickets);
 
 		when(ticketRepository.getTicket(anyInt())).thenReturn(waSolvedTicket);
+
+		doNothing().when(functionsUtil).saveLogData(any(LogData.class));
 
 		ForbiddenException ex = assertThrows(ForbiddenException.class, () -> {
 			retrieveTicketsUseCase.pendingTicket("CMS", "broadband", "10400884", "DNI", "70981983");
@@ -218,10 +236,10 @@ public class RetrieveTicketsUseCaseTest {
 		assertEquals(response.getStatusCode(), HttpStatus.OK);
 		assertNull(response.getBody().getTicketId());
 	}
-	
+
 	@Test
 	void getPendingTicket_completePastTrackTwoTickets() {
-		
+
 		when(ticketRepository.findByCustomerAndUseCase(anyString(), anyString(), anyString(), anyString(),
 				any(LocalDateTime.class), any(LocalDateTime.class))).thenReturn(new ArrayList<>());
 
