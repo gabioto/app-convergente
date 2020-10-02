@@ -69,8 +69,8 @@ public class KafkaController {
 	private String status = TicketStatus.IN_PROGRESS.name();
 	private Boolean indicatorReset = false;
 
-	@Transactional
-	@KafkaListener(topics = "${app.topic.foo}")
+	//@Transactional
+	//@KafkaListener(topics = "${app.topic.foo}")
 	public void listen(@Payload String message) {
 		LOG.info("Receiver.listen()  ==>  queue-notification-tickets");
 		LOG.info(message);

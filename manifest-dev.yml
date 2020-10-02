@@ -7,3 +7,8 @@ applications:
     health-check-type: process
     disk_quota: 2GB
     instances: 1
+    env:
+      TDP_DRIVERCLASSNAME: org.postgresql.Driver
+      TDP_URL: jdbc:postgresql://sl-us-south-1-portal.54.dblayer.com:23239/compose
+      TDP_USERNAME: admin
+      TDP_PASSWORD: GNTVLIQEAIPDVGTT
