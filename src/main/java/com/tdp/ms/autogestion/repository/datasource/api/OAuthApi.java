@@ -11,6 +11,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -20,11 +21,10 @@ import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.Gson;
 import com.tdp.ms.autogestion.config.PropertiesConfig;
+import com.tdp.ms.autogestion.exception.ErrorCategory;
+import com.tdp.ms.autogestion.exception.ExternalServerException;
 import com.tdp.ms.autogestion.model.OAuth;
 import com.tdp.ms.autogestion.repository.datasource.api.entities.OAuthApiResponse;
-import com.tdp.ms.autogestion.util.SSLClientFactory;
-import com.tdp.ms.autogestion.util.SSLClientFactory.HttpClientType;
-
 
 @Component
 public class OAuthApi {
@@ -35,9 +35,14 @@ public class OAuthApi {
 	@Autowired
 	private PropertiesConfig config;
 
+	@Autowired
+	private HttpComponentsClientHttpRequestFactory initClientRestTemplate;
+
+	@Autowired
+	private RestTemplate restTemplate;
+
 	public OAuth generate(OAuth pOAuth) throws Exception, HttpClientErrorException {
-		RestTemplate restTemplate = new RestTemplate(
-				SSLClientFactory.getClientHttpRequestFactory(HttpClientType.OkHttpClient));
+		restTemplate.setRequestFactory(initClientRestTemplate);
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
 		String requestUrl = config.getOAuthUrl();
@@ -61,24 +66,20 @@ public class OAuthApi {
 
 			OAuthApiResponse authResponse = response.getBody();
 
-			System.out.println(new Gson().toJson(authResponse));
+			log.info(new Gson().toJson(authResponse));
 
 			if (authResponse != null && response.getStatusCode().equals(HttpStatus.OK)) {
 				authResponse.setConsentedOn(String.valueOf(new Date().getTime() / 1000));
-
 				return authResponse.fromThis();
 			} else {
-				System.out.println(" getFromService body: else ");
-				throw new Exception("Error when get OAuth response");
+				throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Error when get OAuth response");
 			}
 		} catch (HttpClientErrorException e) {
-			System.out.println(TAG + " Exception: " + e.getMessage());
-			log.info(TAG + " Exception: " + e.getMessage());
-			log.info(TAG + " Exception: " + e.getResponseBodyAsString());
-			throw e;
+			log.info(TAG + e.getMessage());
+			log.info(TAG + e.getResponseBodyAsString());
+			throw new ExternalServerException(ErrorCategory.EXTERNAL_ERROR, e.getLocalizedMessage());
 		} catch (Exception e) {
-			System.out.println(TAG + " Exception: " + e.getMessage());
-			log.info(TAG + " Exception: " + e.getMessage());
+			log.info(TAG + e.getMessage());
 			throw e;
 		}
 	}

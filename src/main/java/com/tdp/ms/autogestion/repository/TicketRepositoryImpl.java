@@ -33,6 +33,7 @@ import com.tdp.ms.autogestion.repository.datasource.db.entities.TblEquivalence;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblEquivalenceNotification;
 import com.tdp.ms.autogestion.repository.datasource.db.entities.TblTicket;
 import com.tdp.ms.autogestion.util.Constants;
+import com.tdp.ms.autogestion.util.StringUtil;
 
 @Repository
 public class TicketRepositoryImpl implements TicketRepository {
@@ -145,7 +146,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 		return optAdditionalData.isPresent() ? TblAttachmentAdditionalData.listFromThis(optAdditionalData.get())
 				: new ArrayList<>();
 	}
-	
+
 	@Override
 	public List<Equivalence> getAttachmentEquivalence(Integer ticketId) {
 		Optional<List<TblEquivalence>> optEquivalence = jpaEquivalenceRepository.getEquivalence(ticketId);
@@ -170,10 +171,10 @@ public class TicketRepositoryImpl implements TicketRepository {
 		lstClientData.add(clientData);
 
 		// Validaciones de attachments
-		lstClientData = fillAttachmentsTicket(ticket, lstClientData, clientData);
+		lstClientData = fillAttachmentsTicket(ticket, lstClientData);
 
 		// Validaciones de notificationId
-		lstClientData = fillNotificationTicket(ticket, lstClientData, clientData);
+		lstClientData = fillNotificationTicket(ticket, lstClientData);
 
 		return lstClientData;
 	}
@@ -190,135 +191,177 @@ public class TicketRepositoryImpl implements TicketRepository {
 		}
 	}
 
-	private List<AdditionalData> fillAttachmentsTicket(Ticket ticket, List<AdditionalData> lstClientData,
-			AdditionalData clientData) {
+	private List<AdditionalData> fillAttachmentsTicket(Ticket ticket, List<AdditionalData> lstClientData) {
 
 		List<Attachment> attachments = ticket.getAttachments();
 
 		if (attachments != null && attachments.size() > 0) {
 			String result = "";
+
 			for (Attachment attachment : attachments) {
 				// Estado Comercial Linea Fija e Internet
-				if (attachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-info-telefono")) {
-					List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(), "estado-linea");
-					for (AdditionalData attachAddData : attachAddDataList) {
-						Boolean check = Boolean.FALSE;
-						if (attachAddData.getValue().equals("active")) {
-							check = Boolean.TRUE;
-						}
-						result += attachment.getNameAttachment().concat(";").concat(check.toString()).concat(",");
-					}
-				}
-				
-				// Sin Deuda Pendiente
-				if (attachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-deuda-amdocs")
-						|| attachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-deuda-cms")
-						|| attachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-deuda-atis")) {
+				result = getCommercialStatus(attachment, result);
 
-					List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(), "monto");
-					for (AdditionalData attachAddData : attachAddDataList) {
-						if (!attachAddData.getValue().equals("") && !attachAddData.getValue().equals("0")) {
-							clientData = new AdditionalData();
-							clientData.setKey(Constants.LABEL_MONTO);
-							clientData.setValue(attachAddData.getValue());
-							lstClientData.add(clientData);
-							
-							result += attachment.getNameAttachment().concat(";").concat(Boolean.FALSE.toString()).concat(",");
-						} else {
-							result += attachment.getNameAttachment().concat(";").concat(Boolean.TRUE.toString()).concat(",");
-						}
-					}
-				}
+				// Sin Deuda Pendiente
+				result = getNoDebt(attachment, result, lstClientData);
 
 				// Sin Orden de Reconexión
-				if (attachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-reconexion-pendiente-amdocs")
-						|| attachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-reconexion-pendiente-cms")
-						|| attachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-reconexion-pendiente-atis-hfc")
-						|| attachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-reconexion-pendiente-atis-adsl")) {
-					
-					List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(), "tiene-reconexion-pendiente");
-					for (AdditionalData attachAddData : attachAddDataList) {
-						Boolean check = Boolean.TRUE;
-						if (attachAddData.getValue().equals("SI")) {
-							check = Boolean.FALSE;
-						}
-						result += attachment.getNameAttachment().concat(";").concat(check.toString()).concat(",");
-					}					
-				}
-				
-				// Ninguna Avería Pendiente
-				if (attachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-amdocs")
-						|| attachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-cms")
-						|| attachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-gestel")) {
+				result = getNoOrder(attachment, result);
 
-					Boolean existe = Boolean.FALSE;
-					List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(), "codigo-averia");
-					for (AdditionalData attachAddData : attachAddDataList) {
-						if (!attachAddData.getValue().equals("")) {
-							clientData = new AdditionalData();
-							clientData.setKey(Constants.LABEL_COD_AVERIA);
-							clientData.setValue(attachAddData.getValue());
-							lstClientData.add(clientData);
-							result += attachment.getNameAttachment().concat(";").concat(Boolean.FALSE.toString()).concat(",");
-						} else {
-							result += attachment.getNameAttachment().concat(";").concat(Boolean.TRUE.toString()).concat(",");
-						}
-						existe = Boolean.TRUE;
-					}
-					if (!existe) {
-						result += attachment.getNameAttachment().concat(";").concat(Boolean.TRUE.toString()).concat(",");
-					}
-				}
-				
+				// Ninguna Avería Pendiente
+				result = getNoFaults(attachment, result, lstClientData);
+
 				// Problemas técnicos
-				if (attachment.getNameAttachment().equals("RecomendacionesDespachoHFC[{}]realiza-sincronizacion-iwy2")
-						|| attachment.getNameAttachment().equals("RecomendacionesDespachoHFC[{}]realiza-sincronizacion-multiconsulta")
-						|| attachment.getNameAttachment().equals("RecomendacionesDespachoHFC[{}]realiza-reset-modem-iwy2")
-						|| attachment.getNameAttachment().equals("RecomendacionesDespachoHFC[{}]realiza-sincronizacion-iwy2-despues-reset-modem")) {
-					
-					List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(), "estado-reset-modem-ok");
-					for (AdditionalData attachAddData : attachAddDataList) {
-						Boolean check = Boolean.TRUE;
-						if (attachAddData.getValue().equals("SI")) {
-							check = Boolean.FALSE;
-						}
-						result += attachment.getNameAttachment().concat(";").concat(check.toString()).concat(",");
-					}					
-				}				
+				result = getTechTroubles(attachment, result);
 			}
 
 			// Equivalencias de Attachments
-			List<Equivalence> equivalenceList = getAttachmentEquivalence(ticket.getId());
-			int index = 1;
-
-			String[] list = result.split(",");
-			
-			for (Equivalence equivalence : equivalenceList) {
-				String success = "";
-				for (int indice=0; indice<list.length; indice++) {
-					String[] value = list[indice].split(";"); 					
-					if (value[0].equals(equivalence.getAttachmentName())) {
-						success = value[1]; 
-					}
-				}				
-				clientData = new AdditionalData();
-				clientData.setKey(Constants.LABEL_FRONT_END.concat(String.valueOf(index)));
-				clientData.setValue(equivalence.getNameEquivalence());
-				clientData.setCheck(success);
-				lstClientData.add(clientData);
-				
-				index++;
-			}
+			attachEquivalence(result, lstClientData, ticket);
 		}
 
 		return lstClientData;
 	}
 
-	private List<AdditionalData> fillNotificationTicket(Ticket ticket, List<AdditionalData> lstClientData,
-			AdditionalData clientData) {
+	private String getCommercialStatus(Attachment attachment, String result) {
+		if (attachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-info-telefono")) {
+			List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(), "estado-linea");
+			for (AdditionalData attachAddData : attachAddDataList) {
+				Boolean check = Boolean.FALSE;
+				if (attachAddData.getValue().equals("active")) {
+					check = Boolean.TRUE;
+				}
+				result += attachment.getNameAttachment().concat(";").concat(check.toString()).concat(",");
+			}
+		}
 
+		return result;
+	}
+
+	private String getNoDebt(Attachment attachment, String result, List<AdditionalData> lstClientData) {
+		if (attachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-deuda-amdocs")
+				|| attachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-deuda-cms")
+				|| attachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-deuda-atis")) {
+
+			List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(), "monto");
+			for (AdditionalData attachAddData : attachAddDataList) {
+				if (!attachAddData.getValue().equals("") && !attachAddData.getValue().equals("0")) {
+					AdditionalData clientData = new AdditionalData();
+					clientData.setKey(Constants.LABEL_MONTO);
+					clientData.setValue(attachAddData.getValue());
+					lstClientData.add(clientData);
+
+					result += attachment.getNameAttachment().concat(";").concat(Boolean.FALSE.toString()).concat(",");
+				} else {
+					result += attachment.getNameAttachment().concat(";").concat(Boolean.TRUE.toString()).concat(",");
+				}
+			}
+		}
+
+		return result;
+	}
+
+	private String getNoOrder(Attachment attachment, String result) {
+		if (attachment.getNameAttachment()
+				.equals("ValidacionesInicialesInternet[{}]recupera-reconexion-pendiente-amdocs")
+				|| attachment.getNameAttachment()
+						.equals("ValidacionesInicialesInternet[{}]recupera-reconexion-pendiente-cms")
+				|| attachment.getNameAttachment()
+						.equals("ValidacionesInicialesInternet[{}]recupera-reconexion-pendiente-atis-hfc")
+				|| attachment.getNameAttachment()
+						.equals("ValidacionesInicialesInternet[{}]recupera-reconexion-pendiente-atis-adsl")) {
+
+			List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(),
+					"tiene-reconexion-pendiente");
+			for (AdditionalData attachAddData : attachAddDataList) {
+				Boolean check = Boolean.TRUE;
+				if (attachAddData.getValue().equals("SI")) {
+					check = Boolean.FALSE;
+				}
+				result += attachment.getNameAttachment().concat(";").concat(check.toString()).concat(",");
+			}
+		}
+
+		return result;
+	}
+
+	private String getNoFaults(Attachment attachment, String result, List<AdditionalData> lstClientData) {
+		if (attachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-amdocs")
+				|| attachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-cms")
+				|| attachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-gestel")) {
+
+			Boolean indicador = Boolean.FALSE;
+			List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(), "codigo-averia");
+			for (AdditionalData attachAddData : attachAddDataList) {
+				if (!attachAddData.getValue().equals("")) {
+					AdditionalData clientData = new AdditionalData();
+					clientData.setKey(Constants.LABEL_COD_AVERIA);
+					clientData.setValue(attachAddData.getValue());
+					lstClientData.add(clientData);
+					result += attachment.getNameAttachment().concat(";").concat(Boolean.FALSE.toString()).concat(",");
+				} else {
+					result += attachment.getNameAttachment().concat(";").concat(Boolean.TRUE.toString()).concat(",");
+				}
+				indicador = Boolean.TRUE;
+			}
+			if (!indicador) {
+				result += attachment.getNameAttachment().concat(";").concat(Boolean.TRUE.toString()).concat(",");
+			}
+		}
+
+		return result;
+	}
+
+	private String getTechTroubles(Attachment attachment, String result) {
+		if (attachment.getNameAttachment().equals("RecomendacionesDespachoHFC[{}]realiza-sincronizacion-iwy2")
+				|| attachment.getNameAttachment()
+						.equals("RecomendacionesDespachoHFC[{}]realiza-sincronizacion-multiconsulta")
+				|| attachment.getNameAttachment().equals("RecomendacionesDespachoHFC[{}]realiza-reset-modem-iwy2")
+				|| attachment.getNameAttachment()
+						.equals("RecomendacionesDespachoHFC[{}]realiza-sincronizacion-iwy2-despues-reset-modem")) {
+
+			List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(), "estado-reset-modem-ok");
+			for (AdditionalData attachAddData : attachAddDataList) {
+				Boolean check = Boolean.TRUE;
+				if (attachAddData.getValue().equals("SI")) {
+					check = Boolean.FALSE;
+				}
+				result += attachment.getNameAttachment().concat(";").concat(check.toString()).concat(",");
+			}
+		}
+
+		return result;
+	}
+
+	private void attachEquivalence(String result, List<AdditionalData> lstClientData, Ticket ticket) {
+		List<Equivalence> equivalenceList = getAttachmentEquivalence(ticket.getId());
+		int index = 1;
+
+		String[] list = result.split(",");
+
+		for (Equivalence equivalence : equivalenceList) {
+			String success = "false";
+			for (int indice = 0; indice < list.length; indice++) {
+				String[] value = list[indice].split(";");
+				if (value[0].equals(equivalence.getAttachmentName())) {
+					success = value[1];
+				}
+			}
+
+			AdditionalData clientData = new AdditionalData();
+			clientData.setKey(Constants.LABEL_FRONT_END.concat(String.valueOf(index)));
+			clientData.setValue(equivalence.getNameEquivalence());
+			clientData.setCheck(success);
+			lstClientData.add(clientData);
+
+			index++;
+		}
+	}
+
+	private List<AdditionalData> fillNotificationTicket(Ticket ticket, List<AdditionalData> lstClientData) {
+		AdditionalData clientData = null;
 		List<AdditionalData> lstAdditionalData = ticket.getAdditionalData();
-		if (lstAdditionalData != null && lstAdditionalData.size() > 0) {
+
+		if (lstAdditionalData != null) {
 			for (AdditionalData additionalData : lstAdditionalData) {
 				if (additionalData.getKey().equals("notification-id")) {
 					EquivalenceNotification equivalence = getNotificationEquivalence(additionalData.getValue());
@@ -326,47 +369,42 @@ public class TicketRepositoryImpl implements TicketRepository {
 					if (equivalence != null) {
 						clientData = new AdditionalData();
 						clientData.setKey(Constants.LABEL_ACTION);
-						clientData.setValue(equivalence.getAction() != null ? equivalence.getAction() : "");
+						clientData.setValue(StringUtil.validateEmptyField(equivalence.getAction()));
 						lstClientData.add(clientData);
 
 						clientData = new AdditionalData();
 						clientData.setKey(Constants.LABEL_TITLE);
-						clientData.setValue(equivalence.getTitle() != null ? equivalence.getTitle() : "");
+						clientData.setValue(StringUtil.validateEmptyField(equivalence.getTitle()));
 						lstClientData.add(clientData);
-
-						/*clientData = new ClientData();
-						clientData.setKey(Constants.LABEL_TITLE_DESC);
-						clientData.setValue(equivalence.getDescription() != null ? equivalence.getDescription() : "");
-						lstClientData.add(clientData);*/
 
 						clientData = new AdditionalData();
 						clientData.setKey(Constants.LABEL_BODY);
-						clientData.setValue(equivalence.getBody() != null ? equivalence.getBody() : "");
+						clientData.setValue(StringUtil.validateEmptyField(equivalence.getBody()));
 						lstClientData.add(clientData);
 
 						clientData = new AdditionalData();
 						clientData.setKey(Constants.LABEL_FOOTER);
-						clientData.setValue(equivalence.getFooter() != null ? equivalence.getFooter() : "");
+						clientData.setValue(StringUtil.validateEmptyField(equivalence.getFooter()));
 						lstClientData.add(clientData);
 
 						clientData = new AdditionalData();
 						clientData.setKey(Constants.LABEL_ICON);
-						clientData.setValue(equivalence.getIcon() != null ? equivalence.getIcon() : "");
+						clientData.setValue(StringUtil.validateEmptyField(equivalence.getIcon()));
 						lstClientData.add(clientData);
 
 						clientData = new AdditionalData();
 						clientData.setKey(Constants.LABEL_BUTTON);
-						clientData.setValue(equivalence.getButton() != null ? equivalence.getButton() : "");
+						clientData.setValue(StringUtil.validateEmptyField(equivalence.getButton()));
 						lstClientData.add(clientData);
 
 						clientData = new AdditionalData();
 						clientData.setKey(Constants.LABEL_IMAGE);
-						clientData.setValue(equivalence.getImage() != null ? equivalence.getImage() : "");
+						clientData.setValue(StringUtil.validateEmptyField(equivalence.getImage()));
 						lstClientData.add(clientData);
 
 						clientData = new AdditionalData();
 						clientData.setKey(Constants.LABEL_ACTION_BUTTON);
-						clientData.setValue(equivalence.getActionbutton() != null ? equivalence.getActionbutton() : "");
+						clientData.setValue(StringUtil.validateEmptyField(equivalence.getActionbutton()));
 						lstClientData.add(clientData);
 					}
 				}
@@ -375,4 +413,5 @@ public class TicketRepositoryImpl implements TicketRepository {
 
 		return lstClientData;
 	}
+
 }

@@ -46,6 +46,7 @@ public class TblStatusHistory implements Serializable {
 	private TblTicket tblTicket;
 
 	public TblStatusHistory() {
+		// Constructor without fields
 	}
 
 	public Integer getIdStatusHistory() {

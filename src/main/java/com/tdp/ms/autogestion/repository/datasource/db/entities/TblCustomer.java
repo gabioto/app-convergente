@@ -30,6 +30,7 @@ public class TblCustomer implements Serializable {
 	private List<TblTicket> tblTickets;
 
 	public TblCustomer() {
+		// Constructor without fields
 	}
 
 	public TblCustomerPK getId() {

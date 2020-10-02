@@ -49,7 +49,7 @@ public class TblLogData implements Serializable {
 	private String actionLog;
 
 	public TblLogData() {
-
+		// Constructor without fields
 	}
 
 	public Integer getIdLogData() {

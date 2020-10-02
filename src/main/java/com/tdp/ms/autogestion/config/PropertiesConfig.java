@@ -3,9 +3,7 @@ package com.tdp.ms.autogestion.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
@@ -25,25 +23,24 @@ import lombok.NoArgsConstructor;
  *         </ul>
  * @version 1.0
  */
-@Data
+
 @NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@Getter
 @Component
 public class PropertiesConfig {
-	
+
 	@Value("${app.oauth.url}")
 	String oAuthUrl;
-	
+
 	@Value("${app.oauth.client}")
 	String oAuthClient;
-	
+
 	@Value("${app.ticket.create}")
 	String createTicket;
-	
+
 	@Value("${app.ticket.retrieve}")
 	String retrieveTicket;
-	
+
 	@Value("${app.ticket.client}")
 	String clientTicket;
 }
