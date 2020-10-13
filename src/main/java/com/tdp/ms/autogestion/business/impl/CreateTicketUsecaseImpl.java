@@ -45,24 +45,12 @@ public class CreateTicketUsecaseImpl implements CreateTicketUseCase {
 
 			String productIdentifier = getAdditionalData(request.getAdditionalData(), "productIdentifier");
 
+			String useCase = getAdditionalData(request.getAdditionalData(), "useCase");
+			
 			ticket = request.fromThis();
 			ticket.setCustomer(new Customer(documentNumber, documentType, request.getRelatedObject().getReference()));
 			ticket.setTechnology(technology);
-
-			switch (request.getRelatedObject().getInvolvement()) {
-			case Constants.INTERNET:
-				ticket.setUseCaseId(Constants.USE_CASE);
-				break;
-			case Constants.FIJA:
-			case Constants.CABLE:
-			case Constants.MOVIL:
-				ticket.setUseCaseId("");
-				break;
-			default:
-				ticket.setUseCaseId("");
-				break;
-			}
-
+			ticket.setUseCaseId(useCase);			
 			ticket.setSubOperationCode(Constants.SUB_OPERATION_CODE);
 			ticket.setProductIdentifier(productIdentifier);
 
@@ -82,14 +70,8 @@ public class CreateTicketUsecaseImpl implements CreateTicketUseCase {
 	}
 
 	private String getAdditionalData(List<AdditionalData> data, String value) {
-//		if (!value.equals("technology")) {
-//			AdditionalData field = data.stream().filter(item -> value.equals(item.getKey())).findFirst().orElse(null);
-//			return field.getValue();
-//		} else {
 		AdditionalData field = data.stream().filter(item -> value.equals(item.getKey())).findFirst().orElse(null);
 		return (field != null) ? field.getValue() : "";
-//			}
-//		}
 	}
 
 }

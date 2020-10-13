@@ -6,12 +6,10 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
@@ -229,7 +227,6 @@ public class KafkaController {
 	}
 
 	private void setSolvedTicketStatus(TblAdditionalData tblAdditionalData, List<AdditionalData> additionalDataList) {
-
 		for (AdditionalData additionalData : additionalDataList) {
 			if (additionalData.getKey().equals("notification-id")) {
 				Optional<TblEquivalenceNotification> tblEquivalenceNotification = equivalenceNotificationRepository
@@ -258,7 +255,6 @@ public class KafkaController {
 		} else if (equivalence.getAction().equals(TicketStatus.FAULT_TRAZA.name())) {
 			return TicketStatus.FAULT_TRAZA.toString();
 		}
-
 		return "";
 	}
 

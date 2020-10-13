@@ -15,9 +15,9 @@ public class Constants {
 	public static final String LABEL_IMAGE = "IMAGE";
 	public static final String LABEL_BUTTON = "BUTTON";
 	public static final String LABEL_ACTION_BUTTON = "ACTION_BUTTON";
+	public static final String LABEL_WINDOW_ID = "WINDOW";
 	public static final String LABEL_MONTO = "MONTO";
-	public static final String LABEL_COD_AVERIA = "COD_AVERIA";
-	public static final String USE_CASE = "20000032";
+	public static final String LABEL_COD_AVERIA = "COD_AVERIA";		
 	public static final String SUB_OPERATION_CODE = "99";
 	public static final String INTERNET = "broadband";
 	public static final String FIJA = "landline";

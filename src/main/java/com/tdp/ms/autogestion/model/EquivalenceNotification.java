@@ -48,4 +48,8 @@ public class EquivalenceNotification {
 	private String image;
 
 	private String actionbutton;
+	
+	private String windows;
+	
+	private String usecase;
 }

@@ -48,6 +48,10 @@ public class TblEquivalenceNotification implements Serializable {
 	private String image;
 
 	private String actionbutton;
+	
+	private String windows;
+	
+	private String usecase;
 
 	public TblEquivalenceNotification() {
 		// Constructor without fields
@@ -141,9 +145,17 @@ public class TblEquivalenceNotification implements Serializable {
 		this.actionbutton = actionbutton;
 	}
 
+	public void setWindows(String windows) {
+		this.windows = windows;
+	}
+	
+	public String getWindows() {
+		return windows;
+	}
+	
 	public EquivalenceNotification fromThis() {
 		return new EquivalenceNotification(idEquivalenceNotification, code, description, action, title, body, footer,
-				icon, button, image, actionbutton);
+				icon, button, image, actionbutton, windows, usecase);
 	}
 
 	public static List<EquivalenceNotification> listFromThis(List<TblEquivalenceNotification> equiNotList) {

@@ -406,6 +406,11 @@ public class TicketRepositoryImpl implements TicketRepository {
 						clientData.setKey(Constants.LABEL_ACTION_BUTTON);
 						clientData.setValue(StringUtil.validateEmptyField(equivalence.getActionbutton()));
 						lstClientData.add(clientData);
+						
+						clientData = new AdditionalData();
+						clientData.setKey(Constants.LABEL_WINDOW_ID);
+						clientData.setValue(StringUtil.validateEmptyField(equivalence.getWindows()));
+						lstClientData.add(clientData);
 					}
 				}
 			}
