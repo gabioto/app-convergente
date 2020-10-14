@@ -8,6 +8,10 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class LogData{
+	
+	public LogData() {
+		// TODO Auto-generated constructor stub
+	}
 	private int idTicketTriaje;
 	private String documentNumber;
 	private String documentType;
