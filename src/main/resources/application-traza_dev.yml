@@ -9,17 +9,17 @@ spring:
           use_jdbc_metadata_defaults : false
         jdbc:
           batch_size: 5
-        default_schema: esqfcrautogestion
+        default_schema: public
     database-platform: org.hibernate.dialect.PostgreSQL9Dialect
   datasource:
     hikari:
       connectionTimeout: 30000
       maximumPoolSize: 100
       minimum-idle: 10
-    url: jdbc:postgresql://sl-us-south-1-portal.54.dblayer.com:23239/compose
-    username: admin
-    password: GNTVLIQEAIPDVGTT
-    driverClassName: org.postgresql.Driver
+#    url: jdbc:postgresql://sl-us-south-1-portal.54.dblayer.com:23239/compose
+#    username: admin
+#    password: GNTVLIQEAIPDVGTT
+#    driverClassName: org.postgresql.Driver
   kafka:
     bootstrap-servers: cap-sg-prd-1.securegateway.appdomain.cloud:18007 
     
