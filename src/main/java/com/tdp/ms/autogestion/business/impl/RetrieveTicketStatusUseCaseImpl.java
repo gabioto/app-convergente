@@ -9,8 +9,11 @@ import org.springframework.stereotype.Service;
 
 import com.tdp.ms.autogestion.business.RetrieveTicketStatusUseCase;
 import com.tdp.ms.autogestion.exception.DomainException;
+import com.tdp.ms.autogestion.exception.ErrorCategory;
+import com.tdp.ms.autogestion.exception.GenericDomainException;
 import com.tdp.ms.autogestion.exception.ResourceNotFoundException;
 import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
+import com.tdp.ms.autogestion.model.LogData;
 import com.tdp.ms.autogestion.model.Ticket;
 import com.tdp.ms.autogestion.repository.TicketRepository;
 import com.tdp.ms.autogestion.util.FunctionsUtil;
@@ -40,29 +43,27 @@ public class RetrieveTicketStatusUseCaseImpl implements RetrieveTicketStatusUseC
 
 	@Autowired
 	FunctionsUtil functionsUtil;
-	
-	@Override
-	public ResponseEntity<TicketStatusResponse> retrieveTicketStatus(String idTicket) {
 
+	@Override
+	public ResponseEntity<TicketStatusResponse> retrieveTicketStatus(int idTicket) throws GenericDomainException {
 		try {
-			List<Ticket> tickets = ticketRepository.getTicketStatus(Integer.parseInt(idTicket));
+			List<Ticket> tickets = ticketRepository.getTicketStatus(idTicket);
 			Ticket ticket = tickets.get(tickets.size() == 1 ? 0 : 1);
 
 			ResponseEntity<TicketStatusResponse> ticketStatusResponse = new ResponseEntity<>(
 					TicketStatusResponse.from(ticket, ticketRepository.getAdditionalData(ticket)), HttpStatus.OK);
 
-			functionsUtil.saveLogData(Integer.parseInt(idTicket),
-					ticket.getCustomer().getNationalId(),
-					ticket.getCustomer().getNationalType(), "Retrieve Ticket Status", "retrieveTicketStatus", idTicket, ticketStatusResponse.toString(),
-					"Retrieve Ticket Status");
-			
+			functionsUtil.saveLogData(new LogData(idTicket, ticket.getCustomer().getNationalId(),
+					ticket.getCustomer().getNationalType(), "Retrieve Ticket Status", "retrieveTicketStatus",
+					String.valueOf(idTicket), ticketStatusResponse.toString(), "Retrieve Ticket Status"));
+
 			return ticketStatusResponse;
 		} catch (ResourceNotFoundException e) {
 			throw e;
 		} catch (DomainException e) {
 			throw e;
-		} catch (Exception exception) {
-			throw exception;
+		} catch (Exception e) {
+			throw new GenericDomainException(ErrorCategory.UNEXPECTED, e.getLocalizedMessage());
 		}
 	}
 

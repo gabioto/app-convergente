@@ -2,6 +2,7 @@ package com.tdp.ms.autogestion.business;
 
 import org.springframework.http.ResponseEntity;
 
+import com.tdp.ms.autogestion.exception.GenericDomainException;
 import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
 
 /**
@@ -24,6 +25,6 @@ import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
 public interface RetrieveTicketsUseCase {
 
 	ResponseEntity<TicketStatusResponse> pendingTicket(String type, String involvement, String reference,
-			String nationalIdType, String nationalId);
+			String nationalIdType, String nationalId) throws GenericDomainException;
 
 }

@@ -15,9 +15,9 @@ public class Constants {
 	public static final String LABEL_IMAGE = "IMAGE";
 	public static final String LABEL_BUTTON = "BUTTON";
 	public static final String LABEL_ACTION_BUTTON = "ACTION_BUTTON";
+	public static final String LABEL_WINDOW_ID = "WINDOW";
 	public static final String LABEL_MONTO = "MONTO";
-	public static final String LABEL_COD_AVERIA = "COD_AVERIA";
-	public static final String USE_CASE = "20000032";
+	public static final String LABEL_COD_AVERIA = "COD_AVERIA";		
 	public static final String SUB_OPERATION_CODE = "99";
 	public static final String INTERNET = "broadband";
 	public static final String FIJA = "landline";
@@ -25,4 +25,13 @@ public class Constants {
 	public static final String MOVIL = "mobil";
 	public static final String SERVICE_CODE = "serviceCode";
 	public static final String PHONE = "phone";	
+	
+	// EXCEPTIONS
+	public static final String SVC0001 = "SVC0001";
+	public static final String SVC1000 = "SVC1000";
+	public static final String SVC1006 = "SVC1006";
+	public static final String SVR1000 = "SVR1000";
+	public static final String SVC1002 = "SVC1002";
+	
+	public static final String ERROR = "ERROR";
 }

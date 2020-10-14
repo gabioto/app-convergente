@@ -14,9 +14,12 @@ import org.springframework.stereotype.Service;
 
 import com.tdp.ms.autogestion.business.RetrieveTicketsUseCase;
 import com.tdp.ms.autogestion.exception.DomainException;
+import com.tdp.ms.autogestion.exception.ErrorCategory;
 import com.tdp.ms.autogestion.exception.ForbiddenException;
+import com.tdp.ms.autogestion.exception.GenericDomainException;
 import com.tdp.ms.autogestion.exception.ResourceNotFoundException;
 import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
+import com.tdp.ms.autogestion.model.LogData;
 import com.tdp.ms.autogestion.model.Ticket;
 import com.tdp.ms.autogestion.model.TicketStatus;
 import com.tdp.ms.autogestion.repository.TicketRepository;
@@ -50,10 +53,10 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 
 	@Autowired
 	FunctionsUtil functionsUtil;
-	
+
 	@Override
 	public ResponseEntity<TicketStatusResponse> pendingTicket(String type, String involvement, String reference,
-			String nationalIdType, String nationalId) {
+			String nationalIdType, String nationalId) throws GenericDomainException {
 
 		LocalDate today = LocalDate.now(ZoneOffset.of(Constants.ZONE_OFFSET));
 
@@ -76,14 +79,13 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 			if (listIds.size() > 0) {
 				return evaluatePastTicketStatus(listIds);
 			}
-			
-			ResponseEntity<TicketStatusResponse> ticketStatusResponse = new ResponseEntity<>(
-					new TicketStatusResponse(), HttpStatus.OK);
 
-			functionsUtil.saveLogData(0, nationalIdType,
-					nationalIdType, "Retrieve Ticket", "retrieveTicket",
-					"", ticketStatusResponse.toString(), "Retrieve Ticket");
-			
+			ResponseEntity<TicketStatusResponse> ticketStatusResponse = new ResponseEntity<>(new TicketStatusResponse(),
+					HttpStatus.OK);
+
+			functionsUtil.saveLogData(new LogData(0, nationalIdType, nationalIdType, "Retrieve Ticket",
+					"retrieveTicket", "", ticketStatusResponse.toString(), "Retrieve Ticket"));
+
 			return ticketStatusResponse;
 		} catch (ResourceNotFoundException e) {
 			throw e;
@@ -92,47 +94,42 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 		} catch (DomainException e) {
 			throw e;
 		} catch (Exception e) {
-			throw e;
+			throw new GenericDomainException(ErrorCategory.UNEXPECTED, e.getLocalizedMessage());
 		}
 	}
 
 	private List<Integer> getListIds(List<Ticket> tickets, boolean isToday) {
 		List<Integer> listIds = new ArrayList<Integer>();
 
-		if (tickets != null && tickets.size() > 0) {
+		if (tickets != null) {
 			String idTicketTriage = "";
 			int count = 0;
+
 			for (Ticket ticket : tickets) {
 				if (idTicketTriage.isEmpty()) {
 					idTicketTriage = ticket.getIdTriage().toString();
 					listIds.add(0, ticket.getId());
-
 					log.info("1 - Id Ticket Triaje (Dia Actual): " + idTicketTriage);
-				} else {
-					if (!idTicketTriage.equals(ticket.getIdTriage().toString())) {
-						idTicketTriage = ticket.getIdTriage().toString();
-						listIds.add(1, ticket.getId());
-						count = 2;
 
-						log.info("2 - Id Ticket Triaje (Dia Actual): " + idTicketTriage);
-					} else {
-						if (count == 0) {
-							idTicketTriage = ticket.getIdTriage().toString();
-							listIds.remove(0);
-							listIds.add(0, ticket.getId());
-							count++;
+				} else if (!idTicketTriage.equals(ticket.getIdTriage().toString())) {
+					idTicketTriage = ticket.getIdTriage().toString();
+					listIds.add(1, ticket.getId());
+					count = 2;
+					log.info("2 - Id Ticket Triaje (Dia Actual): " + idTicketTriage);
 
-							log.info("1 - Id Ticket Triaje Actualizado (Dia Actual): " + idTicketTriage);
-						}
-						if (isToday && count == 2) {
-							idTicketTriage = ticket.getIdTriage().toString();
-							listIds.remove(1);
-							listIds.add(1, ticket.getId());
-							count++;
+				} else if (count == 0) {
+					idTicketTriage = ticket.getIdTriage().toString();
+					listIds.remove(0);
+					listIds.add(0, ticket.getId());
+					count++;
+					log.info("1 - Id Ticket Triaje Actualizado (Dia Actual): " + idTicketTriage);
 
-							log.info("2 - Id Ticket Triaje Actualizado (Dia Actual): " + idTicketTriage);
-						}
-					}
+				} else if (isToday && count == 2) {
+					idTicketTriage = ticket.getIdTriage().toString();
+					listIds.remove(1);
+					listIds.add(1, ticket.getId());
+					count++;
+					log.info("2 - Id Ticket Triaje Actualizado (Dia Actual): " + idTicketTriage);
 				}
 			}
 		}
@@ -147,27 +144,20 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 			ResponseEntity<TicketStatusResponse> ticketStatusResponse = new ResponseEntity<>(
 					TicketStatusResponse.from(ticket, ticketRepository.getAdditionalData(ticket)), HttpStatus.OK);
 
-			functionsUtil.saveLogData(ticket.getIdTriage(), ticket.getCustomer().getNationalId(),
-					ticket.getCustomer().getNationalType(), "Retrieve Ticket", "retrieveTicket",
-					ticket.getIdTriage().toString(), ticketStatusResponse.toString(), "Retrieve Ticket");
+			saveLog(ticket, ticketStatusResponse.toString());
 
 			return ticketStatusResponse;
 		} else {
 			// Si tiene un ticket puede crear otro, en caso contrario no
-			// TODO: Validar si devuelve una excepción
 			if (listIds.size() == 1) {
 				ResponseEntity<TicketStatusResponse> ticketStatusResponse = new ResponseEntity<>(
 						new TicketStatusResponse(), HttpStatus.OK);
 
-				functionsUtil.saveLogData(ticket.getIdTriage(), ticket.getCustomer().getNationalId(),
-						ticket.getCustomer().getNationalType(), "Retrieve Ticket", "retrieveTicket",
-						ticket.getIdTriage().toString(), ticketStatusResponse.toString(), "Retrieve Ticket");
+				saveLog(ticket, ticketStatusResponse.toString());
 
 				return ticketStatusResponse;
 			} else {
-				functionsUtil.saveLogData(ticket.getIdTriage(), ticket.getCustomer().getNationalId(),
-						ticket.getCustomer().getNationalType(), "Retrieve Ticket", "retrieveTicket",
-						ticket.getIdTriage().toString(), "User can´t create more tickets", "Retrieve Ticket");
+				saveLog(ticket, "User can´t create more tickets");
 
 				throw new ForbiddenException("User can´t create more tickets");
 			}
@@ -197,5 +187,11 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 				&& !ticket.getTicketStatus().equalsIgnoreCase(TicketStatus.WA_SOLVED.name())
 				&& !ticket.getTicketStatus().equalsIgnoreCase(TicketStatus.FAULT_SOLVED.name())
 				&& !ticket.getTicketStatus().equalsIgnoreCase(TicketStatus.GENERIC_SOLVED.name());
+	}
+
+	private void saveLog(Ticket ticket, String message) {
+		functionsUtil.saveLogData(new LogData(ticket.getIdTriage(), ticket.getCustomer().getNationalId(),
+				ticket.getCustomer().getNationalType(), "Retrieve Ticket", "retrieveTicket",
+				ticket.getIdTriage().toString(), message, "Retrieve Ticket"));
 	}
 }

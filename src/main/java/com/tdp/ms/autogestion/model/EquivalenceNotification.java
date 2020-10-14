@@ -1,9 +1,8 @@
 package com.tdp.ms.autogestion.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Class: TrazabilidadpruebaResponse. <br/>
@@ -22,10 +21,10 @@ import lombok.NoArgsConstructor;
  *         </ul>
  * @version 1.0
  */
-@Data
-@NoArgsConstructor
+
+@Getter
+@Setter
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
 public class EquivalenceNotification {
 
 	private Integer idEquivalenceNotification;
@@ -49,4 +48,8 @@ public class EquivalenceNotification {
 	private String image;
 
 	private String actionbutton;
+	
+	private String windows;
+	
+	private String usecase;
 }

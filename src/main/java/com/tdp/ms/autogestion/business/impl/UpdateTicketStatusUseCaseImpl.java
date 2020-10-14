@@ -10,12 +10,15 @@ import org.springframework.stereotype.Service;
 import com.tdp.ms.autogestion.business.UpdateTicketStatusUseCase;
 import com.tdp.ms.autogestion.exception.DomainException;
 import com.tdp.ms.autogestion.exception.ErrorCategory;
+import com.tdp.ms.autogestion.exception.GenericDomainException;
 import com.tdp.ms.autogestion.exception.ResourceNotFoundException;
 import com.tdp.ms.autogestion.exception.ValidRequestException;
 import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
+import com.tdp.ms.autogestion.model.LogData;
 import com.tdp.ms.autogestion.model.Ticket;
 import com.tdp.ms.autogestion.model.TicketStatus;
 import com.tdp.ms.autogestion.repository.TicketRepository;
+import com.tdp.ms.autogestion.util.FunctionsUtil;
 
 /**
  * Class: TrazabilidadpruebaServiceImpl. <br/>
@@ -40,19 +43,28 @@ public class UpdateTicketStatusUseCaseImpl implements UpdateTicketStatusUseCase 
 	@Autowired
 	TicketRepository ticketRepository;
 
+	@Autowired
+	FunctionsUtil functionsUtil;
+	
 	@Override
-	public ResponseEntity<TicketStatusResponse> updateTicketStatus(int idTicket, String status) throws Exception {
+	public ResponseEntity<TicketStatusResponse> updateTicketStatus(int idTicket, String status)
+			throws GenericDomainException {
 
 		try {
 			if (idTicket != 0) {
 				for (TicketStatus elemento : TicketStatus.values()) {
 					if (elemento.name().equals(status)) {
 						Ticket ticket = ticketRepository.updateTicketStatus(idTicket, status);
-						return new ResponseEntity<>(TicketStatusResponse.from(ticket, new ArrayList<>()),
+				
+						ResponseEntity<TicketStatusResponse> ticketStatusResponse = new ResponseEntity<>(TicketStatusResponse.from(ticket, new ArrayList<>()),
 								HttpStatus.OK);
+						
+						functionsUtil.saveLogData(new LogData(idTicket, ticket.getCustomer().getNationalType(), ticket.getCustomer().getNationalId(), "Update Ticket",
+								"updateTicketStatus", String.valueOf(idTicket), ticketStatusResponse.toString(), "Update Ticket"));
+						
+						return ticketStatusResponse;
 					}
 				}
-
 				throw new ValidRequestException(ErrorCategory.MISSING_MANDATORY, "invalid status param");
 			} else {
 				throw new ValidRequestException(ErrorCategory.MISSING_MANDATORY, "idTicket is empty or null");
@@ -62,7 +74,7 @@ public class UpdateTicketStatusUseCaseImpl implements UpdateTicketStatusUseCase 
 		} catch (DomainException e) {
 			throw e;
 		} catch (Exception e) {
-			throw e;
+			throw new GenericDomainException(ErrorCategory.UNEXPECTED, e.getLocalizedMessage());
 		}
 	}
 

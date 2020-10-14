@@ -21,7 +21,8 @@ spring:
     password: SyDe2VrKZH
     driverClassName: org.postgresql.Driver
   kafka:
-    bootstrap-servers: cap-sg-prd-1.securegateway.appdomain.cloud:18007 
+    bootstrap-servers: cap-sg-prd-1.securegateway.appdomain.cloud:18007
+    
 app:
   topic:
     foo: queue-notification-tickets

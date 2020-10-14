@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.tdp.ms.autogestion.expose.entities.TicketKafkaResponse;
 import com.tdp.ms.autogestion.expose.entities.TicketKafkaResponse.Event.TroubleTicket.AdditionalData;
 import com.tdp.ms.autogestion.expose.entities.TicketKafkaResponse.Event.TroubleTicket.Attachment;
+import com.tdp.ms.autogestion.model.LogData;
 import com.tdp.ms.autogestion.model.TicketStatus;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaAdditionalDataRepository;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaAttachmentAdditionalDataRepository;
@@ -231,10 +232,14 @@ public class ReceiverKafkaController {
 				tblTicket.setStatusTicket(status);
 				tblTicket.setModifiedDateTicket(sysDate);
 				ticketRepository.save(tblTicket);
-				functionsUtil.saveLogData(tblTicket.getIdTicketTriage(),
-						tblTicket.getTblCustomer().getId().getDocumentNumber(),
-						tblTicket.getTblCustomer().getId().getDocumentType(), "Kafka listener", "event", message, "Ok",
-						"Insert Ticket Fcr");
+				LogData logdata = new LogData();
+				logdata.setActionLog("Kafka listener");
+				logdata.setIdTicketTriaje(tblTicket.getIdTicketTriage());
+				logdata.setDocumentType(tblTicket.getTblCustomer().getId().getDocumentType());
+				logdata.setDocumentNumber(tblTicket.getTblCustomer().getId().getDocumentNumber());
+				logdata.setRequest(message);
+				logdata.setTypeLog("Insert Ticket Fcr");
+				functionsUtil.saveLogData(logdata);
 
 			}
 			
@@ -242,8 +247,13 @@ public class ReceiverKafkaController {
 
 		} catch (Exception e) {
 			System.out.println("Error::: " + e.getMessage());
-			functionsUtil.saveLogData(Integer.parseInt(ticketKafkaResponse.getEvent().getTroubleTicket().getId()), "",
-					"", "Kafka listener", "event", message, e.getMessage(), "Insert Ticket Fcr");
+			LogData logdata = new LogData();
+			logdata.setActionLog("Kafka listener");
+			logdata.setIdTicketTriaje(Integer.parseInt(ticketKafkaResponse.getEvent().getTroubleTicket().getId()));
+			logdata.setRequest(message);
+			logdata.setRequest(e.getMessage());
+			logdata.setTypeLog("Insert Ticket Fcr");
+			functionsUtil.saveLogData(logdata);
 		}
 
 	}
