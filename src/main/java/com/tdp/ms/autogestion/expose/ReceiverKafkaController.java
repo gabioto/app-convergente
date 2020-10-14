@@ -237,6 +237,8 @@ public class ReceiverKafkaController {
 						"Insert Ticket Fcr");
 
 			}
+			
+			//entityManager.close();
 
 		} catch (Exception e) {
 			System.out.println("Error::: " + e.getMessage());
