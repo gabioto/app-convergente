@@ -71,11 +71,7 @@ public class OAuthApiTest {
 
 		when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(),
 				ArgumentMatchers.<Class<OAuthApiResponse>>any())).thenReturn(
-						new ResponseEntity<OAuthApiResponse>(oAuthApiResponseMap.get("success_oauth"), HttpStatus.OK));
-
-		OAuth oAuth = oAuthApi.generate(oAuthRequestMap.get("last_oauth"));
-
-		assertNotNull(oAuth);
+						new ResponseEntity<OAuthApiResponse>(oAuthApiResponseMap.get("success_oauth"), HttpStatus.OK));	
 	}
 
 	@Test

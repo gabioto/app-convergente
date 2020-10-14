@@ -16,15 +16,15 @@ public class DataConnection {
 //		this.username="user_averia";
 //		this.password = SecurityUtil.decrypt("LJ93AUKHW6P9uYaupkaZEw==");
 		// Dev
-		this.url="jdbc:postgresql://sl-us-south-1-portal.54.dblayer.com:23239/compose";
-		this.driverclassname ="org.postgresql.Driver";
-		this.username="admin";
-		this.password = SecurityUtil.decrypt("f97+11v5U9xxkkF/VOxNwY5FP8g5NlGrb7HyLq5D+uA=");
+//		this.url="jdbc:postgresql://sl-us-south-1-portal.54.dblayer.com:23239/compose";
+//		this.driverclassname ="org.postgresql.Driver";
+//		this.username="admin";
+//		this.password = SecurityUtil.decrypt("f97+11v5U9xxkkF/VOxNwY5FP8g5NlGrb7HyLq5D+uA=");
 		// Cert
-//		this.url = "jdbc:postgresql://a1f396ab-707f-4fcc-8225-fee7f1d7647a.br37s45d0p54n73ffbr0.databases.appdomain.cloud:30865/ibmclouddb";
-//		this.driverclassname = "org.postgresql.Driver";
-//		this.username = "user_averia";
-//		this.password = SecurityUtil.decrypt("LJ93AUKHW6P9uYaupkaZEw==");
+		this.url = System.getenv("TDP_URL");
+		this.driverclassname = System.getenv("TDP_DRIVERCLASSNAME");
+		this.username = System.getenv("TDP_USERNAME");
+		this.password = System.getenv("TDP_PASSWORD");
 		// Prod
 //		this.url = "jdbc:postgresql://6de706f1-ed6b-41c3-9714-d84afa6c2726.974550db55eb4ec0983f023940bf637f.databases.appdomain.cloud:31164/ibmclouddb";
 //		this.driverclassname = "org.postgresql.Driver";

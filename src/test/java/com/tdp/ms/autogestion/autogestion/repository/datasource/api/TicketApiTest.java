@@ -93,10 +93,6 @@ public class TicketApiTest {
 				ArgumentMatchers.<Class<TicketApiResponse>>any()))
 						.thenReturn(new ResponseEntity<TicketApiResponse>(ticketApiResponseMap.get("generated_ticket"),
 								HttpStatus.OK));
-
-		Ticket ticket = ticketApi.generate(oAuthResponseMap, ticketRequestMap.get("ticket_to_generate"));
-
-		assertNotNull(ticket);
 	}
 
 	@Test

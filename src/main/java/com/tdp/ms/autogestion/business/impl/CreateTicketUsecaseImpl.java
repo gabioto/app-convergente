@@ -45,12 +45,26 @@ public class CreateTicketUsecaseImpl implements CreateTicketUseCase {
 
 			String productIdentifier = getAdditionalData(request.getAdditionalData(), "productIdentifier");
 
-			String useCase = getAdditionalData(request.getAdditionalData(), "useCase");
-			
 			ticket = request.fromThis();
 			ticket.setCustomer(new Customer(documentNumber, documentType, request.getRelatedObject().getReference()));
 			ticket.setTechnology(technology);
-			ticket.setUseCaseId(useCase);			
+			switch (request.getRelatedObject().getInvolvement()) {
+			case Constants.INTERNET:
+				ticket.setUseCaseId(Constants.USE_CASE_INTERNET);
+				break;
+			case Constants.FIJA:
+				ticket.setUseCaseId(Constants.USE_CASE_FIJA);
+				break;
+			case Constants.CABLE:
+				ticket.setUseCaseId(Constants.USE_CASE_CABLE);
+				break;
+			case Constants.MOVIL:
+				ticket.setUseCaseId(Constants.USE_CASE_MOVIL);				
+				break;
+			default:
+				ticket.setUseCaseId("");
+				break;
+			}
 			ticket.setSubOperationCode(Constants.SUB_OPERATION_CODE);
 			ticket.setProductIdentifier(productIdentifier);
 
