@@ -16,4 +16,4 @@ spring:
     ##unique-names: true
   profiles:
     active:
-    - traza_dev
+    - traza_cert
