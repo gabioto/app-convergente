@@ -29,6 +29,8 @@ public class Constants {
 	public static final String MOVIL = "mobil";
 	public static final String SERVICE_CODE = "serviceCode";
 	public static final String PHONE = "phone";	
+	public static final String CODE_REFRESH = "20000123-122";
+	public static final String CODE_REFRESH_OK = "20000123-202";
 	
 	// EXCEPTIONS
 	public static final String SVC0001 = "SVC0001";

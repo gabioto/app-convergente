@@ -9,7 +9,7 @@ import com.tdp.ms.autogestion.expose.entities.TicketCreateRequest.AdditionalData
 
 public class AdditionalDataValidator implements ConstraintValidator<AdditionalValid, List<AdditionalData>> {
 
-	List<String> mandatoryfields = Arrays.asList("nationalIdType", "nationalId", "productIdentifier", "useCase");
+	List<String> mandatoryfields = Arrays.asList("nationalIdType", "nationalId", "productIdentifier");
 
 	@Override
 	public boolean isValid(List<AdditionalData> value, ConstraintValidatorContext context) {

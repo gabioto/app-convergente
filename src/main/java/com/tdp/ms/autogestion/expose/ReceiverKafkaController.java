@@ -80,9 +80,8 @@ public class ReceiverKafkaController {
 		LOG.info("Receiver.listen()  ==>  queue-notification-tickets");
 		System.out.print(message);
 		System.out.print("\n\n");
-		// System.out.print("received message='{}'" + message);
 		TicketKafkaResponse ticketKafkaResponse = new Gson().fromJson(message, TicketKafkaResponse.class);
-		// System.out.println(ticketKafkaResponse.getEventId());
+
 		try {
 			Optional<List<TblTicket>> listTblTicket = ticketRepository
 					.findByIdTicketTriage(Integer.parseInt(ticketKafkaResponse.getEvent().getTroubleTicket().getId()));
@@ -154,10 +153,8 @@ public class ReceiverKafkaController {
 							tblAttachmentAdditionalData
 									.setValueAttachmentAdditional(additionalDataLista.get(i).getValue());
 							tblAttachmentAdditionalData.setTblAttachment(tblAttachment);
-							// attachmentAdditionalDataRepository.saveAndFlush(tblAttachmentAdditionalData);
 							entityManager.persist(tblAttachmentAdditionalData);
 						}
-
 					}
 				}
 				List<AdditionalData> AdditionalDataList = ticketKafkaResponse.getEvent().getTroubleTicket()
@@ -173,8 +170,8 @@ public class ReceiverKafkaController {
 						additionalDataRepository.saveAndFlush(tblAdditionalData);
 					}
 				}
+				
 				// Logica:: Update status_ticket
-
 				String status = TicketStatus.IN_PROGRESS.name();
 				Boolean indicadorReset = Boolean.FALSE;
 
@@ -207,21 +204,37 @@ public class ReceiverKafkaController {
 								.getEquivalence(tblAdditionalData.getValueAdditional());
 						if (tblEquivalenceNotification.isPresent()) {
 							TblEquivalenceNotification equivalence = tblEquivalenceNotification.get();
-
+							
 							// Validar el estado del notification_id
-							if (equivalence.getAction().equals(TicketStatus.RESET_SOLVED.name()) && indicadorReset) {
-								status = TicketStatus.RESET_SOLVED.toString();
-							} else if (equivalence.getAction().equals(TicketStatus.RESET_SOLVED.name())
-									&& !indicadorReset) {
-								status = TicketStatus.SOLVED.toString();
-							} else if (equivalence.getAction().equals(TicketStatus.FAULT.name())) {
-								status = TicketStatus.FAULT.toString();
-							} else if (equivalence.getAction().equals(TicketStatus.WHATSAPP.name())) {
-								status = TicketStatus.WHATSAPP.toString();
-							} else if (equivalence.getAction().equals(TicketStatus.GENERIC.name())) {
-								status = TicketStatus.GENERIC.toString();
-							} else if (equivalence.getAction().equals(TicketStatus.FAULT_TRAZA.name())) {
-								status = TicketStatus.FAULT_TRAZA.toString();
+							if (tblTicket.getInvolvement().equals(Constants.CABLE)) {
+								if (equivalence.getCode().equals(Constants.CODE_REFRESH)) {
+									status = TicketStatus.REFRESH.toString();
+								} else if (equivalence.getCode().equals(Constants.CODE_REFRESH_OK)) {									
+									status = TicketStatus.REFRESH_SOLVED.toString();
+								} else if (equivalence.getAction().equals(TicketStatus.FAULT.name())) {
+									status = TicketStatus.FAULT.toString();
+								} else if (equivalence.getAction().equals(TicketStatus.WHATSAPP.name())) {
+									status = TicketStatus.WHATSAPP.toString();
+								} else if (equivalence.getAction().equals(TicketStatus.GENERIC.name())) {
+									status = TicketStatus.GENERIC.toString();
+								} else if (equivalence.getAction().equals(TicketStatus.FAULT_TRAZA.name())) {
+									status = TicketStatus.FAULT_TRAZA.toString();
+								}
+							} else if (tblTicket.getInvolvement().equals(Constants.INTERNET)) {							
+								if (equivalence.getAction().equals(TicketStatus.RESET_SOLVED.name()) && indicadorReset) {
+									status = TicketStatus.RESET_SOLVED.toString();
+								} else if (equivalence.getAction().equals(TicketStatus.RESET_SOLVED.name())
+										&& !indicadorReset) {
+									status = TicketStatus.SOLVED.toString();
+								} else if (equivalence.getAction().equals(TicketStatus.FAULT.name())) {
+									status = TicketStatus.FAULT.toString();
+								} else if (equivalence.getAction().equals(TicketStatus.WHATSAPP.name())) {
+									status = TicketStatus.WHATSAPP.toString();
+								} else if (equivalence.getAction().equals(TicketStatus.GENERIC.name())) {
+									status = TicketStatus.GENERIC.toString();
+								} else if (equivalence.getAction().equals(TicketStatus.FAULT_TRAZA.name())) {
+									status = TicketStatus.FAULT_TRAZA.toString();
+								}
 							}
 						}
 					}
@@ -240,11 +253,7 @@ public class ReceiverKafkaController {
 				logdata.setRequest(message);
 				logdata.setTypeLog("Insert Ticket Fcr");
 				functionsUtil.saveLogData(logdata);
-
-			}
-			
-			//entityManager.close();
-
+			}			
 		} catch (Exception e) {
 			System.out.println("Error::: " + e.getMessage());
 			LogData logdata = new LogData();
@@ -255,7 +264,6 @@ public class ReceiverKafkaController {
 			logdata.setTypeLog("Insert Ticket Fcr");
 			functionsUtil.saveLogData(logdata);
 		}
-
 	}
 
 }

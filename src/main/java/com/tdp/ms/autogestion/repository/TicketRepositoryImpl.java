@@ -98,8 +98,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 			TblTicket tblTicket = list.get().get(list.get().size() == 1 ? 0 : 1);
 
 			tblTicket.setStatusTicket(status);
-			tblTicket.setModifiedDateTicket(sysDate);
-			tblTicket.setEventTimeKafka(sysDate);
+			tblTicket.setModifiedDateTicket(sysDate);			
 			tblTicket = jpaTicketRepository.save(tblTicket);
 
 			return tblTicket.fromThis();
@@ -209,8 +208,12 @@ public class TicketRepositoryImpl implements TicketRepository {
 				result = getNoOrder(attachment, result);
 
 				// Ninguna Avería Pendiente
-				result = getNoFaults(attachment, result, lstClientData);
-
+				if (ticket.getInvolvement().equals(Constants.INTERNET)) {
+					result = getNoFaultsInternet(attachment, result, lstClientData);
+				} else if (ticket.getInvolvement().equals(Constants.CABLE)) {
+					result = getNoFaultsCable(attachment, result, lstClientData);
+				}
+				
 				// Problemas técnicos
 				result = getTechTroubles(attachment, result);
 			}
@@ -284,7 +287,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 		return result;
 	}
 
-	private String getNoFaults(Attachment attachment, String result, List<AdditionalData> lstClientData) {
+	private String getNoFaultsInternet(Attachment attachment, String result, List<AdditionalData> lstClientData) {
 		if (attachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-amdocs")
 				|| attachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-cms")
 				|| attachment.getNameAttachment().equals("AveriaPendiente[{}]recupera-averia-pendiente-gestel")) {
@@ -311,6 +314,31 @@ public class TicketRepositoryImpl implements TicketRepository {
 		return result;
 	}
 
+	private String getNoFaultsCable(Attachment attachment, String result, List<AdditionalData> lstClientData) {
+		if (attachment.getNameAttachment().equals("ValidaMasiva[{}]recupera-masiva-dmpe")) {
+
+			Boolean indicador = Boolean.FALSE;
+			List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(), "descripcion-masiva-dmpe");
+			for (AdditionalData attachAddData : attachAddDataList) {
+				if (!attachAddData.getValue().equals("")) {
+					AdditionalData clientData = new AdditionalData();
+					clientData.setKey(Constants.LABEL_COD_AVERIA);
+					clientData.setValue(attachAddData.getValue());
+					lstClientData.add(clientData);
+					result += attachment.getNameAttachment().concat(";").concat(Boolean.FALSE.toString()).concat(",");
+				} else {
+					result += attachment.getNameAttachment().concat(";").concat(Boolean.TRUE.toString()).concat(",");
+				}
+				indicador = Boolean.TRUE;
+			}
+			if (!indicador) {
+				result += attachment.getNameAttachment().concat(";").concat(Boolean.TRUE.toString()).concat(",");
+			}
+		}
+
+		return result;
+	}
+	
 	private String getTechTroubles(Attachment attachment, String result) {
 		if (attachment.getNameAttachment().equals("RecomendacionesDespachoHFC[{}]realiza-sincronizacion-iwy2")
 				|| attachment.getNameAttachment()
