@@ -2,7 +2,7 @@ spring:
   application:
     name: trazabilidad-autogestion
   jpa:
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         temp:
@@ -33,6 +33,7 @@ app:
     create: https://api.us-east.apiconnect.ibmcloud.com/telefonica-del-peru-development/ter/triagefcr/createticket/tickets
     retrieve: https://api.us-east.apiconnect.ibmcloud.com/telefonica-del-peru-development/ter/triagefcr/retrieveticket/tickets/
     client: afc1075e-69a4-40dc-809a-11e498cea9af
+    
 logging:
   level:
-    com.tdp.ms.autogestion: DEBUG
+    com.tdp.ms.autogestion: ERROR    

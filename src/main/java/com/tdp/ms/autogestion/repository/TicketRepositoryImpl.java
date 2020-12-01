@@ -162,13 +162,20 @@ public class TicketRepositoryImpl implements TicketRepository {
 	}
 
 	@Override
-	public List<AdditionalData> getAdditionalData(Ticket ticket) {
+	public List<AdditionalData> getAdditionalData(Ticket ticket, int minutes) {
 		List<AdditionalData> lstClientData = new ArrayList<AdditionalData>();
 		AdditionalData clientData = new AdditionalData();
 		clientData.setKey(Constants.LABEL_STATUS);
 		clientData.setValue(ticket.getStatus());
 		lstClientData.add(clientData);
 
+		if (minutes > 0) {
+			clientData = new AdditionalData();
+			clientData.setKey(Constants.LABEL_TIME);
+			clientData.setValue(String.valueOf(minutes));
+			lstClientData.add(clientData);
+		}
+		
 		// Validaciones de attachments
 		lstClientData = fillAttachmentsTicket(ticket, lstClientData);
 
@@ -214,6 +221,12 @@ public class TicketRepositoryImpl implements TicketRepository {
 					result = getNoFaultsCable(attachment, result, lstClientData);
 				}
 				
+				// Registro Avería
+				result = getNoFaultsReg(attachment, result, lstClientData);
+				
+				// Masiva DMPE
+				result = getMassiveDMPE(attachment, result);
+				
 				// Problemas técnicos
 				result = getTechTroubles(attachment, result);
 			}
@@ -225,6 +238,21 @@ public class TicketRepositoryImpl implements TicketRepository {
 		return lstClientData;
 	}
 
+	private String getMassiveDMPE(Attachment attachment, String result) {
+		if (attachment.getNameAttachment().equals("ValidaMasiva[{}]recupera-masiva-dmpe")) {
+			List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(), "tiene-masiva-dmpe");
+			for (AdditionalData attachAddData : attachAddDataList) {
+				Boolean check = Boolean.FALSE;
+				if (attachAddData.getValue().equals("SI")) {
+					check = Boolean.TRUE;
+				}
+				result += attachment.getNameAttachment().concat(";").concat(check.toString()).concat(",");
+			}
+		}
+
+		return result;
+	}
+	
 	private String getCommercialStatus(Attachment attachment, String result) {
 		if (attachment.getNameAttachment().equals("ValidacionesInicialesInternet[{}]recupera-info-telefono")) {
 			List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(), "estado-linea");
@@ -271,7 +299,9 @@ public class TicketRepositoryImpl implements TicketRepository {
 				|| attachment.getNameAttachment()
 						.equals("ValidacionesInicialesInternet[{}]recupera-reconexion-pendiente-atis-hfc")
 				|| attachment.getNameAttachment()
-						.equals("ValidacionesInicialesInternet[{}]recupera-reconexion-pendiente-atis-adsl")) {
+						.equals("ValidacionesInicialesInternet[{}]recupera-reconexion-pendiente-atis-adsl")
+				|| attachment.getNameAttachment()
+						.equals("PeticionesPendiente[{}]recupera-peticion-pendiente")) {
 
 			List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(),
 					"tiene-reconexion-pendiente");
@@ -297,7 +327,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 			for (AdditionalData attachAddData : attachAddDataList) {
 				if (!attachAddData.getValue().equals("")) {
 					AdditionalData clientData = new AdditionalData();
-					clientData.setKey(Constants.LABEL_COD_AVERIA);
+					clientData.setKey(Constants.LABEL_COD_AVERIA_PEND);
 					clientData.setValue(attachAddData.getValue());
 					lstClientData.add(clientData);
 					result += attachment.getNameAttachment().concat(";").concat(Boolean.FALSE.toString()).concat(",");
@@ -314,11 +344,43 @@ public class TicketRepositoryImpl implements TicketRepository {
 		return result;
 	}
 
-	private String getNoFaultsCable(Attachment attachment, String result, List<AdditionalData> lstClientData) {
-		if (attachment.getNameAttachment().equals("ValidaMasiva[{}]recupera-masiva-dmpe")) {
+	private String getNoFaultsReg(Attachment attachment, String result, List<AdditionalData> lstClientData) {
+		if (attachment.getNameAttachment().equals("ValidaMasiva[{}]generar-averia-cms")
+				|| attachment.getNameAttachment().equals("AveriasPendiente[{}]registra-averia-cms")
+				|| attachment.getNameAttachment().equals("DespachoCampo[{}]registra-averia-cms")
+				|| attachment.getNameAttachment().equals("SolucionNoNavega[{}]registra-averia-cms")
+				|| attachment.getNameAttachment().equals("RecomendacionesDespachoHFC[{}]registra-averia-cms")) {
 
 			Boolean indicador = Boolean.FALSE;
-			List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(), "descripcion-masiva-dmpe");
+			List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(), "numero-requerimiento-averia-cms");
+			for (AdditionalData attachAddData : attachAddDataList) {
+				if (!attachAddData.getValue().equals("")) {
+					AdditionalData clientData = new AdditionalData();
+					clientData.setKey(Constants.LABEL_COD_AVERIA);
+					clientData.setValue(attachAddData.getValue());
+					lstClientData.add(clientData);
+					result += attachment.getNameAttachment().concat(";").concat(Boolean.FALSE.toString()).concat(",");
+				} else {
+					result += attachment.getNameAttachment().concat(";").concat(Boolean.TRUE.toString()).concat(",");
+				}
+				indicador = Boolean.TRUE;
+			}
+			if (!indicador) {
+				result += attachment.getNameAttachment().concat(";").concat(Boolean.TRUE.toString()).concat(",");
+			}
+		}
+
+		return result;
+	}
+	
+	private String getNoFaultsCable(Attachment attachment, String result, List<AdditionalData> lstClientData) {
+		if (attachment.getNameAttachment().equals("AveriasPendientes[{}]registrar-averia-cms")
+				|| attachment.getNameAttachment().equals("AveriasPendientes[{}]registrar-averia-amdocs")
+				|| attachment.getNameAttachment().equals("ValidaMasiva[{}]registrar-averia-cms")
+				|| attachment.getNameAttachment().equals("ValidaMasiva[{}]registrar-averia-amdocs")) {
+
+			Boolean indicador = Boolean.FALSE;
+			List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(), "numero-requerimiento-averia-cms");
 			for (AdditionalData attachAddData : attachAddDataList) {
 				if (!attachAddData.getValue().equals("")) {
 					AdditionalData clientData = new AdditionalData();

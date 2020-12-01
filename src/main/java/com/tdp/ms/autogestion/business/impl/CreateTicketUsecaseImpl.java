@@ -50,7 +50,11 @@ public class CreateTicketUsecaseImpl implements CreateTicketUseCase {
 			ticket.setTechnology(technology);
 			switch (request.getRelatedObject().getInvolvement()) {
 			case Constants.INTERNET:
-				ticket.setUseCaseId(Constants.USE_CASE_INTERNET);
+				if (technology.equals(Constants.TECHNOLOGY_HFC)) {
+					ticket.setUseCaseId(Constants.USE_CASE_INTERNET);
+				} else if (technology.equals(Constants.TECHNOLOGY_GPON)) {
+					ticket.setUseCaseId(Constants.USE_CASE_INTERNET_GPON);
+				}
 				break;
 			case Constants.FIJA:
 				ticket.setUseCaseId(Constants.USE_CASE_FIJA);

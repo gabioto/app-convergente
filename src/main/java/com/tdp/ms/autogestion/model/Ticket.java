@@ -74,7 +74,9 @@ public class Ticket {
 	private String ticketStatus;
 	
 	private LocalDateTime modifiedDateTicket;
-
+	
+	private LocalDateTime eventTimeKafka;
+	
 	private List<AdditionalData> additionalData = new ArrayList<>();
 
 	private List<Attachment> attachments = new ArrayList<>();

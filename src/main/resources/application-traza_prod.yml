@@ -2,7 +2,7 @@ spring:
   application:
     name: trazabilidad-autogestion
   jpa:
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         temp:
@@ -21,8 +21,7 @@ spring:
 #    password: SyDe2VrKZH
 #    driverClassName: org.postgresql.Driver
   kafka:
-    bootstrap-servers: cap-sg-prd-1.securegateway.appdomain.cloud:18007
-    #bootstrap-servers: cap-sg-prd-5.securegateway.appdomain.cloud:18987
+    bootstrap-servers: cap-sg-prd-5.securegateway.appdomain.cloud:18987
 
 app:
   topic:
@@ -37,4 +36,4 @@ app:
 
 logging:
   level:
-    com.tdp.ms.autogestion: DEBUG
+    com.tdp.ms.autogestion: ERROR

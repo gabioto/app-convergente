@@ -137,8 +137,7 @@ public class ReceiverKafkaController {
 						tblAttachment = new TblAttachment();
 						tblAttachment.setIdAttachmentKafka(Integer.parseInt(attachment.getAttachmentId()));
 						tblAttachment.setNameAttachment(attachment.getName());
-						tblAttachment
-								.setCreationDate(DateUtil.formatStringToLocalDateTime(attachment.getCreationDate()));
+						tblAttachment.setCreationDate(DateUtil.formatStringToLocalDateTime(attachment.getCreationDate()));
 						tblAttachment.setTblTicket(tblTicket);
 						tblAttachment = attachmentRepository.saveAndFlush(tblAttachment);
 						additionalDataLista = attachment.getAdditionalData();
@@ -150,8 +149,7 @@ public class ReceiverKafkaController {
 							}
 							tblAttachmentAdditionalData = new TblAttachmentAdditionalData();
 							tblAttachmentAdditionalData.setKeyAttachmentAdditional(additionalDataLista.get(i).getKey());
-							tblAttachmentAdditionalData
-									.setValueAttachmentAdditional(additionalDataLista.get(i).getValue());
+							tblAttachmentAdditionalData.setValueAttachmentAdditional(additionalDataLista.get(i).getValue());
 							tblAttachmentAdditionalData.setTblAttachment(tblAttachment);
 							entityManager.persist(tblAttachmentAdditionalData);
 						}
@@ -181,21 +179,39 @@ public class ReceiverKafkaController {
 				if (tableEquivalence.isPresent()) {
 					List<TblEquivalence> lstEquivalence = tableEquivalence.get();
 
-					for (TblEquivalence tblEquivalence : lstEquivalence) {
-						for (Attachment attachment : listAttachment) {
-							// Validar si el attachment existe en la tabla de equivalencias
-							if (attachment.getName().equals(tblEquivalence.getAttachmentName())) {
-								List<AdditionalData> lstAttachmentAdditionalData = attachment.getAdditionalData();
-								for (AdditionalData attachmentAdditionalData : lstAttachmentAdditionalData) {
-									// Validamos si se realizo un reset
-									if (attachmentAdditionalData.getKey().equals("estado-reset-modem-ok")) {
-										status = TicketStatus.RESET.name();
-										indicadorReset = Boolean.TRUE;
+					if (tblTicket.getInvolvement().equals(Constants.INTERNET) && tblTicket.getTechnology().equals(Constants.TECHNOLOGY_HFC)) {					
+						for (TblEquivalence tblEquivalence : lstEquivalence) {
+							for (Attachment attachment : listAttachment) {
+								// Validar si el attachment existe en la tabla de equivalencias
+								if (attachment.getName().equals(tblEquivalence.getAttachmentName())) {
+									List<AdditionalData> lstAttachmentAdditionalData = attachment.getAdditionalData();
+									for (AdditionalData attachmentAdditionalData : lstAttachmentAdditionalData) {
+										// Validamos si se realizo un reset
+										if (attachmentAdditionalData.getKey().equals("estado-reset-modem-ok")) {
+											status = TicketStatus.RESET.name();
+											indicadorReset = Boolean.TRUE;
+										}
 									}
 								}
 							}
 						}
-					}
+					} else if (tblTicket.getInvolvement().equals(Constants.INTERNET) && tblTicket.getTechnology().equals(Constants.TECHNOLOGY_GPON)) {
+						for (TblEquivalence tblEquivalence : lstEquivalence) {
+							for (Attachment attachment : listAttachment) {
+								// Validar si el attachment existe en la tabla de equivalencias
+								if (attachment.getName().equals(tblEquivalence.getAttachmentName())) {
+									List<AdditionalData> lstAttachmentAdditionalData = attachment.getAdditionalData();
+									for (AdditionalData attachmentAdditionalData : lstAttachmentAdditionalData) {
+										// Validamos si se realizo un reset
+										if (attachmentAdditionalData.getKey().equals("sincronismo-modem-ont-ok")) {
+											status = TicketStatus.RESET.name();
+											indicadorReset = Boolean.TRUE;
+										}
+									}
+								}
+							}
+						}
+					}					
 				}
 
 				for (AdditionalData additionalData : AdditionalDataList) {
@@ -207,18 +223,14 @@ public class ReceiverKafkaController {
 							
 							// Validar el estado del notification_id
 							if (tblTicket.getInvolvement().equals(Constants.CABLE)) {
-								if (equivalence.getCode().equals(Constants.CODE_REFRESH)) {
+								if (equivalence.getCode().equals(Constants.CODE_REFRESH_OK)) {									
 									status = TicketStatus.REFRESH.toString();
-								} else if (equivalence.getCode().equals(Constants.CODE_REFRESH_OK)) {									
-									status = TicketStatus.REFRESH_SOLVED.toString();
 								} else if (equivalence.getAction().equals(TicketStatus.FAULT.name())) {
 									status = TicketStatus.FAULT.toString();
 								} else if (equivalence.getAction().equals(TicketStatus.WHATSAPP.name())) {
 									status = TicketStatus.WHATSAPP.toString();
 								} else if (equivalence.getAction().equals(TicketStatus.GENERIC.name())) {
 									status = TicketStatus.GENERIC.toString();
-								} else if (equivalence.getAction().equals(TicketStatus.FAULT_TRAZA.name())) {
-									status = TicketStatus.FAULT_TRAZA.toString();
 								}
 							} else if (tblTicket.getInvolvement().equals(Constants.INTERNET)) {							
 								if (equivalence.getAction().equals(TicketStatus.RESET_SOLVED.name()) && indicadorReset) {
@@ -232,8 +244,6 @@ public class ReceiverKafkaController {
 									status = TicketStatus.WHATSAPP.toString();
 								} else if (equivalence.getAction().equals(TicketStatus.GENERIC.name())) {
 									status = TicketStatus.GENERIC.toString();
-								} else if (equivalence.getAction().equals(TicketStatus.FAULT_TRAZA.name())) {
-									status = TicketStatus.FAULT_TRAZA.toString();
 								}
 							}
 						}

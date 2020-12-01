@@ -15,7 +15,9 @@ import com.tdp.ms.autogestion.exception.ResourceNotFoundException;
 import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
 import com.tdp.ms.autogestion.model.LogData;
 import com.tdp.ms.autogestion.model.Ticket;
+import com.tdp.ms.autogestion.model.TicketStatus;
 import com.tdp.ms.autogestion.repository.TicketRepository;
+import com.tdp.ms.autogestion.util.Constants;
 import com.tdp.ms.autogestion.util.FunctionsUtil;
 
 /**
@@ -48,10 +50,21 @@ public class RetrieveTicketStatusUseCaseImpl implements RetrieveTicketStatusUseC
 	public ResponseEntity<TicketStatusResponse> retrieveTicketStatus(int idTicket) throws GenericDomainException {
 		try {
 			List<Ticket> tickets = ticketRepository.getTicketStatus(idTicket);
+			if (tickets.size() == 1) {
+				// Si ticket es cableTv en estado refresh
+				if (tickets.get(0).getInvolvement().equals(Constants.CABLE) && tickets.get(0).getTicketStatus().equals(TicketStatus.REFRESH.name())) {
+					tickets.add(0, ticketRepository.updateTicketStatus(tickets.get(0).getIdTriage(), TicketStatus.REFRESH_SOLVED.name()));
+				}
+			} else {
+				// Si ticket es cableTv en estado refresh
+				if (tickets.get(1).getInvolvement().equals(Constants.CABLE) && tickets.get(1).getTicketStatus().equals(TicketStatus.REFRESH.name())) {
+					tickets.add(1, ticketRepository.updateTicketStatus(tickets.get(0).getIdTriage(), TicketStatus.REFRESH_SOLVED.name()));
+				}
+			}
 			Ticket ticket = tickets.get(tickets.size() == 1 ? 0 : 1);
 
 			ResponseEntity<TicketStatusResponse> ticketStatusResponse = new ResponseEntity<>(
-					TicketStatusResponse.from(ticket, ticketRepository.getAdditionalData(ticket)), HttpStatus.OK);
+					TicketStatusResponse.from(ticket, ticketRepository.getAdditionalData(ticket, 0)), HttpStatus.OK);
 
 			functionsUtil.saveLogData(new LogData(idTicket, ticket.getCustomer().getNationalId(),
 					ticket.getCustomer().getNationalType(), "Retrieve Ticket Status", "retrieveTicketStatus",

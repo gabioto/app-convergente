@@ -350,13 +350,14 @@ public class TblTicket implements Serializable {
 		tableTicket.setTechnology(ticket.getTechnology());
 		tableTicket.setTblCustomer(tableCustomer);
 		tableTicket.setProductIdentifier(ticket.getProductIdentifier());
+		tableTicket.setEventTimeKafka(ticket.getEventTimeKafka());
 		return tableTicket;
 	}
 
 	public Ticket fromThis() {
 		return new Ticket(idTicket, idTicketTriage, "", description, creationDate, severity, ticketType, status,
 				statusChangeDate, statusChangeReason, priority, technology, idUseCase, "", productIdentifier, involvement, "", "",
-				tblCustomer.fromThis(), statusTicket, modifiedDateTicket,
+				tblCustomer.fromThis(), statusTicket, modifiedDateTicket, eventTimeKafka, 
 				TblAdditionalData.listFromThis(tblAdditionalData), TblAttachment.listFromThis(tblAttachments));
 	}
 

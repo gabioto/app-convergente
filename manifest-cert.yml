@@ -7,8 +7,12 @@ applications:
     health-check-type: process
     disk_quota: 2GB
     instances: 1
+    services:
+      - dynatrace-service
     env:
       TDP_DRIVERCLASSNAME: org.postgresql.Driver
       TDP_URL: jdbc:postgresql://a1f396ab-707f-4fcc-8225-fee7f1d7647a.br37s45d0p54n73ffbr0.databases.appdomain.cloud:30865/ibmclouddb
       TDP_USERNAME: user_averia
       TDP_PASSWORD: SyDe2VrKZH
+      IBM_JVM_LICENSE: L-SMKR-AVSEUH
+      IBM_LIBERTY_LICENSE: L-CTUR-BSSH6W

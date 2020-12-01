@@ -18,7 +18,9 @@ public class Constants {
 	public static final String LABEL_WINDOW_ID = "WINDOW";
 	public static final String LABEL_MONTO = "MONTO";
 	public static final String LABEL_COD_AVERIA = "COD_AVERIA";
+	public static final String LABEL_COD_AVERIA_PEND = "COD_AVERIA_PEND";
 	public static final String USE_CASE_INTERNET = "20000032";
+	public static final String USE_CASE_INTERNET_GPON = "21000032";
 	public static final String USE_CASE_FIJA = "";
 	public static final String USE_CASE_CABLE = "20000123";
 	public static final String USE_CASE_MOVIL = "";
@@ -28,9 +30,12 @@ public class Constants {
 	public static final String CABLE = "cableTv";
 	public static final String MOVIL = "mobil";
 	public static final String SERVICE_CODE = "serviceCode";
-	public static final String PHONE = "phone";	
-	public static final String CODE_REFRESH = "20000123-122";
+	public static final String PHONE = "phone";		
 	public static final String CODE_REFRESH_OK = "20000123-202";
+	public static final String TECHNOLOGY_HFC = "HFC";
+	public static final String TECHNOLOGY_GPON = "GPON";
+	public static final String LABEL_TIME = "TIME";
+	public static final Integer INT_MINUTES = 3;
 	
 	// EXCEPTIONS
 	public static final String SVC0001 = "SVC0001";

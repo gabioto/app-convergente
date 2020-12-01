@@ -1,9 +1,14 @@
 package com.tdp.ms.autogestion.business.impl;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -137,12 +142,20 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 		return listIds;
 	}
 
-	private ResponseEntity<TicketStatusResponse> evaluateTicketStatus(List<Integer> listIds) {
+	private ResponseEntity<TicketStatusResponse> evaluateTicketStatus(List<Integer> listIds) throws ParseException {
 		Ticket ticket = ticketRepository.getTicket(listIds.get(0));
 
 		if (validateStatus(ticket)) {
+			int minutes = 0;
+			if (ticket.getInvolvement().equals(Constants.CABLE) && ticket.getTicketStatus().equals(TicketStatus.REFRESH.name())) {
+				minutes = getMinutesRefresh(ticket);
+				if (minutes >= Constants.INT_MINUTES) {
+					ticket = ticketRepository.updateTicketStatus(ticket.getIdTriage(), TicketStatus.REFRESH_SOLVED.name());
+					minutes = 0;
+				}
+			}
 			ResponseEntity<TicketStatusResponse> ticketStatusResponse = new ResponseEntity<>(
-					TicketStatusResponse.from(ticket, ticketRepository.getAdditionalData(ticket)), HttpStatus.OK);
+					TicketStatusResponse.from(ticket, ticketRepository.getAdditionalData(ticket, minutes)), HttpStatus.OK);
 
 			saveLog(ticket, ticketStatusResponse.toString());
 
@@ -164,16 +177,24 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 		}
 	}
 
-	private ResponseEntity<TicketStatusResponse> evaluatePastTicketStatus(List<Integer> listIds) {
+	private ResponseEntity<TicketStatusResponse> evaluatePastTicketStatus(List<Integer> listIds) throws ParseException {
 		Ticket ticket = null;
 
-		if (listIds.size() == 1) {
+		int minutes = 0;
+		if (listIds.size() > 0) {
 			ticket = ticketRepository.getTicket(listIds.get(0));
+			if (ticket.getInvolvement().equals(Constants.CABLE) && ticket.getTicketStatus().equals(TicketStatus.REFRESH.name())) {
+				minutes = getMinutesRefresh(ticket);
+				if (minutes >= Constants.INT_MINUTES) {
+					ticket = ticketRepository.updateTicketStatus(ticket.getId(), TicketStatus.REFRESH_SOLVED.name());
+					minutes = 0;
+				}
+			}
 		}
 
 		// Cuando solo tiene un ticket
 		if (ticket != null && validateStatus(ticket)) {
-			return new ResponseEntity<>(TicketStatusResponse.from(ticket, ticketRepository.getAdditionalData(ticket)),
+			return new ResponseEntity<>(TicketStatusResponse.from(ticket, ticketRepository.getAdditionalData(ticket, minutes)),
 					HttpStatus.OK);
 		} else {
 			// Puede crear Ticket
@@ -184,6 +205,7 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 
 	private boolean validateStatus(Ticket ticket) {
 		return !ticket.getTicketStatus().equalsIgnoreCase(TicketStatus.SOLVED.name())
+				&& !ticket.getTicketStatus().equalsIgnoreCase(TicketStatus.WA_DEFAULT_SOLVED.name())
 				&& !ticket.getTicketStatus().equalsIgnoreCase(TicketStatus.WA_SOLVED.name())
 				&& !ticket.getTicketStatus().equalsIgnoreCase(TicketStatus.FAULT_SOLVED.name())
 				&& !ticket.getTicketStatus().equalsIgnoreCase(TicketStatus.GENERIC_SOLVED.name());
@@ -193,5 +215,19 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 		functionsUtil.saveLogData(new LogData(ticket.getIdTriage(), ticket.getCustomer().getNationalId(),
 				ticket.getCustomer().getNationalType(), "Retrieve Ticket", "retrieveTicket",
 				ticket.getIdTriage().toString(), message, "Retrieve Ticket"));
+	}
+	
+	private int getMinutesRefresh(Ticket ticket) throws ParseException {
+		int minutes = 0;
+		String dateReset = ticket.getModifiedDateTicket().toString().replace("T", " ");
+		String dateActual = LocalDateTime.now(ZoneOffset.of(Constants.ZONE_OFFSET)).toString().replace("T", " " );
+			
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			
+		Date d1 = format.parse(dateReset);
+		Date d2 = format.parse(dateActual);
+		long diff = d2.getTime() - d1.getTime();
+		minutes = (int) TimeUnit.MILLISECONDS.toMinutes(diff);		
+		return minutes; 
 	}
 }

@@ -26,7 +26,7 @@ public interface TicketRepository {
 
 	List<AdditionalData> getValue(Integer attachmentId, String field);	
 	
-	List<AdditionalData> getAdditionalData(Ticket ticket);
+	List<AdditionalData> getAdditionalData(Ticket ticket, int minutes);
 
 	List<Equivalence> getAttachmentEquivalence(Integer ticketId);
 
