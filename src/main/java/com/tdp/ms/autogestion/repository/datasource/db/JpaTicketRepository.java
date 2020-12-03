@@ -37,7 +37,7 @@ public interface JpaTicketRepository extends JpaRepository<TblTicket, Integer> {
 			+ "AND t.tblCustomer.id.serviceCode = ?3 "
 			+ "AND t.involvement = ?4 "
 			+ "AND t.creationDate >= ?5 AND t.creationDate < ?6 "
-			+ "ORDER BY t.idTicketTriage DESC,t.eventTimeKafka DESC")
+			+ "ORDER BY t.idTicketTriage DESC,t.eventTimeKafka DESC,t.modifiedDateTicket DESC")
 	List<TblTicket> findByCustomerAndUseCase(String docType, String docNumber,
 			String reference, String involvement, LocalDateTime creationDate, LocalDateTime endDate);
 
@@ -47,13 +47,13 @@ public interface JpaTicketRepository extends JpaRepository<TblTicket, Integer> {
 			+ "AND t.tblCustomer.id.documentNumber = ?2 "
 			+ "AND t.tblCustomer.id.serviceCode = ?3 "
 			+ "AND t.involvement = ?4 "			
-			+ "ORDER BY t.idTicketTriage DESC,t.eventTimeKafka DESC")
+			+ "ORDER BY t.idTicketTriage DESC,t.eventTimeKafka DESC,t.modifiedDateTicket DESC")
 	List<TblTicket> findByCustomerAndUseCasePast(String docType, String docNumber,
 			String reference, String involvement);
 	
 	@Query					
 	(value = "SELECT t FROM TblTicket t "			
-			+ "WHERE t.idTicketTriage = ?1 ORDER BY t.eventTimeKafka DESC")
+			+ "WHERE t.idTicketTriage = ?1 ORDER BY t.eventTimeKafka DESC,t.modifiedDateTicket DESC")
 	Optional<List<TblTicket>> getTicketStatus(int idTicket);
 	
 	@Query					

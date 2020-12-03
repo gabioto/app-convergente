@@ -227,7 +227,7 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 		Date d1 = format.parse(dateReset);
 		Date d2 = format.parse(dateActual);
 		long diff = d2.getTime() - d1.getTime();
-		minutes = (int) TimeUnit.MILLISECONDS.toMinutes(diff);		
+		minutes = (int) TimeUnit.MILLISECONDS.toSeconds(diff);		
 		return minutes; 
 	}
 }

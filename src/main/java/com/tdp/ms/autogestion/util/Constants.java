@@ -35,7 +35,7 @@ public class Constants {
 	public static final String TECHNOLOGY_HFC = "HFC";
 	public static final String TECHNOLOGY_GPON = "GPON";
 	public static final String LABEL_TIME = "TIME";
-	public static final Integer INT_MINUTES = 3;
+	public static final Integer INT_MINUTES = 240;
 	
 	// EXCEPTIONS
 	public static final String SVC0001 = "SVC0001";
