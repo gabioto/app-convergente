@@ -30,7 +30,7 @@ public interface TicketRepository {
 
 	List<Equivalence> getAttachmentEquivalence(Integer ticketId);
 
-	EquivalenceNotification getNotificationEquivalence(String code);
+	EquivalenceNotification getNotificationEquivalence(String code, String usecase);
 	
 	List<Ticket> getTicketStatus(Integer ticketId);
 }

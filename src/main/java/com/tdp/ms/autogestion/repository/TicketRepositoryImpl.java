@@ -39,8 +39,7 @@ import com.tdp.ms.autogestion.util.StringUtil;
 public class TicketRepositoryImpl implements TicketRepository {
 
 	private static final Log log = LogFactory.getLog(TicketRepositoryImpl.class);
-	private static final String TAG = TicketRepositoryImpl.class.getCanonicalName();
-
+	
 	@Autowired
 	private TicketApi ticketApi;
 
@@ -83,8 +82,9 @@ public class TicketRepositoryImpl implements TicketRepository {
 			}
 
 			tableTicket = jpaTicketRepository.save(tableTicket);
-			log.info(TAG + "createTicket: " + tableTicket.getIdTicket());
 		} catch (Exception e) {
+			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
+			
 			throw e;
 		}
 	}
@@ -95,8 +95,16 @@ public class TicketRepositoryImpl implements TicketRepository {
 		Optional<List<TblTicket>> list = jpaTicketRepository.getTicketStatus(idTicket);
 
 		if (list.isPresent()) {
-			TblTicket tblTicket = list.get().get(list.get().size() == 1 ? 0 : 1);
-
+			TblTicket tblTicket = null;
+			if (list.get().size() <= 2) {
+				tblTicket = list.get().get(list.get().size() == 1 ? 0 : 1);
+			} else {
+				if (list.get().get(2).getStatusTicket().equals(TicketStatus.WA_DEFAULT.name())) {
+					tblTicket = list.get().get(2);
+				} else {
+					tblTicket = list.get().get(1);
+				}
+			}
 			tblTicket.setStatusTicket(status);
 			tblTicket.setModifiedDateTicket(sysDate);			
 			tblTicket = jpaTicketRepository.save(tblTicket);
@@ -154,9 +162,9 @@ public class TicketRepositoryImpl implements TicketRepository {
 	}
 
 	@Override
-	public EquivalenceNotification getNotificationEquivalence(String code) {
+	public EquivalenceNotification getNotificationEquivalence(String code, String usecase) {
 		Optional<TblEquivalenceNotification> optEquivalenceNot = jpaEquivalenceNotificationRepository
-				.getEquivalence(code);
+				.getEquivalence(code, usecase);
 
 		return optEquivalenceNot.isPresent() ? optEquivalenceNot.get().fromThis() : null;
 	}
@@ -201,7 +209,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 
 		List<Attachment> attachments = ticket.getAttachments();
 
-		if (attachments != null && attachments.size() > 0) {
+		if (attachments != null && !attachments.isEmpty()) {
 			String result = "";
 
 			for (Attachment attachment : attachments) {
@@ -217,12 +225,12 @@ public class TicketRepositoryImpl implements TicketRepository {
 				// Ninguna Avería Pendiente
 				if (ticket.getInvolvement().equals(Constants.INTERNET)) {
 					result = getNoFaultsInternet(attachment, result, lstClientData);
+					
+					// Registro Avería
+					result = getNoFaultsReg(attachment, result, lstClientData);
 				} else if (ticket.getInvolvement().equals(Constants.CABLE)) {
 					result = getNoFaultsCable(attachment, result, lstClientData);
 				}
-				
-				// Registro Avería
-				result = getNoFaultsReg(attachment, result, lstClientData);
 				
 				// Masiva DMPE
 				result = getMassiveDMPE(attachment, result);
@@ -345,14 +353,33 @@ public class TicketRepositoryImpl implements TicketRepository {
 	}
 
 	private String getNoFaultsReg(Attachment attachment, String result, List<AdditionalData> lstClientData) {
-		if (attachment.getNameAttachment().equals("ValidaMasiva[{}]generar-averia-cms")
-				|| attachment.getNameAttachment().equals("AveriasPendiente[{}]registra-averia-cms")
-				|| attachment.getNameAttachment().equals("DespachoCampo[{}]registra-averia-cms")
+		if (attachment.getNameAttachment().equals("ValidaMasiva[{}]registra-averia-cms")
+				|| attachment.getNameAttachment().equals("AveriaPendiente[{}]registra-averia-cms")
 				|| attachment.getNameAttachment().equals("SolucionNoNavega[{}]registra-averia-cms")
 				|| attachment.getNameAttachment().equals("RecomendacionesDespachoHFC[{}]registra-averia-cms")) {
 
 			Boolean indicador = Boolean.FALSE;
 			List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(), "numero-requerimiento-averia-cms");
+			for (AdditionalData attachAddData : attachAddDataList) {
+				if (!attachAddData.getValue().equals("")) {
+					AdditionalData clientData = new AdditionalData();
+					clientData.setKey(Constants.LABEL_COD_AVERIA);
+					clientData.setValue(attachAddData.getValue());
+					lstClientData.add(clientData);
+					result += attachment.getNameAttachment().concat(";").concat(Boolean.FALSE.toString()).concat(",");
+				} else {
+					result += attachment.getNameAttachment().concat(";").concat(Boolean.TRUE.toString()).concat(",");
+				}
+				indicador = Boolean.TRUE;
+			}
+			if (!indicador) {
+				result += attachment.getNameAttachment().concat(";").concat(Boolean.TRUE.toString()).concat(",");
+			}
+		} else if (attachment.getNameAttachment().equals("AveriaPendiente[{}]registrar-averia-gestel")
+				|| attachment.getNameAttachment().equals("RecomendacionesDespachoADSL[{}]registrar-averia-gestel")
+				|| attachment.getNameAttachment().equals("SolucionNoNavega[{}]registrar-averia-gestel")) {
+			Boolean indicador = Boolean.FALSE;
+			List<AdditionalData> attachAddDataList = getValue(attachment.getIdAttachment(), "codigo-averia-gestel");
 			for (AdditionalData attachAddData : attachAddDataList) {
 				if (!attachAddData.getValue().equals("")) {
 					AdditionalData clientData = new AdditionalData();
@@ -454,7 +481,15 @@ public class TicketRepositoryImpl implements TicketRepository {
 		if (lstAdditionalData != null) {
 			for (AdditionalData additionalData : lstAdditionalData) {
 				if (additionalData.getKey().equals("notification-id")) {
-					EquivalenceNotification equivalence = getNotificationEquivalence(additionalData.getValue());
+					String usecase = "";
+					if (ticket.getUseCaseId().equals(Constants.USE_CASE_INTERNET)) {
+						usecase = Constants.TICKET_INTERNET_HFC;
+					} else if (ticket.getUseCaseId()	.equals(Constants.USE_CASE_INTERNET_GPON)) {
+						usecase = Constants.TICKET_INTERNET_GPON;
+					} else if (ticket.getUseCaseId().equals(Constants.USE_CASE_CABLE)) {
+						usecase = Constants.TICKET_TV;
+					}					
+					EquivalenceNotification equivalence = getNotificationEquivalence(additionalData.getValue(), usecase);
 
 					if (equivalence != null) {
 						clientData = new AdditionalData();
@@ -501,12 +536,42 @@ public class TicketRepositoryImpl implements TicketRepository {
 						clientData.setKey(Constants.LABEL_WINDOW_ID);
 						clientData.setValue(StringUtil.validateEmptyField(equivalence.getWindows()));
 						lstClientData.add(clientData);
+						
+						// Campos adicionales para Averia Individual - Averia Individual asociada a una masiva
+						/*clientData = new AdditionalData();
+						clientData.setKey(Constants.LABEL_SUBTITLE);
+						clientData.setValue(StringUtil.validateEmptyField(equivalence.getSubtitle()));
+						lstClientData.add(clientData);
+						
+						clientData = new AdditionalData();
+						clientData.setKey(Constants.LABEL_ICON2);
+						clientData.setValue(StringUtil.validateEmptyField(equivalence.getIcon2()));
+						lstClientData.add(clientData);
+						
+						clientData = new AdditionalData();
+						clientData.setKey(Constants.LABEL_SUBTITLE2);
+						clientData.setValue(StringUtil.validateEmptyField(equivalence.getSubtitle2()));
+						lstClientData.add(clientData);
+						
+						clientData = new AdditionalData();
+						clientData.setKey(Constants.LABEL_WINDOW_ID2);
+						clientData.setValue(StringUtil.validateEmptyField(equivalence.getWindows2()));
+						lstClientData.add(clientData);
+
+						// Campos adicionales para pase a Whastaspp
+						clientData = new AdditionalData();
+						clientData.setKey(Constants.LABEL_BUTTON2);
+						clientData.setValue(StringUtil.validateEmptyField(equivalence.getButton2()));
+						lstClientData.add(clientData);
+						
+						clientData = new AdditionalData();
+						clientData.setKey(Constants.LABEL_ACTION_BUTTON2);
+						clientData.setValue(StringUtil.validateEmptyField(equivalence.getActionbutton2()));
+						lstClientData.add(clientData);*/
 					}
 				}
 			}
 		}
-
 		return lstClientData;
 	}
-
 }

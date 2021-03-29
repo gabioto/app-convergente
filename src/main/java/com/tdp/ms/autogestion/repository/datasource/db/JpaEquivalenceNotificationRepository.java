@@ -28,6 +28,6 @@ import com.tdp.ms.autogestion.repository.datasource.db.entities.TblEquivalenceNo
 public interface JpaEquivalenceNotificationRepository extends JpaRepository<TblEquivalenceNotification, Integer> {
 	@Query					
 	(value = "SELECT ten FROM TblEquivalenceNotification ten "			
-			+ "WHERE ten.code = ?1")
-	Optional<TblEquivalenceNotification> getEquivalence(String code);	
+			+ "WHERE ten.code = ?1 and ten.usecase = ?2")
+	Optional<TblEquivalenceNotification> getEquivalence(String code, String usecase);	
 }	

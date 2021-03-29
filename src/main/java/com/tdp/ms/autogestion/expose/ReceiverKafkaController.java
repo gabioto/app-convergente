@@ -45,7 +45,7 @@ import com.tdp.ms.autogestion.util.FunctionsUtil;
 @Component
 public class ReceiverKafkaController {
 
-	private static final Logger LOG = LoggerFactory.getLogger(ReceiverKafkaController.class);
+	private static final Logger log = LoggerFactory.getLogger(ReceiverKafkaController.class);
 
 	@Autowired
 	JpaTicketRepository ticketRepository;
@@ -77,9 +77,6 @@ public class ReceiverKafkaController {
 	@Transactional
 	@KafkaListener(topics = "${app.topic.foo}")
 	public void listen(@Payload String message) {
-		LOG.info("Receiver.listen()  ==>  queue-notification-tickets");
-		System.out.print(message);
-		System.out.print("\n\n");
 		TicketKafkaResponse ticketKafkaResponse = new Gson().fromJson(message, TicketKafkaResponse.class);
 
 		try {
@@ -124,15 +121,13 @@ public class ReceiverKafkaController {
 				tblTicket.setTblCustomer(tblCustomer);
 
 				tblTicket = ticketRepository.saveAndFlush(tblTicket);
-				System.out.println("tblTicket idTicket:: " + tblTicket.getIdTicket());
-				System.out.println("tblTicket idTicketTriaje:: " + tblTicket.getIdTicketTriage());
 
 				List<Attachment> listAttachment = ticketKafkaResponse.getEvent().getTroubleTicket().getAttachment();
 				List<AdditionalData> additionalDataLista = null;
 				TblAttachment tblAttachment = null;
 				TblAttachmentAdditionalData tblAttachmentAdditionalData = null;
 
-				if (listAttachment != null && listAttachment.size() > 0) {
+				if (listAttachment != null && !listAttachment.isEmpty()) {
 					for (Attachment attachment : listAttachment) {
 						tblAttachment = new TblAttachment();
 						tblAttachment.setIdAttachmentKafka(Integer.parseInt(attachment.getAttachmentId()));
@@ -159,7 +154,7 @@ public class ReceiverKafkaController {
 						.getAdditionalData();
 				TblAdditionalData tblAdditionalData = null;
 
-				if (AdditionalDataList != null && AdditionalDataList.size() > 0) {
+				if (AdditionalDataList != null && !AdditionalDataList.isEmpty()) {
 					for (AdditionalData ticketAdditional : AdditionalDataList) {
 						tblAdditionalData = new TblAdditionalData();
 						tblAdditionalData.setKeyAdditional(ticketAdditional.getKey());
@@ -179,7 +174,7 @@ public class ReceiverKafkaController {
 				if (tableEquivalence.isPresent()) {
 					List<TblEquivalence> lstEquivalence = tableEquivalence.get();
 
-					if (tblTicket.getInvolvement().equals(Constants.INTERNET) && tblTicket.getTechnology().equals(Constants.TECHNOLOGY_HFC)) {					
+					if (tblTicket.getInvolvement().equals(Constants.INTERNET) && !tblTicket.getTechnology().equals(Constants.TECHNOLOGY_GPON)) {					
 						for (TblEquivalence tblEquivalence : lstEquivalence) {
 							for (Attachment attachment : listAttachment) {
 								// Validar si el attachment existe en la tabla de equivalencias
@@ -216,14 +211,22 @@ public class ReceiverKafkaController {
 
 				for (AdditionalData additionalData : AdditionalDataList) {
 					if (additionalData.getKey().equals("notification-id")) {
+						String usecase = "";
+						if (tblTicket.getIdUseCase().equals(Constants.USE_CASE_INTERNET)) {
+							usecase = Constants.TICKET_INTERNET_HFC;
+						} else if (tblTicket.getIdUseCase().equals(Constants.USE_CASE_INTERNET_GPON)) {
+							usecase = Constants.TICKET_INTERNET_GPON;
+						} else if (tblTicket.getIdUseCase().equals(Constants.USE_CASE_CABLE)) {
+							usecase = Constants.TICKET_TV;
+						}
 						Optional<TblEquivalenceNotification> tblEquivalenceNotification = equivalenceNotificationRepository
-								.getEquivalence(tblAdditionalData.getValueAdditional());
+								.getEquivalence(tblAdditionalData.getValueAdditional(), usecase);
 						if (tblEquivalenceNotification.isPresent()) {
 							TblEquivalenceNotification equivalence = tblEquivalenceNotification.get();
 							
 							// Validar el estado del notification_id
 							if (tblTicket.getInvolvement().equals(Constants.CABLE)) {
-								if (equivalence.getCode().equals(Constants.CODE_REFRESH_OK)) {									
+								if (equivalence.getCode().equals(Constants.CODE_REFRESH_OK)) {
 									status = TicketStatus.REFRESH.toString();
 								} else if (equivalence.getAction().equals(TicketStatus.FAULT.name())) {
 									status = TicketStatus.FAULT.toString();
@@ -250,7 +253,6 @@ public class ReceiverKafkaController {
 					}
 				}
 
-				System.out.println("status ticket:: " + status);
 				LocalDateTime sysDate = LocalDateTime.now(ZoneOffset.of(Constants.ZONE_OFFSET));
 				tblTicket.setStatusTicket(status);
 				tblTicket.setModifiedDateTicket(sysDate);
@@ -263,12 +265,14 @@ public class ReceiverKafkaController {
 				logdata.setRequest(message);
 				logdata.setTypeLog("Insert Ticket Fcr");
 				functionsUtil.saveLogData(logdata);
-			}			
+			}
 		} catch (Exception e) {
-			System.out.println("Error::: " + e.getMessage());
+			log.error(this.getClass().getName() + " - Message: " + ticketKafkaResponse.toString());
+			log.error(this.getClass().getName() + " - Exception: " + e.getLocalizedMessage());
+			
 			LogData logdata = new LogData();
 			logdata.setActionLog("Kafka listener");
-			logdata.setIdTicketTriaje(Integer.parseInt(ticketKafkaResponse.getEvent().getTroubleTicket().getId()));
+			logdata.setIdTicketTriaje(Integer.parseInt(ticketKafkaResponse.getEvent().getTroubleTicket().getId()));			
 			logdata.setRequest(message);
 			logdata.setRequest(e.getMessage());
 			logdata.setTypeLog("Insert Ticket Fcr");

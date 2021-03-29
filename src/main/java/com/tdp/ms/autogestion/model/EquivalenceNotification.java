@@ -52,4 +52,16 @@ public class EquivalenceNotification {
 	private String windows;
 	
 	private String usecase;
+	
+	private String subtitle;
+	
+	private String subtitle2;
+	
+	private String icon2;
+	
+	private String windows2;
+	
+	private String button2;
+	
+	private String actionbutton2;	
 }

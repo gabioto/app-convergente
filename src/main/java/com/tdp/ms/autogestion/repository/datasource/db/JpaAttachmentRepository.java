@@ -31,8 +31,7 @@ import com.tdp.ms.autogestion.repository.datasource.db.entities.TblAttachment;
 public interface JpaAttachmentRepository extends JpaRepository<TblAttachment, Integer> {
 	
 	@Query					
-	(value = "SELECT ta FROM TblAttachment ta "
-			+ "JOIN TblEquivalence te ON te.attachmentName = ta.nameAttachment "
+	(value = "SELECT ta FROM TblAttachment ta "			
 			+ "WHERE ta.tblTicket.idTicket = ?1 ORDER BY ta.idAttachmentKafka ASC")
 	Optional<List<TblAdditionalData>> getTicketAdditionalData(int idTicket);
 }

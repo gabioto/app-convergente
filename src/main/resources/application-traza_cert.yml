@@ -2,7 +2,7 @@ spring:
   application:
     name: trazabilidad-autogestion
   jpa:
-    show-sql: false
+    show-sql: true
     properties:
       hibernate:
         temp:
@@ -16,10 +16,6 @@ spring:
       connectionTimeout: 30000
       maximumPoolSize: 100
       minimum-idle: 10
-#    url: jdbc:postgresql://a1f396ab-707f-4fcc-8225-fee7f1d7647a.br37s45d0p54n73ffbr0.databases.appdomain.cloud:30865/ibmclouddb
-#    username: user_averia
-#    password: SyDe2VrKZH
-#    driverClassName: org.postgresql.Driver
   kafka:
     bootstrap-servers: cap-sg-prd-1.securegateway.appdomain.cloud:18007
     

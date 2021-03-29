@@ -2,7 +2,7 @@ spring:
   application:
     name: trazabilidad-autogestion
   jpa:
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         temp:
@@ -16,10 +16,6 @@ spring:
       connectionTimeout: 30000
       maximumPoolSize: 100
       minimum-idle: 10
-#    url: jdbc:postgresql://sl-us-south-1-portal.54.dblayer.com:23239/compose
-#    username: admin
-#    password: GNTVLIQEAIPDVGTT
-#    driverClassName: org.postgresql.Driver
   kafka:
     bootstrap-servers: cap-sg-prd-1.securegateway.appdomain.cloud:18007 
     
@@ -35,4 +31,4 @@ app:
     client: afc1075e-69a4-40dc-809a-11e498cea9af
 logging:
   level:
-    com.tdp.ms.autogestion: DEBUG
+    com.tdp.ms.autogestion: ERROR

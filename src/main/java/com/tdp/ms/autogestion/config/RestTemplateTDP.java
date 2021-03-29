@@ -7,6 +7,8 @@ import java.security.KeyStore;
 
 import javax.net.ssl.SSLContext;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.HttpClients;
@@ -20,6 +22,8 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class RestTemplateTDP {
 
+	private static final Log log = LogFactory.getLog(RestTemplateTDP.class);
+	
 	private static String KEY_JKS = "Amdocs123";
 
 	@Bean
@@ -38,6 +42,8 @@ public class RestTemplateTDP {
 					.loadKeyMaterial(keyStore("classpath:keystore.jks", password), password)
 					.loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
 		} catch (Exception e) {
+			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
+			
 			e.printStackTrace();
 		}
 

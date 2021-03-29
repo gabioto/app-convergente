@@ -33,9 +33,21 @@ public class Constants {
 	public static final String PHONE = "phone";		
 	public static final String CODE_REFRESH_OK = "20000123-202";
 	public static final String TECHNOLOGY_HFC = "HFC";
+	public static final String TECHNOLOGY_ADSL = "ADSL";
 	public static final String TECHNOLOGY_GPON = "GPON";
 	public static final String LABEL_TIME = "TIME";
 	public static final Integer INT_MINUTES = 240;
+	public static final Integer INT_MINUTES_TIMEOUT = 1800; 
+	public static final String LABEL_SUBTITLE = "SUBTITLE";
+	public static final String LABEL_SUBTITLE2 = "SUBTITLE2";
+	public static final String LABEL_ICON2 = "ICON2";
+	public static final String LABEL_BUTTON2 = "BUTTON2";
+	public static final String LABEL_ACTION_BUTTON2 = "ACTION_BUTTON2";
+	public static final String LABEL_WINDOW_ID2 = "WINDOW2";
+	public static final String TICKET_INTERNET_HFC = "No Navega - HFC";
+	public static final String TICKET_INTERNET_GPON = "No Navega - GPON";
+	public static final String TICKET_TV = "Sin Señal TV";
+	public static final String TXT_EXCEPTION = " - Exception: ";
 	
 	// EXCEPTIONS
 	public static final String SVC0001 = "SVC0001";

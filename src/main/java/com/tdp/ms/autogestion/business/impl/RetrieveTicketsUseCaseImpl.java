@@ -22,7 +22,6 @@ import com.tdp.ms.autogestion.exception.DomainException;
 import com.tdp.ms.autogestion.exception.ErrorCategory;
 import com.tdp.ms.autogestion.exception.ForbiddenException;
 import com.tdp.ms.autogestion.exception.GenericDomainException;
-import com.tdp.ms.autogestion.exception.ResourceNotFoundException;
 import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
 import com.tdp.ms.autogestion.model.LogData;
 import com.tdp.ms.autogestion.model.Ticket;
@@ -70,81 +69,69 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 			List<Ticket> tickets = ticketRepository.findByCustomerAndUseCase(nationalIdType, nationalId, reference,
 					involvement, today.atStartOfDay(), today.atStartOfDay().plusDays(1));
 
-			List<Integer> listIds = getListIds(tickets, true);
+			List<Integer> listIds = getListIds(tickets);
 
-			if (listIds.size() > 0) {
+			if (!listIds.isEmpty()) {
 				return evaluateTicketStatus(listIds);
 			}
 
 			// Validar si tiene tickets en dias anteriores
 			tickets = ticketRepository.findByCustomerAndUseCasePast(nationalIdType, nationalId, reference, involvement);
 
-			listIds = getListIds(tickets, false);
+			listIds = getListIds(tickets);
 
-			if (listIds.size() > 0) {
+			if (!listIds.isEmpty()) {
 				return evaluatePastTicketStatus(listIds);
 			}
-
-			ResponseEntity<TicketStatusResponse> ticketStatusResponse = new ResponseEntity<>(new TicketStatusResponse(),
-					HttpStatus.OK);
-
-			functionsUtil.saveLogData(new LogData(0, nationalIdType, nationalIdType, "Retrieve Ticket",
-					"retrieveTicket", "", ticketStatusResponse.toString(), "Retrieve Ticket"));
-
-			return ticketStatusResponse;
-		} catch (ResourceNotFoundException e) {
-			throw e;
-		} catch (ForbiddenException e) {
-			throw e;
+			return new ResponseEntity<>(new TicketStatusResponse(), HttpStatus.OK);
 		} catch (DomainException e) {
+			log.error(this.getClass().getName() + " - Exception: " + e.getLocalizedMessage());
+			
 			throw e;
 		} catch (Exception e) {
+			log.error(this.getClass().getName() + " - Exception: " + e.getLocalizedMessage());
+			
 			throw new GenericDomainException(ErrorCategory.UNEXPECTED, e.getLocalizedMessage());
 		}
 	}
 
-	private List<Integer> getListIds(List<Ticket> tickets, boolean isToday) {
-		List<Integer> listIds = new ArrayList<Integer>();
-
+	private List<Integer> getListIds(List<Ticket> tickets) {
+		List<Integer> listIds = new ArrayList<>();
+		
 		if (tickets != null) {
 			String idTicketTriage = "";
-			int count = 0;
-
 			for (Ticket ticket : tickets) {
 				if (idTicketTriage.isEmpty()) {
 					idTicketTriage = ticket.getIdTriage().toString();
 					listIds.add(0, ticket.getId());
-					log.info("1 - Id Ticket Triaje (Dia Actual): " + idTicketTriage);
-
-				} else if (!idTicketTriage.equals(ticket.getIdTriage().toString())) {
-					idTicketTriage = ticket.getIdTriage().toString();
-					listIds.add(1, ticket.getId());
-					count = 2;
-					log.info("2 - Id Ticket Triaje (Dia Actual): " + idTicketTriage);
-
-				} else if (count == 0) {
+					if (ticket.getTicketStatus().equals(TicketStatus.WA_DEFAULT.name())
+							|| ticket.getTicketStatus().equals(TicketStatus.WA_DEFAULT_SOLVED.name())) {
+						break;
+					}
+				} else if (idTicketTriage.equals(ticket.getIdTriage().toString())
+						&& (ticket.getTicketStatus().equals(TicketStatus.WA_DEFAULT.name())
+								|| ticket.getTicketStatus().equals(TicketStatus.WA_DEFAULT_SOLVED.name()))) {
 					idTicketTriage = ticket.getIdTriage().toString();
 					listIds.remove(0);
 					listIds.add(0, ticket.getId());
-					count++;
-					log.info("1 - Id Ticket Triaje Actualizado (Dia Actual): " + idTicketTriage);
-
-				} else if (isToday && count == 2) {
+					break;
+				} else {
 					idTicketTriage = ticket.getIdTriage().toString();
-					listIds.remove(1);
-					listIds.add(1, ticket.getId());
-					count++;
-					log.info("2 - Id Ticket Triaje Actualizado (Dia Actual): " + idTicketTriage);
+					listIds.remove(0);
+					listIds.add(0, ticket.getId());
 				}
 			}
 		}
-
 		return listIds;
 	}
 
 	private ResponseEntity<TicketStatusResponse> evaluateTicketStatus(List<Integer> listIds) throws ParseException {
 		Ticket ticket = ticketRepository.getTicket(listIds.get(0));
-
+		
+		int minutesTimeout = getMinutesTimeout(ticket);
+		if (minutesTimeout >= Constants.INT_MINUTES_TIMEOUT) {
+			ticket = updateTicketStatus(ticket);
+		}
 		if (validateStatus(ticket)) {
 			int minutes = 0;
 			if (ticket.getInvolvement().equals(Constants.CABLE) && ticket.getTicketStatus().equals(TicketStatus.REFRESH.name())) {
@@ -153,7 +140,7 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 					ticket = ticketRepository.updateTicketStatus(ticket.getIdTriage(), TicketStatus.REFRESH_SOLVED.name());
 					minutes = 0;
 				}
-			}
+			}			
 			ResponseEntity<TicketStatusResponse> ticketStatusResponse = new ResponseEntity<>(
 					TicketStatusResponse.from(ticket, ticketRepository.getAdditionalData(ticket, minutes)), HttpStatus.OK);
 
@@ -181,8 +168,13 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 		Ticket ticket = null;
 
 		int minutes = 0;
-		if (listIds.size() > 0) {
+		if (!listIds.isEmpty()) {
 			ticket = ticketRepository.getTicket(listIds.get(0));
+			
+			int minutesTimeout = getMinutesTimeout(ticket);
+			if (minutesTimeout >= Constants.INT_MINUTES_TIMEOUT) {
+				ticket = updateTicketStatus(ticket);
+			}			
 			if (ticket.getInvolvement().equals(Constants.CABLE) && ticket.getTicketStatus().equals(TicketStatus.REFRESH.name())) {
 				minutes = getMinutesRefresh(ticket);
 				if (minutes >= Constants.INT_MINUTES) {
@@ -200,7 +192,6 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 			// Puede crear Ticket
 			return new ResponseEntity<>(new TicketStatusResponse(), HttpStatus.OK);
 		}
-
 	}
 
 	private boolean validateStatus(Ticket ticket) {
@@ -211,6 +202,23 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 				&& !ticket.getTicketStatus().equalsIgnoreCase(TicketStatus.GENERIC_SOLVED.name());
 	}
 
+	private Ticket updateTicketStatus(Ticket ticket) {
+		if (ticket.getTicketStatus().equals(TicketStatus.WHATSAPP.name())) {
+			ticket = ticketRepository.updateTicketStatus(ticket.getIdTriage(), TicketStatus.WA_SOLVED.name());					
+		} else if (ticket.getTicketStatus().equals(TicketStatus.GENERIC.name())) {
+			ticket = ticketRepository.updateTicketStatus(ticket.getIdTriage(), TicketStatus.GENERIC_SOLVED.name());					
+		} else if (ticket.getTicketStatus().equals(TicketStatus.FAULT.name())) {
+			ticket = ticketRepository.updateTicketStatus(ticket.getIdTriage(), TicketStatus.FAULT_SOLVED.name());					
+		} else if (ticket.getTicketStatus().equals(TicketStatus.RESET_SOLVED.name())) {
+			ticket = ticketRepository.updateTicketStatus(ticket.getIdTriage(), TicketStatus.SOLVED.name());					
+		} else if (ticket.getTicketStatus().equals(TicketStatus.WA_DEFAULT.name())) {
+			ticket = ticketRepository.updateTicketStatus(ticket.getIdTriage(), TicketStatus.WA_DEFAULT_SOLVED.name());					
+		} else if (ticket.getTicketStatus().equals(TicketStatus.REFRESH.name())) {
+			ticket = ticketRepository.updateTicketStatus(ticket.getIdTriage(), TicketStatus.REFRESH_SOLVED.name());					
+		}
+		return ticket;
+	}
+	
 	private void saveLog(Ticket ticket, String message) {
 		functionsUtil.saveLogData(new LogData(ticket.getIdTriage(), ticket.getCustomer().getNationalId(),
 				ticket.getCustomer().getNationalType(), "Retrieve Ticket", "retrieveTicket",
@@ -225,6 +233,20 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			
 		Date d1 = format.parse(dateReset);
+		Date d2 = format.parse(dateActual);
+		long diff = d2.getTime() - d1.getTime();
+		minutes = (int) TimeUnit.MILLISECONDS.toSeconds(diff);		
+		return minutes; 
+	}
+
+	private int getMinutesTimeout(Ticket ticket) throws ParseException {
+		int minutes = 0;
+		String dateCreation = ticket.getCreationDate().toString().replace("T", " ");
+		String dateActual = LocalDateTime.now(ZoneOffset.of(Constants.ZONE_OFFSET)).toString().replace("T", " " );
+			
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			
+		Date d1 = format.parse(dateCreation);
 		Date d2 = format.parse(dateActual);
 		long diff = d2.getTime() - d1.getTime();
 		minutes = (int) TimeUnit.MILLISECONDS.toSeconds(diff);		

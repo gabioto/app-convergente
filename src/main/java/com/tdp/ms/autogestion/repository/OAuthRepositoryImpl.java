@@ -19,8 +19,7 @@ import com.tdp.ms.autogestion.repository.datasource.db.entities.TblOauth;
 public class OAuthRepositoryImpl implements OAuthRepository {
 
 	private static final Log log = LogFactory.getLog(OAuthRepositoryImpl.class);
-	private static final String TAG = OAuthRepositoryImpl.class.getCanonicalName();
-
+	
 	@Autowired
 	private OAuthApi oAuthApi;
 
@@ -46,6 +45,8 @@ public class OAuthRepositoryImpl implements OAuthRepository {
 				throw new GenericDomainException(ErrorCategory.UNEXPECTED, "OAuth couldn't be null");
 			}
 		} catch (Exception e) {
+			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
+			
 			throw new GenericDomainException(ErrorCategory.UNEXPECTED, e.getLocalizedMessage());
 		}
 
@@ -57,7 +58,6 @@ public class OAuthRepositoryImpl implements OAuthRepository {
 
 		if (lOAuthResponse != null) {
 			TblOauth tableOauth = jpaOAuthRepository.save(TblOauth.from(lOAuthResponse));
-			log.info(TAG + " update tableOauth:: " + tableOauth.getIdOauth());
 		}
 
 		return lOAuthResponse;

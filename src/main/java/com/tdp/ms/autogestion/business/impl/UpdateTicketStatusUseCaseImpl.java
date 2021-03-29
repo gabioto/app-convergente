@@ -2,11 +2,14 @@ package com.tdp.ms.autogestion.business.impl;
 
 import java.util.ArrayList;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.google.gson.Gson;
 import com.tdp.ms.autogestion.business.UpdateTicketStatusUseCase;
 import com.tdp.ms.autogestion.exception.DomainException;
 import com.tdp.ms.autogestion.exception.ErrorCategory;
@@ -40,6 +43,8 @@ import com.tdp.ms.autogestion.util.FunctionsUtil;
 @Service
 public class UpdateTicketStatusUseCaseImpl implements UpdateTicketStatusUseCase {
 
+	private static final Log log = LogFactory.getLog(UpdateTicketStatusUseCaseImpl.class);
+	
 	@Autowired
 	TicketRepository ticketRepository;
 
@@ -55,13 +60,15 @@ public class UpdateTicketStatusUseCaseImpl implements UpdateTicketStatusUseCase 
 				for (TicketStatus elemento : TicketStatus.values()) {
 					if (elemento.name().equals(status)) {
 						Ticket ticket = ticketRepository.updateTicketStatus(idTicket, status);
-				
-						ResponseEntity<TicketStatusResponse> ticketStatusResponse = new ResponseEntity<>(TicketStatusResponse.from(ticket, new ArrayList<>()),
-								HttpStatus.OK);
-						
-						functionsUtil.saveLogData(new LogData(idTicket, ticket.getCustomer().getNationalType(), ticket.getCustomer().getNationalId(), "Update Ticket",
-								"updateTicketStatus", String.valueOf(idTicket), ticketStatusResponse.toString(), "Update Ticket"));
-						
+
+						ResponseEntity<TicketStatusResponse> ticketStatusResponse = new ResponseEntity<>(
+								TicketStatusResponse.from(ticket, new ArrayList<>()), HttpStatus.OK);
+
+						functionsUtil.saveLogData(new LogData(idTicket, ticket.getCustomer().getNationalId(),
+								ticket.getCustomer().getNationalType(), "Update Ticket", "updateTicketStatus",
+								String.valueOf(idTicket).concat("|").concat(status), ticketStatusResponse.toString(),
+								"Update Ticket"));
+
 						return ticketStatusResponse;
 					}
 				}
@@ -69,13 +76,14 @@ public class UpdateTicketStatusUseCaseImpl implements UpdateTicketStatusUseCase 
 			} else {
 				throw new ValidRequestException(ErrorCategory.MISSING_MANDATORY, "idTicket is empty or null");
 			}
-		} catch (ResourceNotFoundException e) {
+		}  catch (DomainException e) {
+			log.error(this.getClass().getName() + " - Exception: " + e.getLocalizedMessage());
+			
 			throw e;
-		} catch (DomainException e) {
-			throw e;
-		} catch (Exception e) {
+		}catch (Exception e) {
+			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
+
 			throw new GenericDomainException(ErrorCategory.UNEXPECTED, e.getLocalizedMessage());
 		}
 	}
-
 }

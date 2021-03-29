@@ -18,5 +18,5 @@ public class AutogestionConfig {
     public javax.validation.Validator validator() {
         return new org.springframework.validation.beanvalidation.LocalValidatorFactoryBean();
     }
-    
+
 }

@@ -1,17 +1,20 @@
 package com.tdp.ms.autogestion.business.impl;
 
+import java.text.ParseException;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.google.gson.Gson;
 import com.tdp.ms.autogestion.business.RetrieveTicketStatusUseCase;
 import com.tdp.ms.autogestion.exception.DomainException;
 import com.tdp.ms.autogestion.exception.ErrorCategory;
 import com.tdp.ms.autogestion.exception.GenericDomainException;
-import com.tdp.ms.autogestion.exception.ResourceNotFoundException;
 import com.tdp.ms.autogestion.expose.entities.TicketStatusResponse;
 import com.tdp.ms.autogestion.model.LogData;
 import com.tdp.ms.autogestion.model.Ticket;
@@ -40,6 +43,8 @@ import com.tdp.ms.autogestion.util.FunctionsUtil;
 @Service
 public class RetrieveTicketStatusUseCaseImpl implements RetrieveTicketStatusUseCase {
 
+	private static final Log log = LogFactory.getLog(RetrieveTicketStatusUseCaseImpl.class);
+	
 	@Autowired
 	TicketRepository ticketRepository;
 
@@ -49,18 +54,7 @@ public class RetrieveTicketStatusUseCaseImpl implements RetrieveTicketStatusUseC
 	@Override
 	public ResponseEntity<TicketStatusResponse> retrieveTicketStatus(int idTicket) throws GenericDomainException {
 		try {
-			List<Ticket> tickets = ticketRepository.getTicketStatus(idTicket);
-			if (tickets.size() == 1) {
-				// Si ticket es cableTv en estado refresh
-				if (tickets.get(0).getInvolvement().equals(Constants.CABLE) && tickets.get(0).getTicketStatus().equals(TicketStatus.REFRESH.name())) {
-					tickets.add(0, ticketRepository.updateTicketStatus(tickets.get(0).getIdTriage(), TicketStatus.REFRESH_SOLVED.name()));
-				}
-			} else {
-				// Si ticket es cableTv en estado refresh
-				if (tickets.get(1).getInvolvement().equals(Constants.CABLE) && tickets.get(1).getTicketStatus().equals(TicketStatus.REFRESH.name())) {
-					tickets.add(1, ticketRepository.updateTicketStatus(tickets.get(0).getIdTriage(), TicketStatus.REFRESH_SOLVED.name()));
-				}
-			}
+			List<Ticket> tickets = validateRefresh(idTicket);
 			Ticket ticket = tickets.get(tickets.size() == 1 ? 0 : 1);
 
 			ResponseEntity<TicketStatusResponse> ticketStatusResponse = new ResponseEntity<>(
@@ -71,13 +65,42 @@ public class RetrieveTicketStatusUseCaseImpl implements RetrieveTicketStatusUseC
 					String.valueOf(idTicket), ticketStatusResponse.toString(), "Retrieve Ticket Status"));
 
 			return ticketStatusResponse;
-		} catch (ResourceNotFoundException e) {
-			throw e;
 		} catch (DomainException e) {
+			log.error(this.getClass().getName() + " - Exception: " + e.getLocalizedMessage());
+			
 			throw e;
 		} catch (Exception e) {
+			log.error(this.getClass().getName() + " - Exception: " + e.getLocalizedMessage());
+			
 			throw new GenericDomainException(ErrorCategory.UNEXPECTED, e.getLocalizedMessage());
 		}
 	}
 
+	private List<Ticket> validateRefresh(int idTicket) throws ParseException {
+		List<Ticket> tickets = ticketRepository.getTicketStatus(idTicket);
+		if (tickets.size() == 1) {
+			// Si ticket es cableTv en estado refresh
+			if (tickets.get(0).getInvolvement().equals(Constants.CABLE)
+					&& tickets.get(0).getTicketStatus().equals(TicketStatus.REFRESH.name())) {
+				int minutes = functionsUtil.getMinutesRefresh(tickets.get(0));
+				if (minutes >= Constants.INT_MINUTES) {
+					tickets.add(0, ticketRepository.updateTicketStatus(tickets.get(0).getIdTriage(),
+							TicketStatus.REFRESH_SOLVED.name()));
+					minutes = 0;
+				}
+			}
+		} else {
+			// Si ticket es cableTv en estado refresh
+			if (tickets.get(1).getInvolvement().equals(Constants.CABLE)
+					&& tickets.get(1).getTicketStatus().equals(TicketStatus.REFRESH.name())) {
+				int minutes = functionsUtil.getMinutesRefresh(tickets.get(1));
+				if (minutes >= Constants.INT_MINUTES) {
+					tickets.add(1, ticketRepository.updateTicketStatus(tickets.get(1).getIdTriage(),
+							TicketStatus.REFRESH_SOLVED.name()));
+					minutes = 0;
+				}
+			}
+		}
+		return tickets;
+	}
 }

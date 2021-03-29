@@ -9,7 +9,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -30,8 +29,7 @@ import com.tdp.ms.autogestion.util.FunctionsUtil;
 @Component
 public class TicketApi {
 
-	private static final Log log = LogFactory.getLog(TicketApi.class);
-	private static final String TAG = TicketApi.class.getCanonicalName();
+	private static final Log log = LogFactory.getLog(TicketApi.class);	
 	private static final String METHOD_NAME = "generateTicket";
 
 	@Autowired
@@ -40,14 +38,7 @@ public class TicketApi {
 	@Autowired
 	private FunctionsUtil functionsUtil;
 
-	//@Autowired
-	//private HttpComponentsClientHttpRequestFactory initClientRestTemplate;
-
-	//@Autowired
-	//private RestTemplate restTemplate;
-
 	public Ticket generate(OAuth pOAuth, Ticket pTicket) {
-		//restTemplate.setRequestFactory(initClientRestTemplate);
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
@@ -63,8 +54,6 @@ public class TicketApi {
 
 		HttpEntity<TicketApiRequest> entity = new HttpEntity<>(ticketRequest, headers);
 
-		log.info(TAG + " " + new Gson().toJson(entity));
-
 		try {
 			ResponseEntity<TicketApiResponse> response = restTemplate.exchange(requestUrl, HttpMethod.POST, entity,
 					TicketApiResponse.class);
@@ -77,11 +66,15 @@ public class TicketApi {
 				throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "invalid ticketResponse");
 			}
 		} catch (HttpClientErrorException e) {
+			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
+			
 			functionsUtil.saveLogData(new LogData(0, pTicket.getCustomer().getNationalId(),
 					pTicket.getCustomer().getNationalType(), pTicket.getChannelId(), Constants.ERROR,
 					new Gson().toJson(entity), e.getLocalizedMessage(), METHOD_NAME));
 			throw new ExternalServerException(ErrorCategory.EXTERNAL_ERROR, e.getLocalizedMessage());
 		} catch (Exception e) {
+			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
+			
 			functionsUtil.saveLogData(new LogData(0, pTicket.getCustomer().getNationalId(),
 					pTicket.getCustomer().getNationalType(), pTicket.getChannelId(), Constants.ERROR,
 					new Gson().toJson(entity), e.getLocalizedMessage(), METHOD_NAME));

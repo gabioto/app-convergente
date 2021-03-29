@@ -25,15 +25,13 @@ public class SecurityUtil {
 			c.init(Cipher.DECRYPT_MODE, key);
 			byte[] decordedValue = Base64Utils.decodeFromString(encryptedValue);
 			byte[] decValue = c.doFinal(decordedValue);
-			String decryptedValue = new String(decValue);
-			return decryptedValue;
+			return new String(decValue);			
 		} catch (Exception e) {
 			throw new GenericDomainException(ErrorCategory.UNEXPECTED, e.getLocalizedMessage());
 		}
 	}
 
 	private static Key generateKey() throws GenericDomainException {
-		Key key = new SecretKeySpec(keyValue, ALGORITHM);
-		return key;
+		return new SecretKeySpec(keyValue, ALGORITHM);		
 	}
 }

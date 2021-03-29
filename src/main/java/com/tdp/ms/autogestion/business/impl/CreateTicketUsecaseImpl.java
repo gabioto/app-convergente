@@ -2,11 +2,14 @@ package com.tdp.ms.autogestion.business.impl;
 
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.google.gson.Gson;
 import com.tdp.ms.autogestion.business.CreateTicketUseCase;
 import com.tdp.ms.autogestion.exception.DomainException;
 import com.tdp.ms.autogestion.exception.ErrorCategory;
@@ -23,7 +26,9 @@ import com.tdp.ms.autogestion.util.Constants;
 
 @Service
 public class CreateTicketUsecaseImpl implements CreateTicketUseCase {
-
+	
+	private static final Log log = LogFactory.getLog(CreateTicketUsecaseImpl.class);
+	
 	@Autowired
 	private OAuthRepository oAuthRepository;
 
@@ -54,6 +59,8 @@ public class CreateTicketUsecaseImpl implements CreateTicketUseCase {
 					ticket.setUseCaseId(Constants.USE_CASE_INTERNET);
 				} else if (technology.equals(Constants.TECHNOLOGY_GPON)) {
 					ticket.setUseCaseId(Constants.USE_CASE_INTERNET_GPON);
+				} else {
+					ticket.setUseCaseId(Constants.USE_CASE_INTERNET);
 				}
 				break;
 			case Constants.FIJA:
@@ -81,8 +88,14 @@ public class CreateTicketUsecaseImpl implements CreateTicketUseCase {
 
 			return new ResponseEntity<>(TicketCreateResponse.from(ticket), HttpStatus.OK);
 		} catch (DomainException e) {
+			log.error(this.getClass().getName() + " - Exception: " + e.getLocalizedMessage());
+			log.error(this.getClass().getName() + new Gson().toJson(request));
+			
 			throw e;
 		} catch (Exception e) {
+			log.error(this.getClass().getName() + " - Exception: " + e.getLocalizedMessage());
+			log.error(this.getClass().getName() + new Gson().toJson(request));
+			
 			throw new GenericDomainException(ErrorCategory.UNEXPECTED, e.getLocalizedMessage());
 		}
 	}
@@ -91,5 +104,4 @@ public class CreateTicketUsecaseImpl implements CreateTicketUseCase {
 		AdditionalData field = data.stream().filter(item -> value.equals(item.getKey())).findFirst().orElse(null);
 		return (field != null) ? field.getValue() : "";
 	}
-
 }

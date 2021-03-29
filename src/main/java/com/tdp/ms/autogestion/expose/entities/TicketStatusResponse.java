@@ -53,8 +53,7 @@ public class TicketStatusResponse {
 
 	private List<ResponseAdditionalData> additionalData;
 
-	@Data
-	@NoArgsConstructor
+	@Data	
 	@AllArgsConstructor
 	@EqualsAndHashCode(callSuper = false)
 	public static class ResponseAdditionalData {

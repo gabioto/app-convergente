@@ -9,6 +9,8 @@ applications:
     instances: 1
     env:
       TDP_DRIVERCLASSNAME: org.postgresql.Driver
-      TDP_URL: jdbc:postgresql://sl-us-south-1-portal.54.dblayer.com:23239/compose
-      TDP_USERNAME: admin
-      TDP_PASSWORD: GNTVLIQEAIPDVGTT
+      TDP_URL: jdbc:postgresql://1ca72738-f3c8-4479-a5a4-e693416200d8.b2b5a92ee2df47d58bad0fa448c15585.databases.appdomain.cloud:31174/ibmclouddb
+      TDP_USERNAME: user_averia
+      TDP_PASSWORD: SyDe2VrKZH
+      IBM_JVM_LICENSE: L-SMKR-AVSEUH
+      IBM_LIBERTY_LICENSE: L-CTUR-BSSH6W

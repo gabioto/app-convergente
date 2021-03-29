@@ -52,7 +52,20 @@ public class TblEquivalenceNotification implements Serializable {
 	private String windows;
 	
 	private String usecase;
-
+	
+	// Nuevos campos
+	private String subtitle;
+	
+	private String icon2;
+	
+	private String subtitle2;
+	
+	private String windows2;
+	
+	private String button2;
+	
+	private String actionbutton2;
+	
 	public TblEquivalenceNotification() {
 		// Constructor without fields
 	}
@@ -155,7 +168,7 @@ public class TblEquivalenceNotification implements Serializable {
 	
 	public EquivalenceNotification fromThis() {
 		return new EquivalenceNotification(idEquivalenceNotification, code, description, action, title, body, footer,
-				icon, button, image, actionbutton, windows, usecase);
+				icon, button, image, actionbutton, windows, usecase, subtitle, subtitle2, icon2, windows2, button2, actionbutton2);
 	}
 
 	public static List<EquivalenceNotification> listFromThis(List<TblEquivalenceNotification> equiNotList) {
@@ -166,5 +179,61 @@ public class TblEquivalenceNotification implements Serializable {
 		}
 
 		return equivalence;
+	}
+
+	public String getUsecase() {
+		return usecase;
+	}
+
+	public void setUsecase(String usecase) {
+		this.usecase = usecase;
+	}
+
+	public String getSubtitle() {
+		return subtitle;
+	}
+
+	public String getIcon2() {
+		return icon2;
+	}
+
+	public String getSubtitle2() {
+		return subtitle2;
+	}
+
+	public String getWindows2() {
+		return windows2;
+	}
+
+	public String getButton2() {
+		return button2;
+	}
+
+	public String getActionbutton2() {
+		return actionbutton2;
+	}
+
+	public void setSubtitle(String subtitle) {
+		this.subtitle = subtitle;
+	}
+
+	public void setIcon2(String icon2) {
+		this.icon2 = icon2;
+	}
+
+	public void setSubtitle2(String subtitle2) {
+		this.subtitle2 = subtitle2;
+	}
+
+	public void setWindows2(String windows2) {
+		this.windows2 = windows2;
+	}
+	
+	public void setButton2(String button2) {
+		this.button2 = button2;
+	}
+
+	public void setActionbutton2(String actionbutton2) {
+		this.actionbutton2 = actionbutton2;
 	}
 }
