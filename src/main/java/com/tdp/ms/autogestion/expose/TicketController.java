@@ -34,7 +34,6 @@ import com.tdp.ms.autogestion.util.Constants;
 @Validated
 @CrossOrigin(origins = "*")
 @RequestMapping("/trazabilidad/v1/tickets")
-
 public class TicketController {
 
 	@Autowired

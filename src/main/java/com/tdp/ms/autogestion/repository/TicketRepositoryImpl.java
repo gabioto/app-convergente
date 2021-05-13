@@ -94,13 +94,48 @@ public class TicketRepositoryImpl implements TicketRepository {
 		LocalDateTime sysDate = LocalDateTime.now(ZoneOffset.of(Constants.ZONE_OFFSET));
 		Optional<List<TblTicket>> list = jpaTicketRepository.getTicketStatus(idTicket);
 
-		if (list.isPresent()) {
+		if (list.isPresent()) { 
 			TblTicket tblTicket = null;
-			if (list.get().size() <= 2) {
-				tblTicket = list.get().get(list.get().size() == 1 ? 0 : 1);
+			if (list.get().size() == 1) {
+				tblTicket = list.get().get(0);
+			} else if (list.get().size() <= 2) {
+				if (list.get().get(0).getStatusTicket().equals(TicketStatus.WA_DEFAULT.name())) {
+					tblTicket = list.get().get(0);
+				} else if (list.get().get(1).getStatusTicket().equals(TicketStatus.WA_DEFAULT.name())) {
+					tblTicket = list.get().get(1);
+				} else {
+					tblTicket = list.get().get(list.get().size() == 1 ? 0 : 1);
+				}
+			} else if (list.get().size() <= 3) {
+				if (list.get().get(0).getStatusTicket().equals(TicketStatus.WA_DEFAULT.name())) {
+					tblTicket = list.get().get(0);
+				} else if (list.get().get(1).getStatusTicket().equals(TicketStatus.WA_DEFAULT.name())) {
+					tblTicket = list.get().get(1);
+				} else if (list.get().get(2).getStatusTicket().equals(TicketStatus.WA_DEFAULT.name())) {
+					tblTicket = list.get().get(2);					
+				} else {
+					tblTicket = list.get().get(1);
+				}
+			} else if (list.get().size() <= 4) {
+				if (list.get().get(0).getStatusTicket().equals(TicketStatus.WA_DEFAULT.name())) {
+					tblTicket = list.get().get(0);
+				} else if (list.get().get(1).getStatusTicket().equals(TicketStatus.WA_DEFAULT.name())) {
+					tblTicket = list.get().get(1);
+				} else if (list.get().get(2).getStatusTicket().equals(TicketStatus.WA_DEFAULT.name())) {
+					tblTicket = list.get().get(2);					
+				} else if (list.get().get(3).getStatusTicket().equals(TicketStatus.WA_DEFAULT.name())) {
+					tblTicket = list.get().get(3);					
+				} else {
+					tblTicket = list.get().get(1);
+				}
 			} else {
-				if (list.get().get(2).getStatusTicket().equals(TicketStatus.WA_DEFAULT.name())) {
-					tblTicket = list.get().get(2);
+				int total = list.get().size();				
+				if (list.get().get(total-1).getStatusTicket().equals(TicketStatus.WA_DEFAULT.name())) {
+					tblTicket = list.get().get(total-1);
+				} else if (list.get().get(total-2).getStatusTicket().equals(TicketStatus.WA_DEFAULT.name())) {
+					tblTicket = list.get().get(total-2);
+				} else if (list.get().get(total-3).getStatusTicket().equals(TicketStatus.WA_DEFAULT.name())) {
+					tblTicket = list.get().get(total-3);
 				} else {
 					tblTicket = list.get().get(1);
 				}
@@ -116,6 +151,24 @@ public class TicketRepositoryImpl implements TicketRepository {
 		}
 	}
 
+	@Override
+	public Ticket updateTicketStatusTimeout(int idTicket, String status) {
+		LocalDateTime sysDate = LocalDateTime.now(ZoneOffset.of(Constants.ZONE_OFFSET));
+		Optional<List<TblTicket>> list = jpaTicketRepository.getTicket(idTicket);
+
+		if (list.isPresent()) {
+			TblTicket tblTicket = list.get().get(0);
+			tblTicket.setStatusTicket(status);
+			tblTicket.setModifiedDateTicket(sysDate);			
+			tblTicket = jpaTicketRepository.save(tblTicket);
+
+			return tblTicket.fromThis();
+		} else {
+			throw new ResourceNotFoundException(ErrorCategory.RESOURCE_NOT_FOUND.getExceptionText(),
+					String.valueOf(idTicket));
+		}
+	}
+	
 	@Override
 	public Ticket getTicket(int idTicket) {
 		Optional<List<TblTicket>> list = jpaTicketRepository.getTicket(idTicket);
@@ -484,7 +537,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 					String usecase = "";
 					if (ticket.getUseCaseId().equals(Constants.USE_CASE_INTERNET)) {
 						usecase = Constants.TICKET_INTERNET_HFC;
-					} else if (ticket.getUseCaseId()	.equals(Constants.USE_CASE_INTERNET_GPON)) {
+					} else if (ticket.getUseCaseId().equals(Constants.USE_CASE_INTERNET_GPON)) {
 						usecase = Constants.TICKET_INTERNET_GPON;
 					} else if (ticket.getUseCaseId().equals(Constants.USE_CASE_CABLE)) {
 						usecase = Constants.TICKET_TV;
@@ -538,7 +591,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 						lstClientData.add(clientData);
 						
 						// Campos adicionales para Averia Individual - Averia Individual asociada a una masiva
-						/*clientData = new AdditionalData();
+						clientData = new AdditionalData();
 						clientData.setKey(Constants.LABEL_SUBTITLE);
 						clientData.setValue(StringUtil.validateEmptyField(equivalence.getSubtitle()));
 						lstClientData.add(clientData);
@@ -567,7 +620,7 @@ public class TicketRepositoryImpl implements TicketRepository {
 						clientData = new AdditionalData();
 						clientData.setKey(Constants.LABEL_ACTION_BUTTON2);
 						clientData.setValue(StringUtil.validateEmptyField(equivalence.getActionbutton2()));
-						lstClientData.add(clientData);*/
+						lstClientData.add(clientData);
 					}
 				}
 			}

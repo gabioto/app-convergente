@@ -31,7 +31,8 @@ import com.tdp.ms.autogestion.repository.datasource.db.entities.TblTicket;
 public interface JpaTicketRepository extends JpaRepository<TblTicket, Integer> {
 
 	@Query
-	(value = "SELECT t FROM TblTicket t "
+	(value = "SELECT t "
+			+ "FROM TblTicket t "
 			+ "WHERE t.tblCustomer.id.documentType = ?1 "
 			+ "AND t.tblCustomer.id.documentNumber = ?2 "
 			+ "AND t.tblCustomer.id.serviceCode = ?3 "
@@ -42,7 +43,8 @@ public interface JpaTicketRepository extends JpaRepository<TblTicket, Integer> {
 			String reference, String involvement, LocalDateTime creationDate, LocalDateTime endDate);
 
 	@Query
-	(value = "SELECT t FROM TblTicket t "
+	(value = "SELECT t "
+			+ "FROM TblTicket t "
 			+ "WHERE t.tblCustomer.id.documentType = ?1 "
 			+ "AND t.tblCustomer.id.documentNumber = ?2 "
 			+ "AND t.tblCustomer.id.serviceCode = ?3 "
@@ -68,7 +70,6 @@ public interface JpaTicketRepository extends JpaRepository<TblTicket, Integer> {
 	@Modifying
 	@Query
 	(value = "UPDATE TblTicket t SET t.status = ?2, modifiedDateTicket = ?3 WHERE t.idTicketTriage = ?1")
-	void updateTicketStatus(int idTicket, String status, LocalDateTime sysDate);
+	void updateTicketStatus(int idTicketTriage, String status, LocalDateTime sysDate);
 
-	
 }

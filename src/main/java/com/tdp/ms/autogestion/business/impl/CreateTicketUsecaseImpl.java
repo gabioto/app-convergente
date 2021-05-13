@@ -54,27 +54,29 @@ public class CreateTicketUsecaseImpl implements CreateTicketUseCase {
 			ticket.setCustomer(new Customer(documentNumber, documentType, request.getRelatedObject().getReference()));
 			ticket.setTechnology(technology);
 			switch (request.getRelatedObject().getInvolvement()) {
-			case Constants.INTERNET:
-				if (technology.equals(Constants.TECHNOLOGY_HFC)) {
-					ticket.setUseCaseId(Constants.USE_CASE_INTERNET);
-				} else if (technology.equals(Constants.TECHNOLOGY_GPON)) {
-					ticket.setUseCaseId(Constants.USE_CASE_INTERNET_GPON);
-				} else {
-					ticket.setUseCaseId(Constants.USE_CASE_INTERNET);
-				}
-				break;
-			case Constants.FIJA:
-				ticket.setUseCaseId(Constants.USE_CASE_FIJA);
-				break;
-			case Constants.CABLE:
-				ticket.setUseCaseId(Constants.USE_CASE_CABLE);
-				break;
-			case Constants.MOVIL:
-				ticket.setUseCaseId(Constants.USE_CASE_MOVIL);				
-				break;
-			default:
-				ticket.setUseCaseId("");
-				break;
+				case Constants.INTERNET:
+					if (technology.equals(Constants.TECHNOLOGY_HFC)) {
+						ticket.setUseCaseId(Constants.USE_CASE_INTERNET);
+					} else if (technology.equals(Constants.TECHNOLOGY_ADSL)) {
+						ticket.setUseCaseId(Constants.USE_CASE_INTERNET);
+					} else if (technology.equals(Constants.TECHNOLOGY_GPON)) {
+						ticket.setUseCaseId(Constants.USE_CASE_INTERNET_GPON);
+					} else {
+						ticket.setUseCaseId(Constants.USE_CASE_INTERNET);
+					}
+					break;
+				case Constants.FIJA:
+					ticket.setUseCaseId(Constants.USE_CASE_FIJA);
+					break;
+				case Constants.CABLE:
+					ticket.setUseCaseId(Constants.USE_CASE_CABLE);
+					break;
+				case Constants.MOVIL:
+					ticket.setUseCaseId(Constants.USE_CASE_MOVIL);				
+					break;
+				default:
+					ticket.setUseCaseId("");
+					break;
 			}
 			ticket.setSubOperationCode(Constants.SUB_OPERATION_CODE);
 			ticket.setProductIdentifier(productIdentifier);

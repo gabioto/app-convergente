@@ -98,27 +98,30 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 	private List<Integer> getListIds(List<Ticket> tickets) {
 		List<Integer> listIds = new ArrayList<>();
 		
-		if (tickets != null) {
+		if (!tickets.isEmpty()) {
 			String idTicketTriage = "";
+			int count = 0;
 			for (Ticket ticket : tickets) {
 				if (idTicketTriage.isEmpty()) {
 					idTicketTriage = ticket.getIdTriage().toString();
-					listIds.add(0, ticket.getId());
-					if (ticket.getTicketStatus().equals(TicketStatus.WA_DEFAULT.name())
-							|| ticket.getTicketStatus().equals(TicketStatus.WA_DEFAULT_SOLVED.name())) {
-						break;
-					}
-				} else if (idTicketTriage.equals(ticket.getIdTriage().toString())
-						&& (ticket.getTicketStatus().equals(TicketStatus.WA_DEFAULT.name())
-								|| ticket.getTicketStatus().equals(TicketStatus.WA_DEFAULT_SOLVED.name()))) {
+					listIds.add(0, ticket.getId());					
+				} else if (idTicketTriage.equals(ticket.getIdTriage().toString()) && count == 0) {						
 					idTicketTriage = ticket.getIdTriage().toString();
 					listIds.remove(0);
 					listIds.add(0, ticket.getId());
+					count++;
+				} else if (!idTicketTriage.equals(ticket.getIdTriage().toString())) {
+					listIds.add(1, ticket.getId());
 					break;
-				} else {
-					idTicketTriage = ticket.getIdTriage().toString();
-					listIds.remove(0);
-					listIds.add(0, ticket.getId());
+				}
+				if (ticket.getTicketStatus().equals(TicketStatus.WA_DEFAULT.name())
+						|| ticket.getTicketStatus().equals(TicketStatus.WA_DEFAULT_SOLVED.name())) {
+					if (count > 0) {
+						listIds.remove(0);
+						listIds.add(0, ticket.getId());						
+					} else {
+						count++;
+					}
 				}
 			}
 		}
@@ -128,8 +131,8 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 	private ResponseEntity<TicketStatusResponse> evaluateTicketStatus(List<Integer> listIds) throws ParseException {
 		Ticket ticket = ticketRepository.getTicket(listIds.get(0));
 		
-		int minutesTimeout = getMinutesTimeout(ticket);
-		if (minutesTimeout >= Constants.INT_MINUTES_TIMEOUT) {
+		int minutesTimeout = getHoursTimeout(ticket);
+		if (minutesTimeout >= Constants.INT_HOURS_TIMEOUT && validateStatus(ticket)) {
 			ticket = updateTicketStatus(ticket);
 		}
 		if (validateStatus(ticket)) {
@@ -171,8 +174,8 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 		if (!listIds.isEmpty()) {
 			ticket = ticketRepository.getTicket(listIds.get(0));
 			
-			int minutesTimeout = getMinutesTimeout(ticket);
-			if (minutesTimeout >= Constants.INT_MINUTES_TIMEOUT) {
+			int minutesTimeout = getHoursTimeout(ticket);
+			if (minutesTimeout >= Constants.INT_HOURS_TIMEOUT && validateStatus(ticket)) {
 				ticket = updateTicketStatus(ticket);
 			}			
 			if (ticket.getInvolvement().equals(Constants.CABLE) && ticket.getTicketStatus().equals(TicketStatus.REFRESH.name())) {
@@ -204,17 +207,17 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 
 	private Ticket updateTicketStatus(Ticket ticket) {
 		if (ticket.getTicketStatus().equals(TicketStatus.WHATSAPP.name())) {
-			ticket = ticketRepository.updateTicketStatus(ticket.getIdTriage(), TicketStatus.WA_SOLVED.name());					
+			ticket = ticketRepository.updateTicketStatusTimeout(ticket.getId(), TicketStatus.WA_SOLVED.name());					
 		} else if (ticket.getTicketStatus().equals(TicketStatus.GENERIC.name())) {
-			ticket = ticketRepository.updateTicketStatus(ticket.getIdTriage(), TicketStatus.GENERIC_SOLVED.name());					
+			ticket = ticketRepository.updateTicketStatusTimeout(ticket.getId(), TicketStatus.GENERIC_SOLVED.name());					
 		} else if (ticket.getTicketStatus().equals(TicketStatus.FAULT.name())) {
-			ticket = ticketRepository.updateTicketStatus(ticket.getIdTriage(), TicketStatus.FAULT_SOLVED.name());					
+			ticket = ticketRepository.updateTicketStatusTimeout(ticket.getId(), TicketStatus.FAULT_SOLVED.name());					
 		} else if (ticket.getTicketStatus().equals(TicketStatus.RESET_SOLVED.name())) {
-			ticket = ticketRepository.updateTicketStatus(ticket.getIdTriage(), TicketStatus.SOLVED.name());					
+			ticket = ticketRepository.updateTicketStatusTimeout(ticket.getId(), TicketStatus.SOLVED.name());					
 		} else if (ticket.getTicketStatus().equals(TicketStatus.WA_DEFAULT.name())) {
-			ticket = ticketRepository.updateTicketStatus(ticket.getIdTriage(), TicketStatus.WA_DEFAULT_SOLVED.name());					
+			ticket = ticketRepository.updateTicketStatusTimeout(ticket.getId(), TicketStatus.WA_DEFAULT_SOLVED.name());					
 		} else if (ticket.getTicketStatus().equals(TicketStatus.REFRESH.name())) {
-			ticket = ticketRepository.updateTicketStatus(ticket.getIdTriage(), TicketStatus.REFRESH_SOLVED.name());					
+			ticket = ticketRepository.updateTicketStatusTimeout(ticket.getId(), TicketStatus.REFRESH_SOLVED.name());					
 		}
 		return ticket;
 	}
@@ -239,8 +242,8 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 		return minutes; 
 	}
 
-	private int getMinutesTimeout(Ticket ticket) throws ParseException {
-		int minutes = 0;
+	private int getHoursTimeout(Ticket ticket) throws ParseException {
+		int hours = 0;
 		String dateCreation = ticket.getCreationDate().toString().replace("T", " ");
 		String dateActual = LocalDateTime.now(ZoneOffset.of(Constants.ZONE_OFFSET)).toString().replace("T", " " );
 			
@@ -249,7 +252,7 @@ public class RetrieveTicketsUseCaseImpl implements RetrieveTicketsUseCase {
 		Date d1 = format.parse(dateCreation);
 		Date d2 = format.parse(dateActual);
 		long diff = d2.getTime() - d1.getTime();
-		minutes = (int) TimeUnit.MILLISECONDS.toSeconds(diff);		
-		return minutes; 
+		hours = (int) TimeUnit.MILLISECONDS.toHours(diff);		
+		return hours; 
 	}
 }

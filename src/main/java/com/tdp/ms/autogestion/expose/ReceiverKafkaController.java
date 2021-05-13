@@ -236,10 +236,10 @@ public class ReceiverKafkaController {
 									status = TicketStatus.GENERIC.toString();
 								}
 							} else if (tblTicket.getInvolvement().equals(Constants.INTERNET)) {							
-								if (equivalence.getAction().equals(TicketStatus.RESET_SOLVED.name()) && indicadorReset) {
+								if (equivalence.getAction().equals(TicketStatus.RESET_SOLVED.name()) && Boolean.TRUE.equals(indicadorReset)) {
 									status = TicketStatus.RESET_SOLVED.toString();
 								} else if (equivalence.getAction().equals(TicketStatus.RESET_SOLVED.name())
-										&& !indicadorReset) {
+										&& Boolean.FALSE.equals(indicadorReset)) {
 									status = TicketStatus.SOLVED.toString();
 								} else if (equivalence.getAction().equals(TicketStatus.FAULT.name())) {
 									status = TicketStatus.FAULT.toString();
@@ -267,14 +267,13 @@ public class ReceiverKafkaController {
 				functionsUtil.saveLogData(logdata);
 			}
 		} catch (Exception e) {
-			log.error(this.getClass().getName() + " - Message: " + ticketKafkaResponse.toString());
-			log.error(this.getClass().getName() + " - Exception: " + e.getLocalizedMessage());
+			log.error(this.getClass().getName().concat(" - Exception: ").concat(e.getLocalizedMessage()));
 			
 			LogData logdata = new LogData();
 			logdata.setActionLog("Kafka listener");
 			logdata.setIdTicketTriaje(Integer.parseInt(ticketKafkaResponse.getEvent().getTroubleTicket().getId()));			
 			logdata.setRequest(message);
-			logdata.setRequest(e.getMessage());
+			logdata.setRequest(e.getLocalizedMessage());
 			logdata.setTypeLog("Insert Ticket Fcr");
 			functionsUtil.saveLogData(logdata);
 		}

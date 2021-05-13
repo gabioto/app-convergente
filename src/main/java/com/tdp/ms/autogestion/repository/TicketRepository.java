@@ -15,7 +15,9 @@ public interface TicketRepository {
 
 	void saveGeneratedTicket(Ticket pTicket);
 
-	Ticket updateTicketStatus(int idTicket, String status);
+	Ticket updateTicketStatus(int idTicketTriage, String status);
+	
+	Ticket updateTicketStatusTimeout(int idTicket, String status);
 
 	List<Ticket> findByCustomerAndUseCase(String docType, String docNumber, String reference, String involvement,
 			LocalDateTime creationDate, LocalDateTime endDate);

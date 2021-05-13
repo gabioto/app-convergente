@@ -34,10 +34,10 @@ public class Constants {
 	public static final String CODE_REFRESH_OK = "20000123-202";
 	public static final String TECHNOLOGY_HFC = "HFC";
 	public static final String TECHNOLOGY_ADSL = "ADSL";
-	public static final String TECHNOLOGY_GPON = "GPON";
+	public static final String TECHNOLOGY_GPON = "FFTH";
 	public static final String LABEL_TIME = "TIME";
 	public static final Integer INT_MINUTES = 240;
-	public static final Integer INT_MINUTES_TIMEOUT = 1800; 
+	public static final Integer INT_HOURS_TIMEOUT = 12;
 	public static final String LABEL_SUBTITLE = "SUBTITLE";
 	public static final String LABEL_SUBTITLE2 = "SUBTITLE2";
 	public static final String LABEL_ICON2 = "ICON2";

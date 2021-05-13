@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.google.gson.Gson;
 import com.tdp.ms.autogestion.business.UpdateTicketStatusUseCase;
 import com.tdp.ms.autogestion.exception.DomainException;
 import com.tdp.ms.autogestion.exception.ErrorCategory;
@@ -76,12 +75,16 @@ public class UpdateTicketStatusUseCaseImpl implements UpdateTicketStatusUseCase 
 			} else {
 				throw new ValidRequestException(ErrorCategory.MISSING_MANDATORY, "idTicket is empty or null");
 			}
-		}  catch (DomainException e) {
+		} catch (ResourceNotFoundException e) {
 			log.error(this.getClass().getName() + " - Exception: " + e.getLocalizedMessage());
 			
 			throw e;
-		}catch (Exception e) {
-			log.error(this.getClass().getName() + " - Exception: " + e.getMessage());
+		} catch (DomainException e) {
+			log.error(this.getClass().getName() + " - Exception: " + e.getLocalizedMessage());
+			
+			throw e;
+		} catch (Exception e) {
+			log.error(this.getClass().getName() + " - Exception: " + e.getLocalizedMessage());
 
 			throw new GenericDomainException(ErrorCategory.UNEXPECTED, e.getLocalizedMessage());
 		}
