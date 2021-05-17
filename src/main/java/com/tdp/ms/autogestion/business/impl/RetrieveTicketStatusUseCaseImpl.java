@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.google.gson.Gson;
 import com.tdp.ms.autogestion.business.RetrieveTicketStatusUseCase;
 import com.tdp.ms.autogestion.exception.DomainException;
 import com.tdp.ms.autogestion.exception.ErrorCategory;
