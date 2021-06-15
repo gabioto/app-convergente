@@ -63,8 +63,8 @@ public class UpdateTicketStatusUseCaseImpl implements UpdateTicketStatusUseCase 
 						ResponseEntity<TicketStatusResponse> ticketStatusResponse = new ResponseEntity<>(
 								TicketStatusResponse.from(ticket, new ArrayList<>()), HttpStatus.OK);
 
-						functionsUtil.saveLogData(new LogData(idTicket, ticket.getCustomer().getNationalType(),
-								ticket.getCustomer().getNationalId(), "Update Ticket", "updateTicketStatus",
+						functionsUtil.saveLogData(new LogData(idTicket, ticket.getCustomer().getNationalId(),
+								ticket.getCustomer().getNationalType(), "Update Ticket", "updateTicketStatus",
 								String.valueOf(idTicket).concat("|").concat(status), ticketStatusResponse.toString(),
 								"Update Ticket"));
 

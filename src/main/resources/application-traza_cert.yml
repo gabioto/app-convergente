@@ -2,7 +2,7 @@ spring:
   application:
     name: trazabilidad-autogestion
   jpa:
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         temp:
@@ -32,4 +32,4 @@ app:
     
 logging:
   level:
-    com.tdp.ms.autogestion: ERROR    
+    com.tdp.ms.autogestion: ERROR
