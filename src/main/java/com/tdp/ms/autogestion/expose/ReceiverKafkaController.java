@@ -259,11 +259,12 @@ public class ReceiverKafkaController {
 				ticketRepository.save(tblTicket);
 				LogData logdata = new LogData();
 				logdata.setActionLog("Kafka listener");
+				logdata.setChannel("Insert Ticket Fcr");
 				logdata.setIdTicketTriaje(tblTicket.getIdTicketTriage());
 				logdata.setDocumentType(tblTicket.getTblCustomer().getId().getDocumentType());
 				logdata.setDocumentNumber(tblTicket.getTblCustomer().getId().getDocumentNumber());
 				logdata.setRequest(message);
-				logdata.setTypeLog("Insert Ticket Fcr");
+				logdata.setTypeLog("insertTicketFcr");
 				functionsUtil.saveLogData(logdata);
 			}
 		} catch (Exception e) {
@@ -274,7 +275,8 @@ public class ReceiverKafkaController {
 			logdata.setIdTicketTriaje(Integer.parseInt(ticketKafkaResponse.getEvent().getTroubleTicket().getId()));			
 			logdata.setRequest(message);
 			logdata.setRequest(e.getLocalizedMessage());
-			logdata.setTypeLog("Insert Ticket Fcr");
+			logdata.setChannel("Insert Ticket Fcr");
+			logdata.setTypeLog("insertTicketFcr");
 			functionsUtil.saveLogData(logdata);
 		}
 	}
