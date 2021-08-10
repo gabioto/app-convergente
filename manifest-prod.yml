@@ -2,7 +2,7 @@
 applications:
   - name: ms-ne-mimovistar-averias-prod
     memory: 2GB
-    path: ms.autogestion-0.0.1-SNAPSHOT.jar
+    path: target/ms.autogestion-0.0.1-SNAPSHOT.jar
     buildpack: liberty-for-java
     health-check-type: process
     disk_quota: 2GB

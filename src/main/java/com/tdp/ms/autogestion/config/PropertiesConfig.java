@@ -3,7 +3,8 @@ package com.tdp.ms.autogestion.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
@@ -23,9 +24,9 @@ import lombok.NoArgsConstructor;
  *         </ul>
  * @version 1.0
  */
-
+@Data
 @NoArgsConstructor
-@Getter
+@EqualsAndHashCode(callSuper = false)
 @Component
 public class PropertiesConfig {
 
