@@ -13,10 +13,9 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   datasource:
     hikari:
-      connectionTimeout: 30000
-      maximumPoolSize: 100
-      minimum-idle: 10
-
+      connection-timeout: 30000
+      maximum-pool-size: 200
+      minimum-idle: 100
   kafka:
     bootstrap-servers: cap-sg-prd-5.securegateway.appdomain.cloud:18987
 
