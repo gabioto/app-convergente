@@ -95,7 +95,7 @@ public class RetrieveTicketStatusUseCaseTest {
 	private void retrieveTicketStatusComplete() {
 		when(ticketRepository.getTicketStatus(anyInt())).thenReturn(lstTicket);
 
-		when(ticketRepository.getAdditionalData(any(Ticket.class))).thenReturn(lstAdditionalData);
+		when(ticketRepository.getAdditionalData(any(Ticket.class), any(Integer.class))).thenReturn(lstAdditionalData);
 
 		doNothing().when(functionsUtil).saveLogData(any(LogData.class));
 

@@ -23,7 +23,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
-import com.tdp.ms.autogestion.expose.KafkaController;
+import com.tdp.ms.autogestion.expose.ReceiverKafkaController;
 import com.tdp.ms.autogestion.model.LogData;
 import com.tdp.ms.autogestion.model.TicketStatus;
 import com.tdp.ms.autogestion.repository.datasource.db.JpaAdditionalDataRepository;
@@ -41,10 +41,10 @@ import com.tdp.ms.autogestion.repository.datasource.db.entities.TblTicket;
 import com.tdp.ms.autogestion.util.FunctionsUtil;
 
 @ExtendWith(MockitoExtension.class)
-public class KafkaControllerTest {
+public class ReceiverKafkaControllerTest {
 
 	@InjectMocks
-	private KafkaController kafkaController;
+	private ReceiverKafkaController kafkaController;
 
 	@Mock
 	private JpaTicketRepository ticketRepository;
@@ -281,7 +281,7 @@ public class KafkaControllerTest {
 
 		when(equivalenceRepository.getEquivalence(anyInt())).thenReturn(Optional.of(lstTblEquivalence));
 
-		when(equivalenceNotificationRepository.getEquivalence(anyString()))
+		when(equivalenceNotificationRepository.getEquivalence(anyString(), anyString()))
 				.thenReturn(Optional.of(tblEquivalenceNotification));
 
 		when(ticketRepository.save(any(TblTicket.class))).thenReturn(new TblTicket());
