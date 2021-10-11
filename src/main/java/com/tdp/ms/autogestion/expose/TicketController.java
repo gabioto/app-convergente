@@ -50,7 +50,7 @@ public class TicketController {
 	private UpdateTicketStatusUseCase updateTicketStatusUseCase;
 
 	// Creación de ticket
-	@PostMapping(produces = { MediaType.APPLICATION_JSON_VALUE })
+	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<TicketCreateResponse> createTicket(@Valid @RequestBody TicketCreateRequest request)
 			throws Exception {
