@@ -12,13 +12,12 @@ import com.azure.messaging.eventhubs.models.CreateBatchOptions;
 
 public class HumioAppender extends AppenderBase<ILoggingEvent> {
 
-    private final String connectStr =
-            System.getenv("HUMIO_CONNECTION") != null ? System.getenv("HUMIO_CONNECTION") : "";
-    private final String queueStatus =
-            System.getenv("HUMIO_ACTIVE") != null ? System.getenv("HUMIO_ACTIVE") : "false";
-    private final String applicationName =
-            System.getenv("HUMIO_APPLICATION_NAME") != null ? System.getenv("HUMIO_APPLICATION_NAME")
-                    : "";
+    private final String connectStr ="Endpoint=sb://ehub-appconvergente-humio-dev.servicebus.windows.net/;SharedAccessKeyName=develop;SharedAccessKey=kRrOZkM+HD6ABoIgNknkSHD5vhimHXz/gV0uWB15Yo4=;EntityPath=humio";
+            //System.getenv("HUMIO_CONNECTION") != null ? System.getenv("HUMIO_CONNECTION") : "";
+    private final String queueStatus ="true";
+            //System.getenv("HUMIO_ACTIVE") != null ? System.getenv("HUMIO_ACTIVE") : "false";
+    private final String applicationName ="ms-trazabilidad-autogestion";
+            //System.getenv("HUMIO_APPLICATION_NAME") != null ? System.getenv("HUMIO_APPLICATION_NAME"): "";
 
     private EventHubProducerAsyncClient eventHubProducerClient;
     private PatternLayout patternLayout;

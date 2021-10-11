@@ -238,8 +238,8 @@
 				<version>1.12.0</version>
 				<configuration>
 					<schemaVersion>V2</schemaVersion>
-					<resourceGroup>RG-AppConvergente-dev</resourceGroup>
-					<appName>WA-appconvergente-averias-dev</appName>
+					<resourceGroup>RG-AppConvergente-cert</resourceGroup>
+					<appName>WA-appconvergente-averias-cert</appName>
 					<region>southcentralus</region>
 					<runtime>
 						<os>linux</os>

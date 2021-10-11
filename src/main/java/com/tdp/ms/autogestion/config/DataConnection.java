@@ -8,10 +8,10 @@ public class DataConnection {
 	private String password;
 
 	public DataConnection() throws Exception {
-		this.url = System.getenv("TDP_URL");
-		this.driverclassname = System.getenv("TDP_DRIVERCLASSNAME");
-		this.username = System.getenv("TDP_USERNAME");
-		this.password = System.getenv("TDP_PASSWORD");
+		this.url = "jdbc:postgresql://1ca72738-f3c8-4479-a5a4-e693416200d8.b2b5a92ee2df47d58bad0fa448c15585.databases.appdomain.cloud:31174/ibmclouddb";//System.getenv("TDP_URL");
+		this.driverclassname = "org.postgresql.Driver";//System.getenv("TDP_DRIVERCLASSNAME");
+		this.username = "user_averia"; //System.getenv("TDP_USERNAME");
+		this.password = "SyDe2VrKZH"; //System.getenv("TDP_PASSWORD");
 	}
 
 	public DataConnection(String driverclassname, String url, String username, String password) {

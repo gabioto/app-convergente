@@ -109,7 +109,7 @@ public class RequestAndResponseLoggingFilter extends OncePerRequestFilter {
         if (content.length > 0) {
             //  logContent(content, response.getContentType(), response.getCharacterEncoding(), prefix);
         }
-        String queueNameBackend = System.getenv("HUMIO_APPLICATION_NAME") != null ? System.getenv("HUMIO_APPLICATION_NAME") : "";
+        String queueNameBackend = "ms-trazabilidad-autogestion";//System.getenv("HUMIO_APPLICATION_NAME") != null ? System.getenv("HUMIO_APPLICATION_NAME") : "";
 
 
         String message = new StringBuilder()
