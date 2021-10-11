@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 public class HumioHttpInterceptor implements WebFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HumioHttpInterceptor.class);
-    String queueNameBackend = "ms-trazabilidad-autogestion";//System.getenv("HUMIO_APPLICATION_NAME") != null ? System.getenv("HUMIO_APPLICATION_NAME") : "";
+    String queueNameBackend = System.getenv("HUMIO_APPLICATION_NAME") != null ? System.getenv("HUMIO_APPLICATION_NAME") : "";
 
     @Override
     public Mono<Void> filter(ServerWebExchange serverWebExchange, WebFilterChain webFilterChain) {
