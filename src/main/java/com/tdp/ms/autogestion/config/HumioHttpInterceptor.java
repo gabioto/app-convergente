@@ -24,9 +24,9 @@ public class HumioHttpInterceptor implements WebFilter {
         long init = System.currentTimeMillis();
 
         serverWebExchange.getResponse().beforeCommit(() -> {
-        	if(!filterRoutes(serverWebExchange.getRequest())) {
+        	//if(!filterRoutes(serverWebExchange.getRequest())) {
         		logMetric(serverWebExchange.getRequest(), serverWebExchange.getResponse(), init);
-        	}
+        	//}
             return Mono.empty();
         });
 
@@ -43,13 +43,13 @@ public class HumioHttpInterceptor implements WebFilter {
         LOGGER.info(message);
     }
     
-    private boolean filterRoutes(ServerHttpRequest request) {
-		return (HttpMethod.GET == request.getMethod() &&
-				(
-				StringUtils.equalsAny(request.getPath().toString(), "/", "/robots933456.txt")
-				|| StringUtils.startsWithAny(request.getPath().toString(), 
-						"/actuator", "/swagger-ui", "/webjars", "/v3/api-docs")
-				)
-			);
-	}
+//    private boolean filterRoutes(ServerHttpRequest request) {
+//		return (HttpMethod.GET == request.getMethod() &&
+//				(
+//				StringUtils.equalsAny(request.getPath().toString(), "/", "/robots933456.txt")
+//				|| StringUtils.startsWithAny(request.getPath().toString(), 
+//						"/actuator", "/swagger-ui", "/webjars", "/v3/api-docs")
+//				)
+//			);
+//	}
 }
