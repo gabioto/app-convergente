@@ -74,8 +74,8 @@ public class ReceiverKafkaController {
 	@Autowired
 	EntityManager entityManager;
 
-	@Transactional
-	@KafkaListener(topics = "${app.topic.foo}")
+	//@Transactional
+	//@KafkaListener(topics = "${app.topic.foo}")
 	public void listen(@Payload String message) {
 		TicketKafkaResponse ticketKafkaResponse = new Gson().fromJson(message, TicketKafkaResponse.class);
 
