@@ -103,7 +103,7 @@ public class ReceiverKafkaController {
 				tblTicket.setSeverity(ticketKafkaResponse.getEvent().getTroubleTicket().getSeverity());
 				tblTicket.setStatusTicket(TicketStatus.CREATED.toString());
 				tblTicket.setTicketType(ticketKafkaResponse.getEvent().getTroubleTicket().getType());
-				
+
 				AdditionalData ticketAdditionalData = ticketKafkaResponse.getEvent().getTroubleTicket()
 						.getAdditionalData().stream().filter(x -> x.getKey().equals("use-case-id")).findAny()
 						.orElse(null);
@@ -132,7 +132,8 @@ public class ReceiverKafkaController {
 						tblAttachment = new TblAttachment();
 						tblAttachment.setIdAttachmentKafka(Integer.parseInt(attachment.getAttachmentId()));
 						tblAttachment.setNameAttachment(attachment.getName());
-						tblAttachment.setCreationDate(DateUtil.formatStringToLocalDateTime(attachment.getCreationDate()));
+						tblAttachment
+								.setCreationDate(DateUtil.formatStringToLocalDateTime(attachment.getCreationDate()));
 						tblAttachment.setTblTicket(tblTicket);
 						tblAttachment = attachmentRepository.saveAndFlush(tblAttachment);
 						additionalDataLista = attachment.getAdditionalData();
@@ -144,7 +145,8 @@ public class ReceiverKafkaController {
 							}
 							tblAttachmentAdditionalData = new TblAttachmentAdditionalData();
 							tblAttachmentAdditionalData.setKeyAttachmentAdditional(additionalDataLista.get(i).getKey());
-							tblAttachmentAdditionalData.setValueAttachmentAdditional(additionalDataLista.get(i).getValue());
+							tblAttachmentAdditionalData
+									.setValueAttachmentAdditional(additionalDataLista.get(i).getValue());
 							tblAttachmentAdditionalData.setTblAttachment(tblAttachment);
 							entityManager.persist(tblAttachmentAdditionalData);
 						}
@@ -163,10 +165,9 @@ public class ReceiverKafkaController {
 						additionalDataRepository.saveAndFlush(tblAdditionalData);
 					}
 				}
-				
+
 				// Logica:: Update status_ticket
 				String status = TicketStatus.IN_PROGRESS.name();
-				Boolean indicadorReset = Boolean.FALSE;
 
 				Optional<List<TblEquivalence>> tableEquivalence = equivalenceRepository
 						.getEquivalence(tblTicket.getIdTicket());
@@ -174,7 +175,8 @@ public class ReceiverKafkaController {
 				if (tableEquivalence.isPresent()) {
 					List<TblEquivalence> lstEquivalence = tableEquivalence.get();
 
-					if (tblTicket.getInvolvement().equals(Constants.INTERNET) && !tblTicket.getTechnology().equals(Constants.TECHNOLOGY_GPON)) {					
+					if (tblTicket.getInvolvement().equals(Constants.INTERNET)
+							&& !tblTicket.getTechnology().equals(Constants.TECHNOLOGY_GPON)) {
 						for (TblEquivalence tblEquivalence : lstEquivalence) {
 							for (Attachment attachment : listAttachment) {
 								// Validar si el attachment existe en la tabla de equivalencias
@@ -184,13 +186,13 @@ public class ReceiverKafkaController {
 										// Validamos si se realizo un reset
 										if (attachmentAdditionalData.getKey().equals("estado-reset-modem-ok")) {
 											status = TicketStatus.RESET.name();
-											indicadorReset = Boolean.TRUE;
 										}
 									}
 								}
 							}
 						}
-					} else if (tblTicket.getInvolvement().equals(Constants.INTERNET) && tblTicket.getTechnology().equals(Constants.TECHNOLOGY_GPON)) {
+					} else if (tblTicket.getInvolvement().equals(Constants.INTERNET)
+							&& tblTicket.getTechnology().equals(Constants.TECHNOLOGY_GPON)) {
 						for (TblEquivalence tblEquivalence : lstEquivalence) {
 							for (Attachment attachment : listAttachment) {
 								// Validar si el attachment existe en la tabla de equivalencias
@@ -200,13 +202,12 @@ public class ReceiverKafkaController {
 										// Validamos si se realizo un reset
 										if (attachmentAdditionalData.getKey().equals("sincronismo-modem-ont-ok")) {
 											status = TicketStatus.RESET.name();
-											indicadorReset = Boolean.TRUE;
 										}
 									}
 								}
 							}
 						}
-					}					
+					}
 				}
 
 				for (AdditionalData additionalData : AdditionalDataList) {
@@ -223,7 +224,7 @@ public class ReceiverKafkaController {
 								.getEquivalence(tblAdditionalData.getValueAdditional(), usecase);
 						if (tblEquivalenceNotification.isPresent()) {
 							TblEquivalenceNotification equivalence = tblEquivalenceNotification.get();
-							
+
 							// Validar el estado del notification_id
 							if (tblTicket.getInvolvement().equals(Constants.CABLE)) {
 								if (equivalence.getCode().equals(Constants.CODE_REFRESH_OK)) {
@@ -235,12 +236,9 @@ public class ReceiverKafkaController {
 								} else if (equivalence.getAction().equals(TicketStatus.GENERIC.name())) {
 									status = TicketStatus.GENERIC.toString();
 								}
-							} else if (tblTicket.getInvolvement().equals(Constants.INTERNET)) {							
-								if (equivalence.getAction().equals(TicketStatus.RESET_SOLVED.name()) && Boolean.TRUE.equals(indicadorReset)) {
+							} else if (tblTicket.getInvolvement().equals(Constants.INTERNET)) {
+								if (equivalence.getAction().equals(TicketStatus.RESET_SOLVED.name())) {
 									status = TicketStatus.RESET_SOLVED.toString();
-								} else if (equivalence.getAction().equals(TicketStatus.RESET_SOLVED.name())
-										&& Boolean.FALSE.equals(indicadorReset)) {
-									status = TicketStatus.SOLVED.toString();
 								} else if (equivalence.getAction().equals(TicketStatus.FAULT.name())) {
 									status = TicketStatus.FAULT.toString();
 								} else if (equivalence.getAction().equals(TicketStatus.WHATSAPP.name())) {
@@ -269,10 +267,10 @@ public class ReceiverKafkaController {
 			}
 		} catch (Exception e) {
 			log.error(this.getClass().getName().concat(" - Exception: ").concat(e.getLocalizedMessage()));
-			
+
 			LogData logdata = new LogData();
 			logdata.setActionLog("Kafka listener");
-			logdata.setIdTicketTriaje(Integer.parseInt(ticketKafkaResponse.getEvent().getTroubleTicket().getId()));			
+			logdata.setIdTicketTriaje(Integer.parseInt(ticketKafkaResponse.getEvent().getTroubleTicket().getId()));
 			logdata.setRequest(message);
 			logdata.setRequest(e.getLocalizedMessage());
 			logdata.setChannel("Insert Ticket Fcr");
